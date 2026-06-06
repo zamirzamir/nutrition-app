@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор питания</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f2;
+    --text: #1d1d1f;
+    --text2: #6e6e73;
+    --accent: #0071e3;
+    --border: #d2d2d7;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --protein-color: #34c759;
+    --fat-color: #ff9f0a;
+    --carb-color: #0071e3;
+    --loss-color: #ff3b30;
+    --hold-color: #0071e3;
+    --gain-color: #34c759;
+  }
+
+  [data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text2: #8e8e93;
+    --accent: #0a84ff;
+    --border: #3a3a3c;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    --protein-color: #30d158;
+    --fat-color: #ffd60a;
+    --carb-color: #0a84ff;
+    --loss-color: #ff453a;
+    --hold-color: #0a84ff;
+    --gain-color: #30d158;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+
+  .theme-toggle {
+    background: var(--surface2);
+    border: none;
+    border-radius: 50px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+  }
+  .theme-toggle:hover { background: var(--border); }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .subtitle {
+    color: var(--text2);
+    font-size: 15px;
+    margin-top: -8px;
+  }
+
+  /* --- Inputs card --- */
+  .inputs-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .weights-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input[type="number"] {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  .unit {
+    font-size: 14px;
+    color: var(--text2);
+    text-align: right;
+    margin-top: -4px;
+  }
+
+  /* --- Segment controls --- */
+  .segment-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .segment {
+    display: flex;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .seg-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    border-radius: 9px;
+    padding: 10px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .seg-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+
+  .seg-btn.active.loss { color: var(--loss-color); }
+  .seg-btn.active.hold { color: var(--hold-color); }
+  .seg-btn.active.gain { color: var(--gain-color); }
+
+  /* --- Safety badge --- */
+  .safety-badge {
+    display: none;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #856404;
+    line-height: 1.5;
+  }
+  [data-theme="dark"] .safety-badge {
+    background: #332900;
+    border-color: #664d00;
+    color: #ffd60a;
+  }
+  .safety-badge.visible { display: block; }
+
+  /* --- Results --- */
+  .results {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .results.visible { display: flex; }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 4px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: transform 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); }
+
+  .card.calories {
+    grid-column: 1 / -1;
+    color: white;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card.calories.loss-bg { background: var(--loss-color); }
+  .card.calories.hold-bg { background: var(--hold-color); }
+  .card.calories.gain-bg { background: var(--gain-color); }
+
+  .card.calories .card-label { color: rgba(255,255,255,0.75); }
+  .card.calories .card-value { font-size: 42px; color: white; }
+  .card.calories .card-unit { color: rgba(255,255,255,0.75); }
+
+  .card-icon { font-size: 22px; margin-bottom: 6px; }
+  .card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .card-value {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .card-unit {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  /* --- Maintenance info --- */
+  .maintenance-info {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 16px 20px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .maintenance-info .mi-label { color: var(--text2); }
+  .maintenance-info .mi-value { font-weight: 700; font-size: 16px; }
+
+  /* --- Chart --- */
+  .chart-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bar-row { display: flex; flex-direction: column; gap: 6px; }
+  .bar-header { display: flex; justify-content: space-between; align-items: center; }
+  .bar-name {
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bar-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .bar-pct { font-size: 14px; font-weight: 600; color: var(--text2); }
+  .bar-track {
+    height: 10px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .bar-fill.protein { background: var(--protein-color); }
+  .bar-fill.fat { background: var(--fat-color); }
+  .bar-fill.carb { background: var(--carb-color); }
+
+  /* --- Empty state --- */
+  .empty-state {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 48px 24px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { color: var(--text2); font-size: 15px; }
+
+  /* --- Chat --- */
+  .chat-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .chat-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 88%;
+  }
+
+  .chat-bubble.user {
+    background: var(--accent);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-bubble.assistant {
+    background: var(--surface2);
+    color: var(--text);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-bubble.typing {
+    color: var(--text2);
+    font-style: italic;
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.4;
+    max-height: 120px;
+    transition: border-color 0.2s;
+  }
+
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text2); }
+
+  .chat-send {
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+
+  .chat-send:hover { opacity: 0.85; }
+  .chat-send:disabled { opacity: 0.4; cursor: default; }
+
+  @media (max-width: 480px) {
+    .weights-row { flex-direction: column; }
+    .card-value { font-size: 26px; }
+    .card.calories .card-value { font-size: 36px; }
+    .seg-btn { font-size: 12px; padding: 9px 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Калькулятор<br>питания</h1>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <span id="theme-icon">🌙</span>
+  </button>
+</div>
+
+<div class="container">
+  <p class="subtitle">Заполните параметры — результат появится автоматически</p>
+
+  <div class="inputs-card">
+    <!-- Веса -->
+    <div class="weights-row">
+      <div class="input-group">
+        <label>Текущий вес</label>
+        <input type="number" id="current" placeholder="80" min="30" max="300" oninput="calculate()">
+        <div class="unit">кг</div>
+      </div>
+      <div class="input-group">
+        <label>Желаемый вес</label>
+        <input type="number" id="target" placeholder="70" min="30" max="300" oninput="calculate()">
+        <div class="unit">кг</div>
+      </div>
+    </div>
+
+    <!-- Активность -->
+    <div>
+      <div class="segment-label">Активность</div>
+      <div class="segment" id="activity-seg">
+        <button class="seg-btn active" onclick="setActivity('none', this)">🚶 Нет</button>
+        <button class="seg-btn" onclick="setActivity('moderate', this)">🚶‍♂️ Умеренная</button>
+        <button class="seg-btn" onclick="setActivity('sport', this)">🏋️ Спорт</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Предупреждение о безопасности -->
+  <div class="safety-badge" id="safety-badge"></div>
+
+  <div class="results" id="results">
+    <div class="section-title">Суточная норма</div>
+
+    <!-- Поддержание -->
+    <div class="maintenance-info">
+      <span class="mi-label">Калории для поддержания веса</span>
+      <span class="mi-value" id="val-maintenance">—</span>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card calories loss-bg" id="cal-card">
+        <div>
+          <div class="card-icon">🔥</div>
+          <div class="card-label">Калории</div>
+        </div>
+        <div>
+          <div class="card-value" id="val-calories">—</div>
+          <div class="card-unit">ккал/день</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🥩</div>
+        <div class="card-label">Белок</div>
+        <div class="card-value" id="val-protein">—</div>
+        <div class="card-unit">г/день</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🥑</div>
+        <div class="card-label">Жиры</div>
+        <div class="card-value" id="val-fat">—</div>
+        <div class="card-unit">г/день</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🍚</div>
+        <div class="card-label">Углеводы</div>
+        <div class="card-value" id="val-carbs">—</div>
+        <div class="card-unit">г/день</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🥦</div>
+        <div class="card-label">Клетчатка</div>
+        <div class="card-value" id="val-fiber">—</div>
+        <div class="card-unit">г/день</div>
+      </div>
+    </div>
+
+    <div class="section-title">Распределение калорий</div>
+
+    <div class="chart-card">
+      <div class="bar-row">
+        <div class="bar-header">
+          <div class="bar-name">
+            <div class="bar-dot" style="background:var(--protein-color)"></div>
+            Белок
+          </div>
+          <div class="bar-pct" id="pct-protein">0%</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill protein" id="bar-protein" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-header">
+          <div class="bar-name">
+            <div class="bar-dot" style="background:var(--fat-color)"></div>
+            Жиры
+          </div>
+          <div class="bar-pct" id="pct-fat">0%</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill fat" id="bar-fat" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-header">
+          <div class="bar-name">
+            <div class="bar-dot" style="background:var(--carb-color)"></div>
+            Углеводы
+          </div>
+          <div class="bar-pct" id="pct-carbs">0%</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill carb" id="bar-carbs" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" id="empty">
+    <div class="empty-icon">⚖️</div>
+    <div class="empty-text">Введите текущий и желаемый вес<br>для расчёта нормы питания</div>
+  </div>
+
+  <!-- Чат -->
+  <div class="section-title">Задай вопрос нутрициологу</div>
+  <div class="chat-card">
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-bubble assistant">Привет! Я помогу разобраться с питанием. Введи свои данные выше и задавай вопросы 👋</div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="Например: можно ли есть углеводы вечером?" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+      <button class="chat-send" id="chat-send" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let activity = 'none';
+
+  function setActivity(a, btn) {
+    activity = a;
+    document.querySelectorAll('#activity-seg .seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    calculate();
+  }
+
+  function calculate() {
+    const current = parseFloat(document.getElementById('current').value);
+    const target = parseFloat(document.getElementById('target').value);
+
+    if (!current || !target || current < 30 || target < 30) {
+      document.getElementById('results').classList.remove('visible');
+      document.getElementById('empty').style.display = 'block';
+      document.getElementById('safety-badge').classList.remove('visible');
+      return;
+    }
+
+    // --- Множители для поддержания по активности ---
+    const maintMultiplier = { none: 30, moderate: 33, sport: 36 };
+    const maintenance = current * maintMultiplier[activity];
+
+    // --- Автоопределение цели ---
+    const goal = target < current ? 'loss' : target > current ? 'gain' : 'hold';
+
+    // --- Процент разницы весов ---
+    const diff = Math.abs(current - target);
+    const pctDiff = (diff / current) * 100;
+
+    let calories;
+    let safetyMsg = '';
+
+    if (goal === 'loss') {
+      // Дефицит в зависимости от % потери
+      let deficitPct;
+      if (pctDiff <= 10) {
+        deficitPct = 0.15;
+      } else if (pctDiff <= 20) {
+        deficitPct = 0.20;
+        if (pctDiff > 12) safetyMsg = `⚠️ Цель — снизить ${Math.round(pctDiff)}% массы тела. Применён умеренный дефицит 20% для безопасного темпа похудения.`;
+      } else {
+        deficitPct = 0.25;
+        safetyMsg = `⚠️ Цель — снизить ${Math.round(pctDiff)}% массы тела. Применён максимально безопасный дефицит 25%, чтобы сохранить мышцы и комфортный темп.`;
+      }
+      calories = Math.round(maintenance * (1 - deficitPct));
+    } else if (goal === 'hold') {
+      calories = maintenance;
+    } else {
+      // Набор: +10%, но не более +15% при большой разнице
+      let surplusPct = 0.10;
+      if (pctDiff > 15) {
+        surplusPct = 0.15;
+        safetyMsg = `⚠️ Цель — набрать ${Math.round(pctDiff)}% массы тела. Применён профицит 15% для постепенного и качественного набора.`;
+      }
+      calories = Math.round(maintenance * (1 + surplusPct));
+    }
+
+    // --- Вес для расчёта белков/жиров ---
+    const calcWeight = (goal === 'hold') ? current : target;
+
+    // --- Белки ---
+    const proteinMultiplier = (goal === 'hold') ? 1.6 : 1.8;
+    const protein = Math.round(calcWeight * proteinMultiplier);
+
+    // --- Жиры ---
+    const fat = Math.round(calcWeight * 0.8);
+
+    // --- Клетчатка ---
+    const fiber = Math.round((calories / 1000) * 14);
+
+    // --- Углеводы ---
+    const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4));
+
+    // --- Распределение % ---
+    const proteinCal = protein * 4;
+    const fatCal = fat * 9;
+    const carbCal = carbs * 4;
+    const totalMacro = proteinCal + fatCal + carbCal;
+    const pctProtein = Math.round((proteinCal / totalMacro) * 100);
+    const pctFat = Math.round((fatCal / totalMacro) * 100);
+    const pctCarbs = Math.round((carbCal / totalMacro) * 100);
+
+    // --- Обновляем UI ---
+    document.getElementById('val-maintenance').textContent = Math.round(maintenance) + ' ккал';
+    document.getElementById('val-calories').textContent = calories;
+    document.getElementById('val-protein').textContent = protein;
+    document.getElementById('val-fat').textContent = fat;
+    document.getElementById('val-carbs').textContent = carbs;
+    document.getElementById('val-fiber').textContent = fiber;
+
+    document.getElementById('pct-protein').textContent = pctProtein + '%';
+    document.getElementById('pct-fat').textContent = pctFat + '%';
+    document.getElementById('pct-carbs').textContent = pctCarbs + '%';
+
+    document.getElementById('bar-protein').style.width = pctProtein + '%';
+    document.getElementById('bar-fat').style.width = pctFat + '%';
+    document.getElementById('bar-carbs').style.width = pctCarbs + '%';
+
+    // Цвет карточки калорий по цели
+    const calCard = document.getElementById('cal-card');
+    calCard.classList.remove('loss-bg', 'hold-bg', 'gain-bg');
+    calCard.classList.add(goal + '-bg');
+
+    // Safety badge
+    const badge = document.getElementById('safety-badge');
+    if (safetyMsg) {
+      badge.textContent = safetyMsg;
+      badge.classList.add('visible');
+    } else {
+      badge.classList.remove('visible');
+    }
+
+    document.getElementById('results').classList.add('visible');
+    document.getElementById('empty').style.display = 'none';
+
+    // Обновляем контекст для чата
+    const goalLabel = goal === 'loss' ? 'похудение' : goal === 'gain' ? 'набор веса' : 'удержание веса';
+    const actLabel = activity === 'none' ? 'без активности' : activity === 'moderate' ? 'умеренная активность' : 'занятия спортом';
+    lastContext = `Цель: ${goalLabel}, текущий вес: ${current} кг, желаемый вес: ${target} кг, активность: ${actLabel}, калории: ${calories} ккал/день, белок: ${protein} г, жиры: ${fat} г, углеводы: ${carbs} г, клетчатка: ${fiber} г.`;
+  }
+
+  // Сохраняем последние данные расчёта для контекста чата
+  let lastContext = '';
+
+  // Перехватываем calculate() чтобы сохранить контекст
+  const _origCalc = calculate;
+  // (контекст обновляется внутри calculate ниже)
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const messages = document.getElementById('chat-messages');
+    const sendBtn = document.getElementById('chat-send');
+
+    // Добавляем сообщение пользователя
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble user';
+    userBubble.textContent = msg;
+    messages.appendChild(userBubble);
+
+    input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    // Индикатор загрузки
+    const typingBubble = document.createElement('div');
+    typingBubble.className = 'chat-bubble assistant typing';
+    typingBubble.textContent = 'Печатает…';
+    messages.appendChild(typingBubble);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+      const res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, context: lastContext }),
+      });
+      const data = await res.json();
+      typingBubble.className = 'chat-bubble assistant';
+      typingBubble.textContent = data.reply || 'Произошла ошибка, попробуй ещё раз.';
+    } catch {
+      typingBubble.className = 'chat-bubble assistant';
+      typingBubble.textContent = 'Не удалось получить ответ. Проверь соединение.';
+    }
+
+    sendBtn.disabled = false;
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+    document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+  }
+
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-icon').textContent = '☀️';
+  }
+</script>
+</body>
+</html>
