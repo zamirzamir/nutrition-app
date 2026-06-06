@@ -394,7 +394,7 @@
 <div class="tabs" style="margin-top:16px;">
   <div class="tab active" onclick="switchTab('calculator')">🧮 Калькулятор</div>
   <div class="tab" onclick="switchTab('menu')">🍽️ Меню</div>
-  <div class="tab" onclick="switchTab('chat')">🤖 AI-нутрициолог</div>
+  <div class="tab" onclick="switchTab('chat')">🤖 AI</div>
 </div>
 
 <!-- CALCULATOR -->
@@ -415,41 +415,11 @@
   </div>
 
   <div class="card">
-    <div class="card-title">🎯 Цель</div>
-    <div class="option-grid row3" id="goalGrid">
-      <div class="option-btn selected" data-val="loss" onclick="selectOption('goal','loss',this)">
-        <span class="emoji">📉</span>Похудение
-      </div>
-      <div class="option-btn" data-val="maintain" onclick="selectOption('goal','maintain',this)">
-        <span class="emoji">⚖️</span>Удержание
-      </div>
-      <div class="option-btn" data-val="gain" onclick="selectOption('goal','gain',this)">
-        <span class="emoji">📈</span>Набор массы
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
     <div class="card-title">🏃 Активность</div>
     <div class="option-grid" id="activityGrid">
       <div class="option-btn selected" data-val="none" onclick="selectOption('activity','none',this)">🚶 Отсутствует (×30)</div>
       <div class="option-btn" data-val="moderate" onclick="selectOption('activity','moderate',this)">🚶‍♂️ Умеренная активность (×33)</div>
       <div class="option-btn" data-val="sport" onclick="selectOption('activity','sport',this)">🏋️ Занятия спортом (×36)</div>
-    </div>
-  </div>
-
-  <div class="card" id="paceCard">
-    <div class="card-title">⚡ Темп</div>
-    <div class="option-grid row3" id="paceGrid">
-      <div class="option-btn sel-green" data-val="comfortable" onclick="selectOption('pace','comfortable',this)">
-        <span class="emoji">🟢</span>Комфортный
-      </div>
-      <div class="option-btn" data-val="fast" onclick="selectOption('pace','fast',this)">
-        <span class="emoji">🟡</span>Быстрый
-      </div>
-      <div class="option-btn" data-val="aggressive" onclick="selectOption('pace','aggressive',this)">
-        <span class="emoji">🔴</span>Агрессивный
-      </div>
     </div>
   </div>
 
@@ -466,9 +436,6 @@
       <div class="res-card"><div class="icon">🍚</div><div class="val" id="r-carb">—</div><div class="unit">г/день</div><div class="lbl">Углеводы</div></div>
       <div class="res-card full"><div class="icon">🥦</div><div class="val" id="r-fiber">—</div><div class="unit">г/день</div><div class="lbl">Клетчатка</div></div>
     </div>
-
-    <div class="section-label" style="margin-top:8px;">Темп изменения</div>
-    <div id="paceBadge"></div>
 
     <div class="section-label" style="margin-top:8px;">Прогноз веса</div>
     <div class="forecast-grid" id="forecastGrid"></div>
@@ -514,7 +481,7 @@
 
 <script>
 const state = {
-  goal: 'loss', activity: 'none', pace: 'comfortable',
+  activity: 'none',
   calculated: false, kcal: 0, context: ''
 };
 
@@ -529,12 +496,7 @@ function switchTab(tab) {
 function selectOption(type, val, el) {
   el.parentElement.querySelectorAll('.option-btn').forEach(b => b.className='option-btn');
   state[type] = val;
-  if (type==='pace') {
-    if (val==='comfortable') el.classList.add('sel-green');
-    else if (val==='fast') el.classList.add('sel-yellow');
-    else el.classList.add('sel-red');
-  } else el.classList.add('selected');
-  document.getElementById('paceCard').style.display = state.goal==='maintain' ? 'none' : 'block';
+  el.classList.add('selected');
 }
 
 function calculate() {
@@ -542,61 +504,40 @@ function calculate() {
   const tw = parseFloat(document.getElementById('targetWeight').value);
 
   if (!cw || !tw || cw<30 || tw<30) { alert('Введи корректный вес (от 30 кг)'); return; }
-  if (state.goal==='loss' && tw>=cw) { alert('Желаемый вес для похудения должен быть меньше текущего'); return; }
-  if (state.goal==='gain' && tw<=cw) { alert('Желаемый вес для набора должен быть больше текущего'); return; }
 
   const mult = state.activity==='none' ? 30 : state.activity==='moderate' ? 33 : 36;
   const maintenance = cw * mult;
+
+  // Похудение: дефицит 20%, минимум 1200 ккал
+  const isLoss = tw < cw;
+  const isGain = tw > cw;
   let kcal, weeklyChange;
 
-  if (state.goal==='maintain') {
-    kcal = maintenance; weeklyChange = 0;
-  } else if (state.goal==='loss') {
-    const pct = ((cw-tw)/cw)*100;
-    let d;
-    if (state.pace==='comfortable') d = pct<10?15:pct<=20?20:25;
-    else if (state.pace==='fast')   d = pct<10?20:pct<=20?25:30;
-    else                            d = pct<10?25:pct<=20?30:35;
-    kcal = Math.max(maintenance*(1-d/100), 1200);
-    weeklyChange = ((maintenance-kcal)*7)/7700;
+  if (isLoss) {
+    kcal = Math.max(maintenance * 0.80, 1200);
+    weeklyChange = ((maintenance - kcal) * 7) / 7700;
+  } else if (isGain) {
+    kcal = maintenance * 1.10;
+    weeklyChange = ((kcal - maintenance) * 7) / 7700;
   } else {
-    const s = state.pace==='comfortable'?10:state.pace==='fast'?15:20;
-    kcal = maintenance*(1+s/100);
-    weeklyChange = ((kcal-maintenance)*7)/7700;
+    kcal = maintenance;
+    weeklyChange = 0;
   }
   kcal = Math.round(kcal);
 
-  const protein = Math.round(state.goal==='maintain' ? cw*1.6 : tw*1.8);
-  const fat     = Math.round(state.goal==='maintain' ? cw*0.8 : tw*0.8);
-  const fiber   = Math.round((kcal/1000)*14);
-  const carbs   = Math.max(0, Math.round((kcal-protein*4-fat*9)/4));
+  const protein = Math.round(isLoss || isGain ? tw * 1.8 : cw * 1.6);
+  const fat     = Math.round(isLoss || isGain ? tw * 0.8 : cw * 0.8);
+  const fiber   = Math.round((kcal / 1000) * 14);
+  const carbs   = Math.max(0, Math.round((kcal - protein*4 - fat*9) / 4));
 
-  const sign = state.goal==='gain'?1:state.goal==='loss'?-1:0;
-  const wk = weeklyChange*sign;
+  const sign = isGain ? 1 : isLoss ? -1 : 0;
+  const wk = weeklyChange * sign;
 
   document.getElementById('r-kcal').textContent = kcal;
   document.getElementById('r-prot').textContent = protein;
   document.getElementById('r-fat').textContent  = fat;
   document.getElementById('r-carb').textContent = carbs;
   document.getElementById('r-fiber').textContent= fiber;
-
-  const pb = document.getElementById('paceBadge');
-  if (state.goal==='maintain') {
-    pb.innerHTML=`<div class="pace-badge pace-green"><div style="font-size:24px">⚖️</div>
-      <div><div style="font-size:16px;font-weight:800;color:#4ade80;">Удержание веса</div>
-      <div style="font-size:12px;color:var(--muted);">Калории = норма поддержания</div></div></div>`;
-  } else {
-    const kgW=weeklyChange.toFixed(2);
-    let cls,icon,label;
-    if (weeklyChange<0.7){cls='pace-green';icon='🟢';label='Комфортный темп';}
-    else if (weeklyChange<=1.2){cls='pace-yellow';icon='🟡';label='Быстрый темп';}
-    else{cls='pace-red';icon='🔴';label='Агрессивный темп';}
-    let days='—';
-    if (weeklyChange>0){const d=Math.round(Math.abs(tw-cw)/weeklyChange*7);days=d<365?`~${d} дней`:`~${Math.round(d/30)} мес`;}
-    pb.innerHTML=`<div class="pace-badge ${cls}"><div style="font-size:24px">${icon}</div>
-      <div><div style="font-size:16px;font-weight:800;">${kgW} кг/нед · ${label}</div>
-      <div style="font-size:12px;color:var(--muted);">Срок: ${days}</div></div></div>`;
-  }
 
   document.getElementById('forecastGrid').innerHTML=
     [{d:'7 дней',w:+(cw+wk).toFixed(1)},{d:'30 дней',w:+(cw+wk*(30/7)).toFixed(1)},
@@ -612,18 +553,17 @@ function calculate() {
   else wb.innerHTML='';
 
   const mb=document.getElementById('motivationBlock');
-  if(state.goal==='loss') mb.textContent='💪 При соблюдении рассчитанного КБЖУ ты сможешь снижать вес без жёстких ограничений и срывов.';
-  else if(state.goal==='gain') mb.textContent='💪 Для набора мышечной массы совмещай этот рацион с силовыми тренировками 3–4 раза в неделю.';
+  if(isLoss) mb.textContent='💪 При соблюдении рассчитанного КБЖУ ты сможешь снижать вес без жёстких ограничений и срывов.';
+  else if(isGain) mb.textContent='💪 Для набора мышечной массы совмещай этот рацион с силовыми тренировками 3–4 раза в неделю.';
   else mb.textContent='💪 Ты на стадии поддержания формы. Фокусируйся на качестве питания и регулярной активности.';
 
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
 
   state.calculated=true; state.kcal=kcal;
-  const goalLbl=state.goal==='loss'?'похудение':state.goal==='gain'?'набор веса':'удержание веса';
-  const actLbl=state.activity==='none'?'без активности':state.activity==='moderate'?'умеренная активность':'занятия спортом';
-  const paceLbl=state.pace==='comfortable'?'комфортный':state.pace==='fast'?'быстрый':'агрессивный';
-  state.context=`Цель: ${goalLbl}, темп: ${paceLbl}, текущий вес: ${cw} кг, желаемый вес: ${tw} кг, активность: ${actLbl}, калории: ${kcal} ккал/день, белки: ${protein} г, жиры: ${fat} г, углеводы: ${carbs} г, клетчатка: ${fiber} г, скорость: ${weeklyChange.toFixed(2)} кг/нед.`;
+  const goalLbl = isLoss ? 'похудение' : isGain ? 'набор веса' : 'удержание веса';
+  const actLbl  = state.activity==='none' ? 'без активности' : state.activity==='moderate' ? 'умеренная активность' : 'занятия спортом';
+  state.context = `Цель: ${goalLbl}, текущий вес: ${cw} кг, желаемый вес: ${tw} кг, активность: ${actLbl}, калории: ${kcal} ккал/день, белки: ${protein} г, жиры: ${fat} г, углеводы: ${carbs} г, клетчатка: ${fiber} г.`;
 }
 
 // MENU
