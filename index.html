@@ -395,6 +395,7 @@ const state = {
   context: '',
   purchased: false,
   excludedFoods: [],
+  dietType: 'default', // default | vegan | vegetarian | pescatarian
   activeDayBtn: null,
 };
 
@@ -465,7 +466,7 @@ function calculate() {
   const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';
   state.context=`Цель: ${goalLbl}, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;
 
-  renderMeals(state.excludedFoods);
+  renderMeals(state.excludedFoods, state.dietType);
 
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
@@ -563,8 +564,325 @@ const MEALS = [
   },
 ];
 
-function renderMeals(excluded=[]) {
-  const filtered = MEALS.filter(m => {
+// ========== VEGAN MEALS ==========
+const MEALS_VEGAN = [
+  {
+    type:'Завтрак', name:'Смузи-боул с ягодами и семенами',
+    img:'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=600&h=300&fit=crop&q=80',
+    kcal:330, p:9, f:10, c:52,
+    ingredients:[
+      {name:'Замороженная черника',qty:'100 г'},
+      {name:'Банан',qty:'1 шт (120 г)'},
+      {name:'Растительное молоко',qty:'80 мл'},
+      {name:'Семена чиа',qty:'1 ст.л. (10 г)'},
+      {name:'Гранола',qty:'30 г'},
+      {name:'Кокосовая стружка',qty:'1 ч.л.'},
+    ],
+    steps:[
+      'Взбей чернику, банан и растительное молоко в блендере до однородной массы.',
+      'Перелей смузи в миску — оно должно быть густым.',
+      'Сверху выложи гранолу, семена чиа и кокосовую стружку.',
+      'Подавай сразу — боул вкуснее холодным.',
+    ]
+  },
+  {
+    type:'Перекус', name:'Хумус с овощными палочками',
+    img:'https://images.unsplash.com/photo-1544025162-d76594e8bb5c?w=600&h=300&fit=crop&q=80',
+    kcal:190, p:8, f:9, c:20,
+    ingredients:[
+      {name:'Нут варёный',qty:'100 г'},
+      {name:'Тахини (кунжутная паста)',qty:'1 ст.л.'},
+      {name:'Лимонный сок',qty:'1 ст.л.'},
+      {name:'Чеснок',qty:'1 зубчик'},
+      {name:'Оливковое масло',qty:'1 ч.л.'},
+      {name:'Морковь',qty:'1 шт'},
+      {name:'Огурец',qty:'½ шт'},
+    ],
+    steps:[
+      'Пробей нут, тахини, лимонный сок и чеснок блендером.',
+      'Добавляй воду по 1 ст.л., пока хумус не станет кремовым.',
+      'Нарежь морковь и огурец палочками.',
+      'Выложи хумус в миску, полей маслом. Подавай с овощами.',
+    ]
+  },
+  {
+    type:'Обед', name:'Нут с овощами карри и рисом',
+    img:'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&h=300&fit=crop&q=80',
+    kcal:430, p:18, f:10, c:68,
+    ingredients:[
+      {name:'Нут варёный',qty:'150 г'},
+      {name:'Рис басмати',qty:'80 г'},
+      {name:'Кокосовое молоко',qty:'100 мл'},
+      {name:'Томаты в собственном соку',qty:'100 г'},
+      {name:'Шпинат',qty:'60 г'},
+      {name:'Карри, куркума',qty:'по 1 ч.л.'},
+      {name:'Оливковое масло',qty:'1 ч.л.'},
+    ],
+    steps:[
+      'Отвари рис согласно инструкции на упаковке.',
+      'Разогрей масло в сковороде, добавь карри и куркуму, жарь 30 секунд.',
+      'Добавь томаты и кокосовое молоко, туши 3 минуты.',
+      'Добавь нут и шпинат, туши ещё 5 минут.',
+      'Подавай карри с рисом.',
+    ]
+  },
+  {
+    type:'Полдник', name:'Финики с арахисовой пастой',
+    img:'https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=600&h=300&fit=crop&q=80',
+    kcal:175, p:5, f:8, c:23,
+    ingredients:[
+      {name:'Финики Medjool',qty:'3 шт (60 г)'},
+      {name:'Арахисовая паста (без сахара)',qty:'1 ст.л. (20 г)'},
+    ],
+    steps:[
+      'Удали косточки из фиников.',
+      'Наполни каждый финик небольшим количеством арахисовой пасты.',
+      'Простой и питательный перекус готов!',
+    ]
+  },
+  {
+    type:'Ужин', name:'Тофу с овощами и гречкой',
+    img:'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?w=600&h=300&fit=crop&q=80',
+    kcal:370, p:22, f:12, c:44,
+    ingredients:[
+      {name:'Тофу твёрдый',qty:'180 г'},
+      {name:'Гречка сухая',qty:'80 г'},
+      {name:'Болгарский перец',qty:'100 г'},
+      {name:'Цукини',qty:'80 г'},
+      {name:'Соевый соус',qty:'2 ст.л.'},
+      {name:'Оливковое масло',qty:'1 ч.л.'},
+      {name:'Чеснок',qty:'1 зубчик'},
+      {name:'Кунжут',qty:'1 ч.л.'},
+    ],
+    steps:[
+      'Отвари гречку в воде 1:2, 15 минут.',
+      'Нарежь тофу кубиками, обсуши бумажным полотенцем.',
+      'Обжарь тофу на масле до золотистой корочки по 3 мин с каждой стороны.',
+      'Добавь перец, цукини и чеснок, жарь 5 минут.',
+      'Полей соевым соусом, посыпь кунжутом. Подавай с гречкой.',
+    ]
+  },
+];
+
+// ========== VEGETARIAN MEALS ==========
+const MEALS_VEGETARIAN = [
+  {
+    type:'Завтрак', name:'Омлет со шпинатом и сыром',
+    img:'https://images.unsplash.com/photo-1510693206972-df098062cb71?w=600&h=300&fit=crop&q=80',
+    kcal:350, p:22, f:24, c:8,
+    ingredients:[
+      {name:'Яйца',qty:'3 шт'},
+      {name:'Молоко',qty:'2 ст.л.'},
+      {name:'Шпинат свежий',qty:'50 г'},
+      {name:'Сыр твёрдый',qty:'30 г'},
+      {name:'Сливочное масло',qty:'1 ч.л.'},
+      {name:'Соль, перец',qty:'по вкусу'},
+    ],
+    steps:[
+      'Взбей яйца с молоком, посоли и поперчи.',
+      'Растопи масло на сковороде, вылей яичную смесь.',
+      'Когда края схватятся, выложи шпинат и тёртый сыр на одну половину.',
+      'Сложи омлет пополам, держи ещё минуту. Подавай горячим.',
+    ]
+  },
+  {
+    type:'Перекус', name:'Творог с ягодами',
+    img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&h=300&fit=crop&q=80',
+    kcal:175, p:18, f:3, c:19,
+    ingredients:[
+      {name:'Творог 5%',qty:'150 г'},
+      {name:'Черника / клубника',qty:'80 г'},
+      {name:'Мёд',qty:'1 ч.л.'},
+      {name:'Ванилин',qty:'щепотка'},
+    ],
+    steps:[
+      'Выложи творог в миску, разомни вилкой до однородности.',
+      'Добавь ванилин и перемешай.',
+      'Выложи ягоды сверху, полей мёдом. Готово!',
+    ]
+  },
+  {
+    type:'Обед', name:'Паста с овощами и сыром фета',
+    img:'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&h=300&fit=crop&q=80',
+    kcal:420, p:18, f:14, c:56,
+    ingredients:[
+      {name:'Паста (твёрдые сорта)',qty:'100 г'},
+      {name:'Черри томаты',qty:'120 г'},
+      {name:'Шпинат',qty:'60 г'},
+      {name:'Сыр фета',qty:'50 г'},
+      {name:'Чеснок',qty:'2 зубчика'},
+      {name:'Оливковое масло',qty:'1 ст.л.'},
+      {name:'Базилик',qty:'несколько листиков'},
+    ],
+    steps:[
+      'Отвари пасту до состояния al dente согласно инструкции.',
+      'Обжарь чеснок на масле 30 секунд, добавь томаты, туши 3 минуты.',
+      'Добавь шпинат, перемешай — он уменьшится за 1 минуту.',
+      'Смешай с пастой, посыпь раскрошенной фетой и базиликом.',
+    ]
+  },
+  {
+    type:'Полдник', name:'Яблоко с миндалём',
+    img:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=300&fit=crop&q=80',
+    kcal:168, p:4, f:9, c:20,
+    ingredients:[
+      {name:'Яблоко',qty:'1 шт (180 г)'},
+      {name:'Миндаль сырой',qty:'20 г'},
+    ],
+    steps:[
+      'Вымой яблоко, нарежь дольками или ешь целым.',
+      'Дополни горстью миндаля. Лёгкий перекус готов!',
+    ]
+  },
+  {
+    type:'Ужин', name:'Запечённые овощи с яйцом и фетой',
+    img:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=300&fit=crop&q=80',
+    kcal:360, p:20, f:18, c:28,
+    ingredients:[
+      {name:'Кабачок',qty:'150 г'},
+      {name:'Болгарский перец',qty:'120 г'},
+      {name:'Баклажан',qty:'100 г'},
+      {name:'Яйца',qty:'2 шт'},
+      {name:'Сыр фета',qty:'40 г'},
+      {name:'Оливковое масло',qty:'1 ст.л.'},
+      {name:'Прованские травы',qty:'1 ч.л.'},
+    ],
+    steps:[
+      'Разогрей духовку до 200°C.',
+      'Нарежь овощи, выложи в форму, полей маслом, посыпь травами.',
+      'Запекай 20 минут, достань, сделай 2 углубления и вбей яйца.',
+      'Верни в духовку на 8 минут, пока белок не схватится.',
+      'Посыпь раскрошенной фетой и подавай.',
+    ]
+  },
+];
+
+// ========== PESCATARIAN MEALS ==========
+const MEALS_PESCATARIAN = [
+  {
+    type:'Завтрак', name:'Овсянка с бананом и мёдом',
+    img:'https://images.unsplash.com/photo-1517093450110-6a5b72a0a5f3?w=600&h=300&fit=crop&q=80',
+    kcal:340, p:12, f:6, c:62,
+    ingredients:[
+      {name:'Овсяные хлопья',qty:'80 г'},
+      {name:'Молоко 1.5%',qty:'200 мл'},
+      {name:'Банан',qty:'½ шт (60 г)'},
+      {name:'Мёд',qty:'1 ч.л. (10 г)'},
+      {name:'Корица',qty:'щепотка'},
+    ],
+    steps:[
+      'Залей овсяные хлопья молоком в кастрюле, поставь на средний огонь.',
+      'Вари 5–7 минут, постоянно помешивая, до нужной густоты.',
+      'Переложи в тарелку, нарежь банан кружочками сверху.',
+      'Полей мёдом и посыпь корицей. Подавай тёплой.',
+    ]
+  },
+  {
+    type:'Перекус', name:'Творог с ягодами',
+    img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&h=300&fit=crop&q=80',
+    kcal:175, p:18, f:3, c:19,
+    ingredients:[
+      {name:'Творог 5%',qty:'150 г'},
+      {name:'Черника / клубника',qty:'80 г'},
+      {name:'Мёд',qty:'1 ч.л.'},
+      {name:'Ванилин',qty:'щепотка'},
+    ],
+    steps:[
+      'Выложи творог в миску, разомни вилкой до однородности.',
+      'Добавь ванилин и перемешай.',
+      'Выложи ягоды сверху, полей мёдом. Готово!',
+    ]
+  },
+  {
+    type:'Обед', name:'Тунец с рисом и овощами',
+    img:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=300&fit=crop&q=80',
+    kcal:420, p:44, f:8, c:42,
+    ingredients:[
+      {name:'Тунец (стейк или консервы)',qty:'180 г'},
+      {name:'Рис',qty:'80 г'},
+      {name:'Брокколи',qty:'120 г'},
+      {name:'Морковь',qty:'50 г'},
+      {name:'Соевый соус',qty:'1 ст.л.'},
+      {name:'Оливковое масло',qty:'1 ч.л.'},
+    ],
+    steps:[
+      'Отвари рис в воде 1:2 до готовности.',
+      'Брокколи и морковь отвари на пару 7 минут.',
+      'Обжарь тунец на сковороде с маслом по 3 мин с каждой стороны.',
+      'Полей соевым соусом. Подавай с рисом и овощами.',
+    ]
+  },
+  {
+    type:'Полдник', name:'Яблоко с миндалём',
+    img:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=300&fit=crop&q=80',
+    kcal:168, p:4, f:9, c:20,
+    ingredients:[
+      {name:'Яблоко',qty:'1 шт (180 г)'},
+      {name:'Миндаль сырой',qty:'20 г'},
+    ],
+    steps:[
+      'Вымой яблоко, нарежь дольками или ешь целым.',
+      'Дополни горстью миндаля. Лёгкий перекус готов!',
+    ]
+  },
+  {
+    type:'Ужин', name:'Запечённый лосось с овощами',
+    img:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&h=300&fit=crop&q=80',
+    kcal:380, p:38, f:18, c:12,
+    ingredients:[
+      {name:'Лосось (стейк)',qty:'180 г'},
+      {name:'Болгарский перец',qty:'100 г'},
+      {name:'Цукини',qty:'100 г'},
+      {name:'Лимон',qty:'½ шт'},
+      {name:'Оливковое масло',qty:'1 ч.л.'},
+      {name:'Укроп / петрушка',qty:'несколько веточек'},
+      {name:'Соль, перец',qty:'по вкусу'},
+    ],
+    steps:[
+      'Разогрей духовку до 190°C. Застели форму фольгой.',
+      'Нарежь перец и цукини кружочками, выложи в форму.',
+      'Положи лосось сверху на овощи, полей лимонным соком и маслом.',
+      'Посоли, поперчи, запекай 20–22 минуты.',
+      'Подавай с зеленью.',
+    ]
+  },
+];
+
+// ========== DIET DETECTION ==========
+const DIET_KEYWORDS = {
+  vegan: ['веган','vegan','веганка','веганство','растительн','plant-based','без животных','без мяса без молока'],
+  vegetarian: ['вегетарианец','вегетарианка','вегетариан','vegetarian','без мяса','не ем мясо','не кушаю мясо'],
+  pescatarian: ['пескаторианец','пескатарианец','пескаторианка','pescatarian','pescetarian','рыбу ем','только рыба'],
+};
+
+function detectDiet(text) {
+  const t = text.toLowerCase();
+  for (const [diet, keywords] of Object.entries(DIET_KEYWORDS)) {
+    if (keywords.some(k => t.includes(k))) return diet;
+  }
+  return null;
+}
+
+function getMealSet(dietType) {
+  if (dietType === 'vegan') return MEALS_VEGAN;
+  if (dietType === 'vegetarian') return MEALS_VEGETARIAN;
+  if (dietType === 'pescatarian') return MEALS_PESCATARIAN;
+  return MEALS;
+}
+
+// ========== DIET BADGE ==========
+const DIET_LABELS = {
+  vegan: '🌱 Веганское меню',
+  vegetarian: '🥚 Вегетарианское меню',
+  pescatarian: '🐟 Пескаторианское меню',
+  default: null,
+};
+
+function renderMeals(excluded=[], dietType='default') {
+  const base = getMealSet(dietType);
+
+  // also filter by excluded ingredients
+  const filtered = base.filter(m => {
     if (!excluded.length) return true;
     const excLower = excluded.map(e=>e.toLowerCase());
     return !excLower.some(e =>
@@ -573,7 +891,12 @@ function renderMeals(excluded=[]) {
     );
   });
 
-  document.getElementById('mealsContainer').innerHTML = filtered.map((m,i)=>`
+  const badge = DIET_LABELS[dietType];
+  const badgeHtml = badge
+    ? `<div style="display:inline-block;background:rgba(34,197,94,.15);border:1.5px solid #22c55e;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#4ade80;margin-bottom:10px;">${badge}</div>`
+    : '';
+
+  document.getElementById('mealsContainer').innerHTML = badgeHtml + filtered.map((m,i)=>`
     <div class="meal-card">
       <div class="meal-img-wrap" onclick="toggleRecipe(${i})">
         <img src="${m.img}" alt="${m.name}" loading="lazy"
@@ -764,12 +1087,21 @@ function toggleMic() {
 function sendFoodPref() {
   const val = document.getElementById('foodPrefInput').value.trim();
   if (!val) return;
-  // parse excluded foods (simple: split by comma or "и")
-  const words = val.split(/,|\sи\s|\sне\s/).map(w=>w.trim()).filter(Boolean);
-  state.excludedFoods = words;
+
+  // Detect diet type
+  const detected = detectDiet(val);
+  if (detected) {
+    state.dietType = detected;
+    state.excludedFoods = [];
+  } else {
+    // parse excluded specific foods
+    const words = val.split(/[,;]|\sи\s|\sне\s/).map(w=>w.trim()).filter(w=>w.length>1);
+    state.excludedFoods = words;
+  }
+
   if (state.kcal > 0) {
-    renderMeals(state.excludedFoods);
-    document.getElementById('mealsContainer').scrollIntoView({behavior:'smooth',block:'start'});
+    renderMeals(state.excludedFoods, state.dietType);
+    document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
   }
   document.getElementById('foodPrefInput').value='';
   document.querySelector('.marquee-hint').style.opacity='1';
