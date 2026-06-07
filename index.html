@@ -870,8 +870,16 @@ const DIET_KEYWORDS = {
   pescatarian: ['пескаторианец','пескатарианец','пескаторианка','pescatarian','pescetarian','рыбу ем','только рыба'],
 };
 
+const RESET_KEYWORDS = [
+  'ем мясо','мясоед','мясоедка','ем всё','ем все','не вегетарианец','не веган',
+  'обычное питание','обычный рацион','хочу мясо','снова мясо','вернуть мясо',
+  'i eat meat','omnivore','всеядн',
+];
+
 function detectDiet(text) {
   const t = text.toLowerCase();
+  // Check reset first
+  if (RESET_KEYWORDS.some(k => t.includes(k))) return 'default';
   for (const [diet, keywords] of Object.entries(DIET_KEYWORDS)) {
     if (keywords.some(k => t.includes(k))) return diet;
   }
@@ -1129,12 +1137,15 @@ async function sendFoodPref() {
 
   // 1. Detect diet type locally (fast, no API call)
   const detected = detectDiet(val);
-  if (detected) {
+  if (detected !== null) {
     state.dietType = detected;
     state.excludedFoods = [];
     if (state.kcal > 0) {
       renderMeals([], state.dietType);
       document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    if (detected === 'default') {
+      openPopup('🍖', 'Отлично! Меню возвращено к обычному рациону с мясом.');
     }
     return;
   }
