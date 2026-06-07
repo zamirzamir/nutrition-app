@@ -1030,9 +1030,9 @@ function toggleDay(d) {
 
 function renderDayMeals(d) {
   const container = document.getElementById('dayMealsContainer');
-  // Use same meals, slightly vary names per day
+  const meals = getMealSet(state.dietType);
   container.innerHTML = `<div class="section-label" style="margin-top:12px;">День ${d}</div>` +
-    MEALS.map((m,i)=>`
+    meals.map((m,i)=>`
     <div class="meal-card">
       <div class="meal-img-wrap" onclick="toggleDayRecipe(${d},${i})">
         <img src="${m.img}" alt="${m.name}" loading="lazy"
@@ -1140,12 +1140,18 @@ async function sendFoodPref() {
   if (detected !== null) {
     state.dietType = detected;
     state.excludedFoods = [];
+    // обновить дневное меню
     if (state.kcal > 0) {
       renderMeals([], state.dietType);
-      document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
     }
+    // обновить открытый день в сетке 28 дней
+    const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
+    if (openDay) renderDayMeals(parseInt(openDay));
+
     if (detected === 'default') {
       openPopup('🍖', 'Отлично! Меню возвращено к обычному рациону с мясом.');
+    } else if (state.kcal > 0) {
+      document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
     }
     return;
   }
