@@ -370,6 +370,21 @@ body {
   </div>
 </div>
 
+<!-- ========== AI POPUP ========== -->
+<div id="aiPopup" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); padding:20px; display:none; align-items:center; justify-content:center;">
+  <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:22px; padding:24px 20px 20px; max-width:420px; width:100%; position:relative; animation:fadeUp .25s ease both; max-height:80vh; overflow-y:auto;">
+    <button onclick="closePopup()" style="position:absolute;top:14px;right:14px;background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;">✕</button>
+    <div id="aiPopupIcon" style="font-size:36px;text-align:center;margin-bottom:10px;">🤖</div>
+    <div id="aiPopupText" style="font-size:14px;line-height:1.7;color:var(--muted);text-align:center;"></div>
+    <div id="aiPopupLoader" style="display:none;text-align:center;padding:10px 0;">
+      <div style="display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+
 <!-- ========== STICKY BOTTOM ========== -->
 <div class="sticky-bar">
   <div class="sticky-input-row">
@@ -1084,27 +1099,92 @@ function toggleMic() {
   recognition.start();
 }
 
-function sendFoodPref() {
+function openPopup(icon, text) {
+  const p = document.getElementById('aiPopup');
+  document.getElementById('aiPopupIcon').textContent = icon;
+  document.getElementById('aiPopupText').textContent = text;
+  document.getElementById('aiPopupLoader').style.display = 'none';
+  p.style.display = 'flex';
+}
+function openPopupLoading() {
+  const p = document.getElementById('aiPopup');
+  document.getElementById('aiPopupIcon').textContent = '🤖';
+  document.getElementById('aiPopupText').textContent = '';
+  document.getElementById('aiPopupLoader').style.display = 'block';
+  p.style.display = 'flex';
+}
+function closePopup() {
+  document.getElementById('aiPopup').style.display = 'none';
+}
+document.getElementById('aiPopup').addEventListener('click', function(e) {
+  if (e.target === this) closePopup();
+});
+
+async function sendFoodPref() {
   const val = document.getElementById('foodPrefInput').value.trim();
   if (!val) return;
 
-  // Detect diet type
+  document.getElementById('foodPrefInput').value = '';
+  document.querySelector('.marquee-hint').style.opacity = '1';
+
+  // 1. Detect diet type locally (fast, no API call)
   const detected = detectDiet(val);
   if (detected) {
     state.dietType = detected;
     state.excludedFoods = [];
-  } else {
-    // parse excluded specific foods
-    const words = val.split(/[,;]|\sи\s|\sне\s/).map(w=>w.trim()).filter(w=>w.length>1);
-    state.excludedFoods = words;
+    if (state.kcal > 0) {
+      renderMeals([], state.dietType);
+      document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return;
   }
 
-  if (state.kcal > 0) {
-    renderMeals(state.excludedFoods, state.dietType);
-    document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
+  // 2. Detect specific ingredient exclusions locally
+  const excludePatterns = /не\s+\w+|без\s+\w+|не\s+ем\s+\w+|не\s+кушаю\s+\w+|аллерг/i;
+  if (excludePatterns.test(val)) {
+    const words = val.split(/[,;]|\sи\s/).map(w=>w.replace(/не\s+ем|не\s+кушаю|без|не\s+/gi,'').trim()).filter(w=>w.length>2);
+    state.excludedFoods = words;
+    if (state.kcal > 0) {
+      renderMeals(state.excludedFoods, state.dietType);
+      document.getElementById('meal-section').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return;
   }
-  document.getElementById('foodPrefInput').value='';
-  document.querySelector('.marquee-hint').style.opacity='1';
+
+  // 3. Everything else → OpenAI
+  openPopupLoading();
+
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: val,
+        context: state.context ||
+          'Пользователь ещё не рассчитал КБЖУ. Отвечай на общие вопросы про питание.'
+      })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      openPopup('⚠️', 'Не удалось получить ответ. Попробуй позже.');
+      return;
+    }
+
+    const reply = data.reply || '';
+
+    // Detect off-topic response from AI
+    const offTopicPhrases = ['не могу помочь','не по теме','выходит за рамки','вне моей компетенции','не связан с питанием'];
+    const isOffTopic = offTopicPhrases.some(p => reply.toLowerCase().includes(p));
+
+    if (isOffTopic) {
+      openPopup('🚫', 'Этот вопрос выходит за рамки питания и КБЖУ. Попробуй спросить что-то про еду, рацион или ингредиенты — с удовольствием помогу! 😊');
+    } else {
+      openPopup('🤖', reply);
+    }
+  } catch {
+    openPopup('⚠️', 'Нет соединения с сервером. Проверь интернет и попробуй снова.');
+  }
 }
 </script>
 </body>
