@@ -1370,45 +1370,6 @@ const MEALS_SPORT = [
   },
 ];
 
-// ========== CARNIVORE MEALS ==========
-const MEALS_CARNIVORE = [
-  {
-    type:'Завтрак', name:'Стейк и яйца',
-    img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=300&fit=crop&q=80',
-    kcal:520, p:52, f:34, c:1,
-    ingredients:[{name:'Говяжий стейк рибай',qty:'200 г'},{name:'Яйца',qty:'3 шт'},{name:'Сливочное масло',qty:'1 ст.л.'},{name:'Соль',qty:'по вкусу'}],
-    steps:['Разогрей сковороду на сильном огне.','Обжарь стейк 2–3 мин с каждой стороны (medium rare).','Дай отдохнуть 5 мин под фольгой.','На том же масле обжарь яйца.','Только соль — никаких соусов.']
-  },
-  {
-    type:'Перекус', name:'Вяленое говяжье мясо',
-    img:'https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=600&h=300&fit=crop&q=80',
-    kcal:180, p:28, f:8, c:0,
-    ingredients:[{name:'Говяжий джерки (вяленое)',qty:'60 г'}],
-    steps:['Перекус без углеводов.','На карниворе — только мясо и соль.']
-  },
-  {
-    type:'Обед', name:'Говяжьи рёбра тушёные',
-    img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=300&fit=crop&q=80',
-    kcal:580, p:48, f:44, c:0,
-    ingredients:[{name:'Говяжьи короткие рёбра',qty:'350 г'},{name:'Соль',qty:'по вкусу'}],
-    steps:['Посоли рёбра заранее.','Туши в кастрюле с небольшим количеством воды 3 часа на слабом огне.','Ешь досыта — на карниворе насыщение приходит быстро.']
-  },
-  {
-    type:'Полдник', name:'Яйца вкрутую',
-    img:'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&h=300&fit=crop&q=80',
-    kcal:155, p:12, f:11, c:1,
-    ingredients:[{name:'Яйца',qty:'2 шт'},{name:'Соль',qty:'щепотка'}],
-    steps:['Отвари яйца вкрутую 10 минут.','Остуди, посоли. Всё.']
-  },
-  {
-    type:'Ужин', name:'Говяжий фарш на сковороде',
-    img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=300&fit=crop&q=80',
-    kcal:460, p:44, f:32, c:0,
-    ingredients:[{name:'Говяжий фарш 80/20',qty:'250 г'},{name:'Сливочное масло',qty:'1 ч.л.'},{name:'Соль',qty:'по вкусу'}],
-    steps:['Обжарь фарш на сухой сковороде, разбивая комки.','Добавь соль и масло в конце.','Карнивор прост — мясо и соль.']
-  },
-];
-
 // ========== DIET DETECTION ==========
 const DIET_KEYWORDS = {
   vegan:        ['веган','vegan','веганка','веганство','растительн','plant-based','без животных'],
@@ -1427,7 +1388,6 @@ const DIET_KEYWORDS = {
   macrobiotic:  ['макробиотик','macrobiotic','японская диета','дзен питание'],
   diabetic:     ['диабет','диабетическ','сахарный диабет','низкий ги','без сахара','diabetic'],
   sport:        ['спортивн','на массу','набор мышц','качаюсь','бодибилдинг','высокобелков','gym','спортзал'],
-  carnivore:    ['карнивор','carnivore','только мясо','ем только мясо','мясная диета','zero carb'],
 };
 
 const RESET_KEYWORDS = [
@@ -1452,7 +1412,7 @@ function getMealSet(dietType) {
     flexitarian: MEALS_FLEXITARIAN, rawfood: MEALS_RAW, halal: MEALS_HALAL,
     kosher: MEALS_KOSHER, glutenfree: MEALS_GLUTENFREE, lactosefree: MEALS_LACTOSEFREE,
     postnoye: MEALS_POSTNOYE, macrobiotic: MEALS_MACROBIOTIC,
-    diabetic: MEALS_DIABETIC, sport: MEALS_SPORT, carnivore: MEALS_CARNIVORE,
+    diabetic: MEALS_DIABETIC, sport: MEALS_SPORT,
   };
   return map[dietType] || MEALS;
 }
@@ -1475,7 +1435,6 @@ const DIET_LABELS = {
   macrobiotic:   '🫘 Макробиотическое меню',
   diabetic:      '🩺 Диабетическое меню',
   sport:         '💪 Спортивное меню (на массу)',
-  carnivore:     '🥩 Карнивор-меню',
   default: null,
 };
 
