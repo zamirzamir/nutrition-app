@@ -481,7 +481,17 @@ function calculate() {
   const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';
   state.context=`Цель: ${goalLbl}, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;
 
-  renderMeals(state.excludedFoods, state.dietType);
+  // Wait for nutrition data if still loading, then render
+  if (nutritionDataLoading) {
+    const waitAndRender = setInterval(() => {
+      if (!nutritionDataLoading) {
+        clearInterval(waitAndRender);
+        renderMeals(state.excludedFoods, state.dietType);
+      }
+    }, 100);
+  } else {
+    renderMeals(state.excludedFoods, state.dietType);
+  }
 
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
@@ -1738,23 +1748,68 @@ loadNutritionData();
 // ========== END RECIPE ENGINE ===============================
 // ============================================================
 
-function renderMeals(excluded=[], dietType='default') {
-  const base = getMealSet(dietType);
+const MEAL_TYPE_RU = { breakfast:'Завтрак', lunch:'Обед', dinner:'Ужин', snack:'Перекус' };
 
-  // also filter by excluded ingredients
+function renderMeals(excluded=[], dietType='default') {
+  const badge = DIET_LABELS[dietType];
+  const badgeHtml = badge
+    ? `<div style="display:inline-block;background:rgba(34,197,94,.15);border:1.5px solid #22c55e;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#4ade80;margin-bottom:10px;">${badge}</div>`
+    : '';
+
+  // ---- Engine path ----
+  if (nutritionDataLoaded && state.kcal > 0) {
+    const profile = buildUserProfile();
+    const tracker = new NutrientTracker();
+    const engineMeals = buildDayMenu(profile, 1, tracker);
+
+    document.getElementById('mealsContainer').innerHTML = badgeHtml + engineMeals.map((m, i) => {
+      const nut = m.nutrition;
+      const ingList = m.scaledIngredients.map(ing => {
+        const ingData = ingredientsMap[ing.id];
+        const ingName = ingData ? ingData.name : ing.id;
+        return `<li><span>${ingName}</span><span class="ig">${ing.amount_g} г</span></li>`;
+      }).join('');
+      const stepsList = (m.instructions || []).map((s, si) =>
+        `<li><div class="step-num">${si+1}</div><span>${s}</span></li>`
+      ).join('');
+      return `
+    <div class="meal-card">
+      <div class="meal-img-wrap" onclick="toggleRecipe(${i})">
+        <img src="${m.image_url || m.recipe?.image_url || ''}" alt="${m.recipe?.name || ''}" loading="lazy"
+          onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.recipe?.name||'')}'">
+        <div class="meal-img-overlay">
+          <div class="meal-type">${MEAL_TYPE_RU[m.mealType] || m.mealType}</div>
+          <div class="meal-name">${m.recipe?.name || ''}</div>
+        </div>
+        <div class="meal-tap-hint">👆 рецепт</div>
+      </div>
+      <div class="recipe-block" id="recipe-${i}">
+        <div class="recipe-macros">
+          <div class="macro-chip">🔥 ${Math.round(nut.calories)} ккал</div>
+          <div class="macro-chip">🥩 Б: ${Math.round(nut.protein)}г</div>
+          <div class="macro-chip">🥑 Ж: ${Math.round(nut.fat)}г</div>
+          <div class="macro-chip">🍚 У: ${Math.round(nut.carbs)}г</div>
+        </div>
+        <div class="recipe-section-title">Продукты</div>
+        <ul class="ingredient-list">${ingList}</ul>
+        <div class="recipe-section-title">Приготовление</div>
+        <ul class="steps-list">${stepsList}</ul>
+      </div>
+    </div>`;
+    }).join('');
+    return;
+  }
+
+  // ---- Fallback: legacy hardcoded sets ----
+  const base = getMealSet(dietType);
   const filtered = base.filter(m => {
     if (!excluded.length) return true;
-    const excLower = excluded.map(e=>e.toLowerCase());
+    const excLower = excluded.map(e => e.toLowerCase());
     return !excLower.some(e =>
       m.name.toLowerCase().includes(e) ||
       m.ingredients.some(i => i.name.toLowerCase().includes(e))
     );
   });
-
-  const badge = DIET_LABELS[dietType];
-  const badgeHtml = badge
-    ? `<div style="display:inline-block;background:rgba(34,197,94,.15);border:1.5px solid #22c55e;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#4ade80;margin-bottom:10px;">${badge}</div>`
-    : '';
 
   document.getElementById('mealsContainer').innerHTML = badgeHtml + filtered.map((m,i)=>`
     <div class="meal-card">
