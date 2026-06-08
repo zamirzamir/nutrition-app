@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "description": "База рецептов для приложения Дичка. КБЖУ считается динамически из ingredients.json.",
   "total_recipes": 320,
   "diets_supported": [
@@ -27479,6 +27479,2582 @@
         "Разрыхлите киноа вилкой.",
         "Выложите на тарелки киноа, шпинат и лосось.",
         "Сбрызните лимонным соком и маслом."
+      ]
+    },
+    {
+      "id": "buckwheat_porridge_milk",
+      "name": "Гречневая каша на молоке",
+      "meal_type": [
+        "breakfast"
+      ],
+      "prep_time": 5,
+      "cook_time": 20,
+      "base_servings": 2,
+      "base_weight_g": 400,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "buckwheat",
+          "amount_g": 160
+        },
+        {
+          "id": "milk_whole",
+          "amount_g": 300
+        },
+        {
+          "id": "butter",
+          "amount_g": 15
+        },
+        {
+          "id": "honey",
+          "amount_g": 20
+        },
+        {
+          "id": "salt",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Гречку тщательно промойте и переберите от посторонних примесей.",
+        "Залейте гречку молоком, добавьте щепотку соли.",
+        "Поставьте на средний огонь и доведите до кипения, постоянно помешивая.",
+        "Убавьте огонь до минимума, накройте крышкой.",
+        "Варите 15–18 минут до полного впитывания молока.",
+        "Снимите с огня, добавьте сливочное масло.",
+        "Дайте постоять под крышкой 5 минут.",
+        "Разложите по тарелкам, полейте мёдом."
+      ]
+    },
+    {
+      "id": "turkey_cutlets_steam",
+      "name": "Паровые котлеты из индейки",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 25,
+      "base_servings": 4,
+      "base_weight_g": 560,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "steam"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "turkey_breast",
+          "amount_g": 500
+        },
+        {
+          "id": "onion",
+          "amount_g": 80
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 55
+        },
+        {
+          "id": "oats",
+          "amount_g": 40
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Овсяные хлопья залейте 60 мл воды и дайте набухнуть 10 минут.",
+        "Филе индейки нарежьте кусками и пропустите через мясорубку вместе с луком и чесноком.",
+        "Добавьте в фарш набухшие хлопья, яйцо, соль и перец.",
+        "Тщательно перемешайте и уберите в холодильник на 15 минут.",
+        "Смочите руки холодной водой и сформируйте котлеты весом 70–80 г.",
+        "Выложите котлеты на решётку пароварки с зазором.",
+        "Готовьте на пару 22–25 минут под крышкой.",
+        "Проверьте готовность — при надавливании выделяется прозрачный сок.",
+        "Подавайте с любым гарниром и тушёными овощами."
+      ]
+    },
+    {
+      "id": "lentil_stew_vegetables",
+      "name": "Чечевичное рагу с овощами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 40,
+      "base_servings": 4,
+      "base_weight_g": 1000,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "boil",
+          "braise"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "lentils_green",
+          "amount_g": 250
+        },
+        {
+          "id": "carrot",
+          "amount_g": 150
+        },
+        {
+          "id": "onion",
+          "amount_g": 120
+        },
+        {
+          "id": "celery",
+          "amount_g": 80
+        },
+        {
+          "id": "tomato",
+          "amount_g": 200
+        },
+        {
+          "id": "garlic",
+          "amount_g": 12
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "cumin",
+          "amount_g": 3
+        },
+        {
+          "id": "paprika",
+          "amount_g": 3
+        },
+        {
+          "id": "salt",
+          "amount_g": 6
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Зелёную чечевицу промойте и замочите на 30 минут.",
+        "Лук, морковь и сельдерей нарежьте небольшими кубиками.",
+        "Разогрейте оливковое масло в кастрюле с толстым дном.",
+        "Обжарьте лук 4–5 минут, затем добавьте морковь и сельдерей.",
+        "Жарьте 5 минут, добавьте чеснок, зиру и паприку.",
+        "Добавьте нарезанные помидоры и тушите 3 минуты.",
+        "Добавьте слитую чечевицу и 700 мл воды.",
+        "Доведите до кипения, варите 25–30 минут до мягкости чечевицы.",
+        "Посолите, поперчите. Подавайте горячим с хлебом."
+      ]
+    },
+    {
+      "id": "cod_baked_with_vegetables",
+      "name": "Треска запечённая с овощами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 30,
+      "base_servings": 2,
+      "base_weight_g": 500,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "cod",
+          "amount_g": 400
+        },
+        {
+          "id": "zucchini",
+          "amount_g": 150
+        },
+        {
+          "id": "tomato",
+          "amount_g": 150
+        },
+        {
+          "id": "bell_pepper_red",
+          "amount_g": 100
+        },
+        {
+          "id": "onion",
+          "amount_g": 80
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "lemon",
+          "amount_g": 40
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        },
+        {
+          "id": "oregano",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Разогрейте духовку до 190°C.",
+        "Кабачок и перец нарежьте крупными кусками, помидоры — дольками, лук — полукольцами.",
+        "Перемешайте овощи с оливковым маслом, чесноком, орегано и солью.",
+        "Выложите овощи в форму для запекания.",
+        "Треску нарежьте порционными кусками, посолите и выложите поверх овощей.",
+        "Сбрызните лимонным соком и маслом.",
+        "Накройте фольгой и запекайте 20 минут.",
+        "Снимите фольгу и запекайте ещё 8–10 минут.",
+        "Подавайте прямо в форме с дольками лимона."
+      ]
+    },
+    {
+      "id": "chickpea_curry",
+      "name": "Карри из нута с томатами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 30,
+      "base_servings": 4,
+      "base_weight_g": 900,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "braise"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "chickpeas",
+          "amount_g": 400
+        },
+        {
+          "id": "tomato",
+          "amount_g": 400
+        },
+        {
+          "id": "onion",
+          "amount_g": 150
+        },
+        {
+          "id": "garlic",
+          "amount_g": 12
+        },
+        {
+          "id": "ginger_root",
+          "amount_g": 10
+        },
+        {
+          "id": "coconut_milk",
+          "amount_g": 200
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "cumin",
+          "amount_g": 4
+        },
+        {
+          "id": "turmeric",
+          "amount_g": 3
+        },
+        {
+          "id": "coriander_ground",
+          "amount_g": 3
+        },
+        {
+          "id": "paprika",
+          "amount_g": 2
+        },
+        {
+          "id": "salt",
+          "amount_g": 6
+        }
+      ],
+      "instructions": [
+        "Лук нарежьте мелко, чеснок и имбирь измельчите.",
+        "Обжарьте лук в масле 7–8 минут до золотистости.",
+        "Добавьте чеснок и имбирь, жарьте 2 минуты.",
+        "Добавьте зиру, куркуму, кориандр и паприку. Жарьте 1 минуту помешивая.",
+        "Добавьте нарезанные помидоры, тушите 8–10 минут.",
+        "Добавьте отварной или консервированный нут.",
+        "Влейте кокосовое молоко, перемешайте.",
+        "Тушите 10–15 минут до загустения соуса.",
+        "Подавайте с рисом и лепёшкой, украсив кинзой."
+      ]
+    },
+    {
+      "id": "beef_vegetable_stew",
+      "name": "Говяжье рагу с картофелем",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 80,
+      "base_servings": 4,
+      "base_weight_g": 1400,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "braise"
+        ],
+        "season": [
+          "autumn",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "beef_lean",
+          "amount_g": 500
+        },
+        {
+          "id": "potato",
+          "amount_g": 400
+        },
+        {
+          "id": "carrot",
+          "amount_g": 150
+        },
+        {
+          "id": "onion",
+          "amount_g": 150
+        },
+        {
+          "id": "tomato_paste",
+          "amount_g": 40
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "garlic",
+          "amount_g": 12
+        },
+        {
+          "id": "bay_leaf",
+          "amount_g": 2
+        },
+        {
+          "id": "salt",
+          "amount_g": 8
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "paprika",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Говядину нарежьте кусками по 4–5 см, обсушите бумажным полотенцем.",
+        "Разогрейте масло в казане на сильном огне, обжарьте мясо до корочки порциями.",
+        "Убавьте огонь, добавьте нарезанный лук и жарьте 5 минут.",
+        "Добавьте морковь и томатную пасту, жарьте 3 минуты.",
+        "Добавьте паприку, лавровый лист, соль и перец.",
+        "Залейте горячей водой чуть выше уровня мяса.",
+        "Накройте крышкой и тушите на слабом огне 50 минут.",
+        "Добавьте нарезанный картофель, варите ещё 20–25 минут.",
+        "Добавьте измельчённый чеснок и подавайте горячим."
+      ]
+    },
+    {
+      "id": "ovsyanka_s_yablokom",
+      "name": "Овсянка с запечённым яблоком",
+      "meal_type": [
+        "breakfast"
+      ],
+      "prep_time": 5,
+      "cook_time": 15,
+      "base_servings": 1,
+      "base_weight_g": 320,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "autumn",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "oats",
+          "amount_g": 80
+        },
+        {
+          "id": "milk_whole",
+          "amount_g": 200
+        },
+        {
+          "id": "apple",
+          "amount_g": 100
+        },
+        {
+          "id": "honey",
+          "amount_g": 15
+        },
+        {
+          "id": "cinnamon",
+          "amount_g": 2
+        },
+        {
+          "id": "walnuts",
+          "amount_g": 15
+        }
+      ],
+      "instructions": [
+        "Яблоко очистите, нарежьте кубиками и потушите с мёдом и корицей 5 минут.",
+        "Молоко доведите до кипения в кастрюле.",
+        "Добавьте овсяные хлопья, убавьте огонь.",
+        "Варите 5–7 минут, помешивая, до желаемой густоты.",
+        "Снимите с огня, дайте постоять 2 минуты.",
+        "Переложите в тарелку, выложите сверху яблоко с мёдом.",
+        "Посыпьте грецкими орехами и подавайте."
+      ]
+    },
+    {
+      "id": "chicken_rice_bowl",
+      "name": "Рисовый боул с курицей и овощами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 25,
+      "base_servings": 2,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "fry",
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "rice_white",
+          "amount_g": 200
+        },
+        {
+          "id": "chicken_breast",
+          "amount_g": 250
+        },
+        {
+          "id": "cucumber",
+          "amount_g": 100
+        },
+        {
+          "id": "carrot",
+          "amount_g": 80
+        },
+        {
+          "id": "spinach",
+          "amount_g": 60
+        },
+        {
+          "id": "soy_sauce",
+          "amount_g": 30
+        },
+        {
+          "id": "sesame_oil",
+          "amount_g": 10
+        },
+        {
+          "id": "garlic",
+          "amount_g": 6
+        },
+        {
+          "id": "sesame_seeds",
+          "amount_g": 10
+        },
+        {
+          "id": "salt",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Рис промойте и отварите до готовности.",
+        "Куриную грудку нарежьте полосками, замаринуйте в соевом соусе с чесноком на 10 минут.",
+        "Обжарьте курицу в кунжутном масле 5–6 минут до готовности.",
+        "Морковь натрите на тёрке или нарежьте соломкой.",
+        "Огурец нарежьте ломтиками, шпинат промойте.",
+        "Соберите боул: выложите рис в миску.",
+        "Разложите по секторам курицу, морковь, огурец и шпинат.",
+        "Полейте соевым соусом.",
+        "Посыпьте кунжутом и подавайте."
+      ]
+    },
+    {
+      "id": "mushroom_cream_soup",
+      "name": "Крем-суп из шампиньонов",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 30,
+      "base_servings": 4,
+      "base_weight_g": 1200,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "mushroom_champignon",
+          "amount_g": 500
+        },
+        {
+          "id": "onion",
+          "amount_g": 150
+        },
+        {
+          "id": "potato",
+          "amount_g": 200
+        },
+        {
+          "id": "cream_heavy",
+          "amount_g": 150
+        },
+        {
+          "id": "butter",
+          "amount_g": 30
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "salt",
+          "amount_g": 6
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "nutmeg",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Лук нарежьте кубиками, грибы — пластинками, картофель — кубиками.",
+        "Растопите масло в кастрюле, обжарьте лук 4 минуты.",
+        "Добавьте грибы, жарьте 8–10 минут до испарения жидкости.",
+        "Добавьте чеснок, жарьте 1 минуту.",
+        "Добавьте картофель и 700 мл воды, посолите.",
+        "Варите 15–18 минут до мягкости картофеля.",
+        "Пюрируйте суп погружным блендером до однородности.",
+        "Влейте сливки, добавьте мускатный орех, прогрейте 3 минуты.",
+        "Подавайте с гренками и свежей зеленью."
+      ]
+    },
+    {
+      "id": "shashlik_kuriniy",
+      "name": "Куриный шашлык в духовке",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 25,
+      "base_servings": 4,
+      "base_weight_g": 800,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "summer",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "chicken_thigh",
+          "amount_g": 800
+        },
+        {
+          "id": "onion",
+          "amount_g": 200
+        },
+        {
+          "id": "lemon",
+          "amount_g": 60
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 40
+        },
+        {
+          "id": "garlic",
+          "amount_g": 15
+        },
+        {
+          "id": "paprika",
+          "amount_g": 5
+        },
+        {
+          "id": "cumin",
+          "amount_g": 3
+        },
+        {
+          "id": "salt",
+          "amount_g": 8
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Куриные бёдра нарежьте крупными кусками 4–5 см.",
+        "Для маринада смешайте масло, лимонный сок, давленый чеснок, паприку, зиру, соль и перец.",
+        "Лук нарежьте полукольцами.",
+        "Смешайте курицу с маринадом и луком. Маринуйте 2–4 часа.",
+        "Разогрейте духовку до 220°C с грилем или режимом конвекции.",
+        "Нанижите кусочки на шпажки, чередуя с луком.",
+        "Выложите шпажки на решётку над противнем.",
+        "Запекайте 20–25 минут, переворачивая раз в 10 минут.",
+        "Подавайте с овощами и лавашом."
+      ]
+    },
+    {
+      "id": "manty_s_bараниной",
+      "name": "Манты с бараниной и луком",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 60,
+      "cook_time": 40,
+      "base_servings": 5,
+      "base_weight_g": 1000,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "steam"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "rye_flour",
+          "amount_g": 400
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 55
+        },
+        {
+          "id": "lamb_leg",
+          "amount_g": 500
+        },
+        {
+          "id": "onion",
+          "amount_g": 300
+        },
+        {
+          "id": "salt",
+          "amount_g": 8
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 4
+        },
+        {
+          "id": "cumin",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Замесите крутое тесто из муки, яйца, щепотки соли и 150 мл тёплой воды. Накройте и дайте отдохнуть 30 минут.",
+        "Баранину мелко нарежьте ножом (не в мясорубке) — кубиками 0,5 см.",
+        "Лук мелко нарежьте, смешайте с мясом, зирой, солью и перцем.",
+        "Тесто раскатайте тонко (2 мм), нарежьте квадратами 10×10 см.",
+        "На каждый квадрат положите 1,5–2 ст.л. начинки.",
+        "Соедините противоположные углы и слепите края — форма мантов.",
+        "Смажьте решётку мантоварки маслом, выложите манты.",
+        "Готовьте на пару 35–40 минут.",
+        "Подавайте горячими со сметаной или с бульоном."
+      ]
+    },
+    {
+      "id": "greek_yogurt_parfait",
+      "name": "Парфе из греческого йогурта",
+      "meal_type": [
+        "breakfast",
+        "snack"
+      ],
+      "prep_time": 10,
+      "cook_time": 0,
+      "base_servings": 2,
+      "base_weight_g": 360,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "greek_yogurt",
+          "amount_g": 300
+        },
+        {
+          "id": "strawberry",
+          "amount_g": 100
+        },
+        {
+          "id": "blueberry",
+          "amount_g": 60
+        },
+        {
+          "id": "oats",
+          "amount_g": 50
+        },
+        {
+          "id": "honey",
+          "amount_g": 20
+        },
+        {
+          "id": "almonds",
+          "amount_g": 20
+        }
+      ],
+      "instructions": [
+        "Клубнику нарежьте тонкими ломтиками.",
+        "Орехи крупно порубите.",
+        "В высокий бокал выложите слой йогурта.",
+        "Сверху — слой клубники и черники.",
+        "Добавьте слой овсяных хлопьев и орехов.",
+        "Повторите слои — йогурт, ягоды, хлопья.",
+        "Полейте мёдом.",
+        "Подавайте сразу или охладите 15 минут."
+      ]
+    },
+    {
+      "id": "potato_pancakes_draniki",
+      "name": "Картофельные драники",
+      "meal_type": [
+        "breakfast",
+        "lunch"
+      ],
+      "prep_time": 20,
+      "cook_time": 25,
+      "base_servings": 3,
+      "base_weight_g": 540,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "fry"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "potato",
+          "amount_g": 600
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 55
+        },
+        {
+          "id": "rye_flour",
+          "amount_g": 30
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 50
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        },
+        {
+          "id": "sour_cream",
+          "amount_g": 80
+        }
+      ],
+      "instructions": [
+        "Картофель очистите и натрите на мелкой тёрке.",
+        "Отожмите картофель от лишнего сока через марлю или сито.",
+        "Лук натрите на тёрке и добавьте к картофелю.",
+        "Добавьте яйцо, муку, соль и перец. Перемешайте.",
+        "Разогрейте масло в сковороде на среднем огне.",
+        "Выкладывайте тесто столовой ложкой, приплющивайте.",
+        "Жарьте 3–4 минуты с каждой стороны до золотистой корочки.",
+        "Выложите на бумажное полотенце для впитывания лишнего масла.",
+        "Подавайте горячими со сметаной."
+      ]
+    },
+    {
+      "id": "salmon_miso_soup",
+      "name": "Мисо-суп с лососем и тофу",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 10,
+      "cook_time": 15,
+      "base_servings": 2,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "salmon",
+          "amount_g": 200
+        },
+        {
+          "id": "tofu",
+          "amount_g": 150
+        },
+        {
+          "id": "miso_paste",
+          "amount_g": 40
+        },
+        {
+          "id": "seaweed_nori",
+          "amount_g": 10
+        },
+        {
+          "id": "onion",
+          "amount_g": 50
+        },
+        {
+          "id": "ginger_root",
+          "amount_g": 8
+        },
+        {
+          "id": "sesame_oil",
+          "amount_g": 5
+        },
+        {
+          "id": "salt",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Залейте водорослевые листы 600 мл воды, доведите до кипения.",
+        "Тофу нарежьте небольшими кубиками 1 см.",
+        "Лосось нарежьте кусочками, лук — тонкими кольцами.",
+        "Имбирь натрите на мелкой тёрке.",
+        "Добавьте в кипящий бульон лосось и тофу.",
+        "Варите 5 минут до готовности рыбы.",
+        "Разведите мисо-пасту в 3 ст.л. тёплого бульона, влейте в суп.",
+        "Добавьте кунжутное масло, имбирь и лук. Не кипятите!",
+        "Подавайте горячим с рисом."
+      ]
+    },
+    {
+      "id": "tempeh_vegetables",
+      "name": "Темпе с овощами и соевым соусом",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 20,
+      "base_servings": 2,
+      "base_weight_g": 480,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "fry"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "tempeh",
+          "amount_g": 250
+        },
+        {
+          "id": "bok_choy",
+          "amount_g": 150
+        },
+        {
+          "id": "carrot",
+          "amount_g": 100
+        },
+        {
+          "id": "garlic",
+          "amount_g": 10
+        },
+        {
+          "id": "ginger_root",
+          "amount_g": 8
+        },
+        {
+          "id": "soy_sauce",
+          "amount_g": 35
+        },
+        {
+          "id": "sesame_oil",
+          "amount_g": 10
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 20
+        },
+        {
+          "id": "honey",
+          "amount_g": 10
+        }
+      ],
+      "instructions": [
+        "Темпе нарежьте кубиками 2 см или тонкими пластинками.",
+        "Смешайте соевый соус, мёд, измельчённый чеснок, тёртый имбирь и кунжутное масло.",
+        "Замаринуйте темпе в соусе на 15 минут.",
+        "Разогрейте масло в воке на сильном огне.",
+        "Обжарьте темпе 4–5 минут до золотистой корочки. Отложите.",
+        "В том же воке обжарьте морковь (соломка) 3 минуты.",
+        "Добавьте бок-чой и жарьте ещё 3 минуты.",
+        "Верните темпе, полейте оставшимся маринадом.",
+        "Перемешайте и подавайте с рисом, посыпав кунжутом."
+      ]
+    },
+    {
+      "id": "pork_stewed_sauerkraut",
+      "name": "Свинина тушёная с квашеной капустой",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 60,
+      "base_servings": 4,
+      "base_weight_g": 1000,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "braise"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "pork_loin",
+          "amount_g": 400
+        },
+        {
+          "id": "cabbage_white",
+          "amount_g": 500
+        },
+        {
+          "id": "onion",
+          "amount_g": 150
+        },
+        {
+          "id": "carrot",
+          "amount_g": 100
+        },
+        {
+          "id": "tomato_paste",
+          "amount_g": 30
+        },
+        {
+          "id": "bay_leaf",
+          "amount_g": 3
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 40
+        },
+        {
+          "id": "salt",
+          "amount_g": 5
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "cumin",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Свинину нарежьте кусками 3 см. Лук — полукольцами, морковь натрите.",
+        "Разогрейте масло в казане, обжарьте свинину до корочки 8 минут.",
+        "Добавьте лук и морковь, жарьте 5 минут.",
+        "Добавьте томатную пасту, жарьте 2 минуты.",
+        "Капусту нашинкуйте (или добавьте квашеную со слитым рассолом).",
+        "Добавьте капусту к мясу, перемешайте.",
+        "Добавьте лавровый лист, зиру, соль и перец.",
+        "Добавьте 150 мл воды, накройте крышкой.",
+        "Тушите на слабом огне 45–50 минут, иногда помешивая."
+      ]
+    },
+    {
+      "id": "egg_avocado_toast",
+      "name": "Тост с авокадо и варёным яйцом",
+      "meal_type": [
+        "breakfast"
+      ],
+      "prep_time": 10,
+      "cook_time": 10,
+      "base_servings": 1,
+      "base_weight_g": 250,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil",
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "bread_whole_wheat",
+          "amount_g": 80
+        },
+        {
+          "id": "avocado",
+          "amount_g": 100
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 55
+        },
+        {
+          "id": "lemon",
+          "amount_g": 20
+        },
+        {
+          "id": "salt",
+          "amount_g": 2
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        },
+        {
+          "id": "chili_pepper",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Яйцо сварите вкрутую (10 минут) или пашот (3 минуты в кипятке с уксусом).",
+        "Хлеб обжарьте в тостере до хрустящей корочки.",
+        "Авокадо разрежьте пополам, удалите косточку, ложкой выньте мякоть.",
+        "Разомните мякоть вилкой, добавьте лимонный сок, соль и перец.",
+        "Намажьте авокадо-пасту на тост.",
+        "Сверху выложите яйцо — нарезанное или целое (пашот).",
+        "Посыпьте острым перцем и солью. Подавайте сразу."
+      ]
+    },
+    {
+      "id": "stuffed_peppers_rice_veg",
+      "name": "Перец фаршированный рисом и грибами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 25,
+      "cook_time": 45,
+      "base_servings": 4,
+      "base_weight_g": 1000,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil",
+          "braise"
+        ],
+        "season": [
+          "summer",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "bell_pepper_red",
+          "amount_g": 800
+        },
+        {
+          "id": "rice_white",
+          "amount_g": 150
+        },
+        {
+          "id": "mushroom_champignon",
+          "amount_g": 200
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "carrot",
+          "amount_g": 80
+        },
+        {
+          "id": "cheese_cheddar",
+          "amount_g": 60
+        },
+        {
+          "id": "tomato_paste",
+          "amount_g": 30
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "salt",
+          "amount_g": 5
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Рис отварите до полуготовности (8 минут), откиньте.",
+        "Лук и морковь нарежьте кубиками, грибы — мелкими ломтиками.",
+        "Обжарьте лук и морковь на масле 5 минут, добавьте грибы.",
+        "Жарьте 7–8 минут, посолите.",
+        "Смешайте рис с грибной зажаркой, добавьте тёртый сыр.",
+        "Срежьте крышечки с перцев, удалите семена.",
+        "Наполните перцы начинкой, установите в кастрюлю.",
+        "Разведите томатную пасту в воде, залейте перцы.",
+        "Тушите под крышкой 35–40 минут на слабом огне."
+      ]
+    },
+    {
+      "id": "baked_sweet_potato",
+      "name": "Запечённый батат с йогуртом",
+      "meal_type": [
+        "lunch",
+        "dinner",
+        "snack"
+      ],
+      "prep_time": 5,
+      "cook_time": 45,
+      "base_servings": 2,
+      "base_weight_g": 400,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "autumn",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "sweet_potato",
+          "amount_g": 400
+        },
+        {
+          "id": "greek_yogurt",
+          "amount_g": 100
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 15
+        },
+        {
+          "id": "cinnamon",
+          "amount_g": 1
+        },
+        {
+          "id": "honey",
+          "amount_g": 10
+        },
+        {
+          "id": "salt",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Разогрейте духовку до 200°C.",
+        "Батат тщательно вымойте и обсушите.",
+        "Натрите оливковым маслом и посолите.",
+        "Выложите на противень и запекайте 40–45 минут до мягкости.",
+        "Проверьте готовность — вилка должна легко входить в мякоть.",
+        "Надрежьте батат сверху, раскройте.",
+        "Выложите ложку греческого йогурта внутрь.",
+        "Посыпьте корицей и полейте мёдом. Подавайте горячим."
+      ]
+    },
+    {
+      "id": "herring_salad",
+      "name": "Салат с селёдкой и картофелем",
+      "meal_type": [
+        "lunch",
+        "snack"
+      ],
+      "prep_time": 20,
+      "cook_time": 30,
+      "base_servings": 4,
+      "base_weight_g": 700,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "boil",
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "herring",
+          "amount_g": 200
+        },
+        {
+          "id": "potato",
+          "amount_g": 300
+        },
+        {
+          "id": "onion",
+          "amount_g": 80
+        },
+        {
+          "id": "apple",
+          "amount_g": 100
+        },
+        {
+          "id": "sour_cream",
+          "amount_g": 80
+        },
+        {
+          "id": "salt",
+          "amount_g": 2
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        },
+        {
+          "id": "dill_fresh",
+          "amount_g": 10
+        }
+      ],
+      "instructions": [
+        "Картофель отварите в мундире 25–30 минут, охладите, очистите и нарежьте кубиками.",
+        "Сельдь очистите от кожи и костей, нарежьте небольшими кусочками.",
+        "Лук нарежьте тонкими полукольцами, залейте кипятком на 5 минут для мягкости.",
+        "Яблоко очистите и нарежьте небольшими кубиками.",
+        "Смешайте картофель, сельдь, лук и яблоко.",
+        "Заправьте сметаной, посолите и поперчите.",
+        "Посыпьте рубленым укропом.",
+        "Уберите в холодильник на 20 минут и подавайте."
+      ]
+    },
+    {
+      "id": "bulgur_vegetables",
+      "name": "Булгур с овощами и зеленью",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 10,
+      "cook_time": 20,
+      "base_servings": 3,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "boil",
+          "fry"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "bulgur",
+          "amount_g": 200
+        },
+        {
+          "id": "tomato",
+          "amount_g": 200
+        },
+        {
+          "id": "bell_pepper_green",
+          "amount_g": 150
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "parsley_fresh",
+          "amount_g": 20
+        },
+        {
+          "id": "salt",
+          "amount_g": 5
+        },
+        {
+          "id": "cumin",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Лук нарежьте кубиками, перец — небольшими кусочками.",
+        "Разогрейте масло, обжарьте лук 4 минуты.",
+        "Добавьте перец и жарьте ещё 4 минуты.",
+        "Добавьте нарезанные помидоры и чеснок, тушите 3 минуты.",
+        "Всыпьте булгур и зиру, перемешайте.",
+        "Залейте 400 мл горячей воды, посолите.",
+        "Доведите до кипения, накройте крышкой и варите 12–15 минут.",
+        "Дайте постоять 5 минут, разрыхлите вилкой.",
+        "Добавьте мелко нарезанную петрушку и подавайте."
+      ]
+    },
+    {
+      "id": "trout_with_herbs",
+      "name": "Форель запечённая с травами",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 25,
+      "base_servings": 2,
+      "base_weight_g": 500,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "trout",
+          "amount_g": 500
+        },
+        {
+          "id": "lemon",
+          "amount_g": 60
+        },
+        {
+          "id": "rosemary_fresh",
+          "amount_g": 10
+        },
+        {
+          "id": "thyme_fresh",
+          "amount_g": 5
+        },
+        {
+          "id": "garlic",
+          "amount_g": 10
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 25
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Разогрейте духовку до 200°C.",
+        "Форель очистите и промойте, сделайте надрезы на коже через 3 см.",
+        "Смешайте оливковое масло, измельчённый чеснок, соль и перец.",
+        "Натрите рыбу смесью снаружи и внутри.",
+        "Внутрь вложите веточки розмарина и тимьяна, кружочки лимона.",
+        "Выложите рыбу на фольгу, заверните плотно.",
+        "Запекайте 20 минут, затем раскройте фольгу.",
+        "Запекайте ещё 5 минут для румяной корочки.",
+        "Подавайте с запечёнными овощами или зелёным салатом."
+      ]
+    },
+    {
+      "id": "chicken_soup_ginger",
+      "name": "Куриный суп с имбирём и шпинатом",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 35,
+      "base_servings": 4,
+      "base_weight_g": 1400,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "chicken_breast",
+          "amount_g": 300
+        },
+        {
+          "id": "spinach",
+          "amount_g": 100
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "carrot",
+          "amount_g": 100
+        },
+        {
+          "id": "ginger_root",
+          "amount_g": 15
+        },
+        {
+          "id": "garlic",
+          "amount_g": 10
+        },
+        {
+          "id": "lemon",
+          "amount_g": 30
+        },
+        {
+          "id": "salt",
+          "amount_g": 6
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "turmeric",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Куриную грудку залейте 1,5 л холодной воды и доведите до кипения.",
+        "Снимите пену, добавьте целую луковицу и варите 25 минут.",
+        "Достаньте курицу, бульон процедите.",
+        "Морковь нарежьте кружочками, имбирь — тонкой соломкой, чеснок измельчите.",
+        "Верните бульон на огонь, добавьте морковь и варите 8 минут.",
+        "Курицу нарежьте и верните в суп.",
+        "Добавьте имбирь, чеснок, куркуму, соль и перец.",
+        "Добавьте шпинат и варите 2 минуты.",
+        "Добавьте лимонный сок и подавайте."
+      ]
+    },
+    {
+      "id": "cottage_cheese_pancakes_oven",
+      "name": "Запечённые творожные оладьи",
+      "meal_type": [
+        "breakfast"
+      ],
+      "prep_time": 15,
+      "cook_time": 25,
+      "base_servings": 3,
+      "base_weight_g": 450,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "cottage_cheese",
+          "amount_g": 350
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 110
+        },
+        {
+          "id": "oats",
+          "amount_g": 80
+        },
+        {
+          "id": "honey",
+          "amount_g": 30
+        },
+        {
+          "id": "vanilla_extract",
+          "amount_g": 2
+        },
+        {
+          "id": "cinnamon",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Разогрейте духовку до 180°C. Застелите противень пергаментом.",
+        "Овсяные хлопья измельчите в муку.",
+        "Творог взбейте блендером до однородности.",
+        "Смешайте творог, яйца, мёд, ваниль и корицу.",
+        "Добавьте овсяную муку и перемешайте — тесто будет мягким.",
+        "Выложите на противень ложкой круглые лепёшки.",
+        "Выпекайте 20–25 минут до золотистого цвета.",
+        "Подавайте с ягодами или мёдом."
+      ]
+    },
+    {
+      "id": "tuna_pasta_salad",
+      "name": "Паста-салат с тунцом и овощами",
+      "meal_type": [
+        "lunch",
+        "snack"
+      ],
+      "prep_time": 15,
+      "cook_time": 10,
+      "base_servings": 3,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "boil",
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "pasta_wheat",
+          "amount_g": 200
+        },
+        {
+          "id": "tuna_canned",
+          "amount_g": 160
+        },
+        {
+          "id": "tomato",
+          "amount_g": 150
+        },
+        {
+          "id": "cucumber",
+          "amount_g": 100
+        },
+        {
+          "id": "bell_pepper_green",
+          "amount_g": 80
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "lemon",
+          "amount_g": 30
+        },
+        {
+          "id": "salt",
+          "amount_g": 3
+        },
+        {
+          "id": "oregano",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Отварите пасту в подсолённой воде до готовности, откиньте и остудите.",
+        "Тунец слейте и разомните вилкой.",
+        "Помидоры, огурец и перец нарежьте небольшими кусочками.",
+        "Смешайте остывшую пасту с тунцом и овощами.",
+        "Приготовьте заправку: оливковое масло, лимонный сок, орегано, соль.",
+        "Полейте заправкой и перемешайте.",
+        "Охладите 15 минут. Подавайте как самостоятельное блюдо."
+      ]
+    },
+    {
+      "id": "beef_liver_onion",
+      "name": "Говяжья печень с луком и сметаной",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 25,
+      "base_servings": 3,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "fry",
+          "braise"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "liver_beef",
+          "amount_g": 500
+        },
+        {
+          "id": "onion",
+          "amount_g": 200
+        },
+        {
+          "id": "sour_cream",
+          "amount_g": 120
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 40
+        },
+        {
+          "id": "oat_bran",
+          "amount_g": 30
+        },
+        {
+          "id": "salt",
+          "amount_g": 5
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "bay_leaf",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Печень очистите от плёнок и желчных протоков, нарежьте кусочками 1,5–2 см.",
+        "Замочите печень в молоке на 30 минут для устранения горечи, затем обсушите.",
+        "Обваляйте кусочки в отрубях или муке.",
+        "Разогрейте масло на сильном огне, обжарьте печень по 2–3 минуты с каждой стороны.",
+        "Убавьте огонь, добавьте нарезанный полукольцами лук.",
+        "Жарьте 5–7 минут до мягкости лука.",
+        "Добавьте сметану и лавровый лист, перемешайте.",
+        "Тушите под крышкой 8–10 минут. Не пересушите печень!",
+        "Подавайте с картофельным пюре или гречкой."
+      ]
+    },
+    {
+      "id": "overnight_oats",
+      "name": "Овсянка на ночь с ягодами",
+      "meal_type": [
+        "breakfast"
+      ],
+      "prep_time": 5,
+      "cook_time": 0,
+      "base_servings": 1,
+      "base_weight_g": 300,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "oats",
+          "amount_g": 80
+        },
+        {
+          "id": "greek_yogurt",
+          "amount_g": 100
+        },
+        {
+          "id": "milk_whole",
+          "amount_g": 80
+        },
+        {
+          "id": "blueberry",
+          "amount_g": 60
+        },
+        {
+          "id": "honey",
+          "amount_g": 15
+        },
+        {
+          "id": "chia_seeds",
+          "amount_g": 10
+        }
+      ],
+      "instructions": [
+        "В банку или глубокую миску насыпьте овсяные хлопья.",
+        "Добавьте семена чиа, перемешайте.",
+        "Влейте молоко и добавьте йогурт, перемешайте.",
+        "Добавьте мёд, перемешайте.",
+        "Накройте крышкой и уберите в холодильник на ночь (минимум 6 часов).",
+        "Утром выложите сверху свежие ягоды.",
+        "Подавайте холодным прямо из банки."
+      ]
+    },
+    {
+      "id": "shchi_postnie",
+      "name": "Постные щи из свежей капусты",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 45,
+      "base_servings": 4,
+      "base_weight_g": 1600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "cabbage_white",
+          "amount_g": 400
+        },
+        {
+          "id": "potato",
+          "amount_g": 300
+        },
+        {
+          "id": "carrot",
+          "amount_g": 120
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "tomato",
+          "amount_g": 150
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 30
+        },
+        {
+          "id": "bay_leaf",
+          "amount_g": 2
+        },
+        {
+          "id": "salt",
+          "amount_g": 7
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "dill_fresh",
+          "amount_g": 15
+        }
+      ],
+      "instructions": [
+        "Доведите 1,8 л воды до кипения.",
+        "Лук нарежьте кубиками, морковь натрите. Обжарьте на масле 5 минут.",
+        "Добавьте нарезанные помидоры к зажарке, тушите 3 минуты.",
+        "Картофель нарежьте кубиками и отправьте в кипящую воду.",
+        "Через 7 минут добавьте нашинкованную капусту.",
+        "Через 5 минут добавьте зажарку.",
+        "Добавьте лавровый лист, соль и перец.",
+        "Варите ещё 10 минут до мягкости овощей.",
+        "Добавьте чеснок и укроп, настаивайте 10 минут под крышкой."
+      ]
+    },
+    {
+      "id": "chicken_liver_pate",
+      "name": "Паштет из куриной печени",
+      "meal_type": [
+        "snack"
+      ],
+      "prep_time": 15,
+      "cook_time": 25,
+      "base_servings": 6,
+      "base_weight_g": 350,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "fry"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "liver_chicken",
+          "amount_g": 400
+        },
+        {
+          "id": "onion",
+          "amount_g": 150
+        },
+        {
+          "id": "butter",
+          "amount_g": 80
+        },
+        {
+          "id": "cream_heavy",
+          "amount_g": 50
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        },
+        {
+          "id": "bay_leaf",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Печень очистите от плёнок, промойте и обсушите.",
+        "Лук нарежьте полукольцами, чеснок измельчите.",
+        "Растопите половину масла в сковороде, обжарьте лук до мягкости 7 минут.",
+        "Добавьте печень и жарьте на среднем огне 8–10 минут.",
+        "Добавьте чеснок, лавровый лист, соль и перец. Жарьте ещё 3 минуты.",
+        "Печень должна оставаться чуть розовой внутри для нежности.",
+        "Остудите, удалите лавровый лист.",
+        "Переложите в блендер с оставшимся маслом и сливками.",
+        "Измельчите до однородной кремовой консистенции. Охладите 2 часа."
+      ]
+    },
+    {
+      "id": "greek_style_chicken",
+      "name": "Курица по-гречески с оливками",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 15,
+      "cook_time": 40,
+      "base_servings": 4,
+      "base_weight_g": 900,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "chicken_thigh",
+          "amount_g": 800
+        },
+        {
+          "id": "tomato",
+          "amount_g": 300
+        },
+        {
+          "id": "olives_black",
+          "amount_g": 80
+        },
+        {
+          "id": "garlic",
+          "amount_g": 15
+        },
+        {
+          "id": "lemon",
+          "amount_g": 60
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 40
+        },
+        {
+          "id": "oregano",
+          "amount_g": 4
+        },
+        {
+          "id": "salt",
+          "amount_g": 7
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Разогрейте духовку до 200°C.",
+        "Куриные бёдра посолите, поперчите и натрите орегано.",
+        "Смажьте форму маслом, выложите курицу кожей вверх.",
+        "Помидоры нарежьте дольками, разложите вокруг курицы.",
+        "Добавьте маслины и дольки чеснока.",
+        "Сбрызните маслом и лимонным соком.",
+        "Запекайте 35–40 минут до золотистой корочки.",
+        "Полейте соком со дна формы за 10 минут до готовности.",
+        "Подавайте с питой или рисом."
+      ]
+    },
+    {
+      "id": "brown_rice_bowl_egg",
+      "name": "Боул с бурым рисом и яйцом пашот",
+      "meal_type": [
+        "breakfast",
+        "lunch"
+      ],
+      "prep_time": 10,
+      "cook_time": 30,
+      "base_servings": 2,
+      "base_weight_g": 500,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "rice_brown",
+          "amount_g": 200
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 110
+        },
+        {
+          "id": "avocado",
+          "amount_g": 100
+        },
+        {
+          "id": "spinach",
+          "amount_g": 80
+        },
+        {
+          "id": "cherry_tomato",
+          "amount_g": 100
+        },
+        {
+          "id": "soy_sauce",
+          "amount_g": 20
+        },
+        {
+          "id": "sesame_oil",
+          "amount_g": 8
+        },
+        {
+          "id": "sesame_seeds",
+          "amount_g": 8
+        },
+        {
+          "id": "salt",
+          "amount_g": 3
+        }
+      ],
+      "instructions": [
+        "Бурый рис промойте и отварите 30 минут до готовности.",
+        "Для яйца пашот: доведите воду с уксусом до кипения, сделайте воронку.",
+        "Аккуратно вбейте яйцо в воронку, варите 3 минуты.",
+        "Авокадо очистите и нарежьте ломтиками.",
+        "Черри разрежьте пополам, шпинат промойте.",
+        "Соберите боул: рис — основа.",
+        "Разложите авокадо, черри и шпинат по секторам.",
+        "Выложите яйцо пашот в центр.",
+        "Полейте соевым соусом и кунжутным маслом, посыпьте кунжутом."
+      ]
+    },
+    {
+      "id": "spicy_squid_salad",
+      "name": "Салат из кальмаров с овощами",
+      "meal_type": [
+        "lunch",
+        "snack"
+      ],
+      "prep_time": 15,
+      "cook_time": 5,
+      "base_servings": 3,
+      "base_weight_g": 450,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "boil",
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "squid",
+          "amount_g": 300
+        },
+        {
+          "id": "cucumber",
+          "amount_g": 150
+        },
+        {
+          "id": "carrot",
+          "amount_g": 100
+        },
+        {
+          "id": "bell_pepper_green",
+          "amount_g": 80
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "soy_sauce",
+          "amount_g": 25
+        },
+        {
+          "id": "sesame_oil",
+          "amount_g": 8
+        },
+        {
+          "id": "lemon",
+          "amount_g": 25
+        },
+        {
+          "id": "chili_pepper",
+          "amount_g": 5
+        }
+      ],
+      "instructions": [
+        "Кальмаров очистите и варите в подсолённой воде ровно 2 минуты.",
+        "Остудите под холодной водой и нарежьте кольцами.",
+        "Морковь натрите на тёрке для корейской моркови.",
+        "Огурец и перец нарежьте тонкой соломкой.",
+        "Смешайте соевый соус, лимонный сок, кунжутное масло, измельчённый чеснок и острый перец.",
+        "Смешайте кальмаров с овощами.",
+        "Залейте заправкой, тщательно перемешайте.",
+        "Охладите 20 минут и подавайте."
+      ]
+    },
+    {
+      "id": "green_pea_soup",
+      "name": "Суп-пюре из зелёного горошка",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 10,
+      "cook_time": 25,
+      "base_servings": 4,
+      "base_weight_g": 1200,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "boil"
+        ],
+        "season": [
+          "spring",
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "green_peas",
+          "amount_g": 400
+        },
+        {
+          "id": "onion",
+          "amount_g": 120
+        },
+        {
+          "id": "potato",
+          "amount_g": 200
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 25
+        },
+        {
+          "id": "mint_fresh",
+          "amount_g": 10
+        },
+        {
+          "id": "lemon",
+          "amount_g": 30
+        },
+        {
+          "id": "salt",
+          "amount_g": 5
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 2
+        }
+      ],
+      "instructions": [
+        "Лук и чеснок нарежьте, картофель — кубиками.",
+        "Разогрейте масло, обжарьте лук 4 минуты до мягкости.",
+        "Добавьте чеснок, жарьте 1 минуту.",
+        "Добавьте картофель и 800 мл горячей воды, посолите.",
+        "Варите 12 минут до мягкости картофеля.",
+        "Добавьте горошек и варите ещё 5 минут.",
+        "Добавьте мяту и лимонный сок.",
+        "Пюрируйте до однородности.",
+        "Подавайте с гренками или хлебом, украсив мятой."
+      ]
+    },
+    {
+      "id": "sardine_toast",
+      "name": "Тост с сардинами и помидором",
+      "meal_type": [
+        "breakfast",
+        "snack"
+      ],
+      "prep_time": 10,
+      "cook_time": 0,
+      "base_servings": 2,
+      "base_weight_g": 250,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "pescatarian"
+        ],
+        "cook_method": [
+          "raw"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "bread_rye",
+          "amount_g": 100
+        },
+        {
+          "id": "sardines_canned",
+          "amount_g": 120
+        },
+        {
+          "id": "tomato",
+          "amount_g": 100
+        },
+        {
+          "id": "onion",
+          "amount_g": 30
+        },
+        {
+          "id": "lemon",
+          "amount_g": 20
+        },
+        {
+          "id": "parsley_fresh",
+          "amount_g": 10
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Ржаной хлеб нарежьте и поджарьте в тостере.",
+        "Сардины слейте от масла и разомните вилкой.",
+        "Помидор нарежьте тонкими кружочками.",
+        "Лук нарежьте тонкими кольцами.",
+        "Выложите на хлеб помидоры.",
+        "Сверху распределите сардины.",
+        "Выложите лук, сбрызните лимонным соком.",
+        "Посыпьте нарезанной петрушкой и чёрным перцем."
+      ]
+    },
+    {
+      "id": "lentil_meatballs",
+      "name": "Чечевичные котлеты с морковью",
+      "meal_type": [
+        "lunch",
+        "dinner"
+      ],
+      "prep_time": 20,
+      "cook_time": 30,
+      "base_servings": 4,
+      "base_weight_g": 600,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian",
+          "vegan"
+        ],
+        "cook_method": [
+          "bake"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "lentils_red",
+          "amount_g": 200
+        },
+        {
+          "id": "carrot",
+          "amount_g": 150
+        },
+        {
+          "id": "onion",
+          "amount_g": 100
+        },
+        {
+          "id": "garlic",
+          "amount_g": 8
+        },
+        {
+          "id": "oats",
+          "amount_g": 60
+        },
+        {
+          "id": "sunflower_oil",
+          "amount_g": 20
+        },
+        {
+          "id": "cumin",
+          "amount_g": 3
+        },
+        {
+          "id": "paprika",
+          "amount_g": 2
+        },
+        {
+          "id": "salt",
+          "amount_g": 4
+        }
+      ],
+      "instructions": [
+        "Чечевицу отварите до мягкости 15 минут, откиньте и дайте остыть.",
+        "Разогрейте духовку до 190°C.",
+        "Лук и чеснок мелко нарежьте, морковь натрите.",
+        "Обжарьте лук 3 минуты, добавьте морковь и жарьте ещё 5 минут.",
+        "Смешайте чечевицу, зажарку, хлопья, специи и соль.",
+        "Слегка помните смесь вилкой — она должна склеиваться.",
+        "Сформируйте котлетки, выложите на пергамент.",
+        "Смажьте маслом и выпекайте 20–25 минут до румяной корочки.",
+        "Подавайте с соусом тахини или йогуртом."
+      ]
+    },
+    {
+      "id": "warm_spinach_salad",
+      "name": "Тёплый салат со шпинатом и яйцом",
+      "meal_type": [
+        "breakfast",
+        "lunch"
+      ],
+      "prep_time": 10,
+      "cook_time": 10,
+      "base_servings": 2,
+      "base_weight_g": 300,
+      "image_url": null,
+      "tags": {
+        "diets": [
+          "omnivore",
+          "vegetarian"
+        ],
+        "cook_method": [
+          "fry",
+          "boil"
+        ],
+        "season": [
+          "all"
+        ]
+      },
+      "ingredients": [
+        {
+          "id": "spinach",
+          "amount_g": 200
+        },
+        {
+          "id": "egg_chicken",
+          "amount_g": 110
+        },
+        {
+          "id": "cherry_tomato",
+          "amount_g": 100
+        },
+        {
+          "id": "garlic",
+          "amount_g": 6
+        },
+        {
+          "id": "olive_oil",
+          "amount_g": 20
+        },
+        {
+          "id": "lemon",
+          "amount_g": 20
+        },
+        {
+          "id": "salt",
+          "amount_g": 2
+        },
+        {
+          "id": "black_pepper",
+          "amount_g": 1
+        }
+      ],
+      "instructions": [
+        "Яйца сварите вкрутую (10 минут), охладите и разрежьте пополам.",
+        "Черри разрежьте пополам.",
+        "Разогрейте масло в большой сковороде, обжарьте чеснок 30 секунд.",
+        "Добавьте шпинат, перемешайте и тушите 2–3 минуты.",
+        "Добавьте черри, прогрейте 1 минуту.",
+        "Снимите с огня, посолите, поперчите.",
+        "Выложите в тарелки, сверху разложите половинки яиц.",
+        "Сбрызните лимонным соком и подавайте."
       ]
     }
   ]
