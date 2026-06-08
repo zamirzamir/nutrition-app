@@ -1457,8 +1457,11 @@ async function loadNutritionData() {
       fetch('/recipes.json')
     ]);
     if (!ingRes.ok || !recRes.ok) throw new Error('JSON files not found');
-    const ingArr = await ingRes.json();
-    const recArr = await recRes.json();
+    const ingData = await ingRes.json();
+    const recData = await recRes.json();
+    // Support both array format and {ingredients:[...], recipes:[...]} wrapper
+    const ingArr = Array.isArray(ingData) ? ingData : (ingData.ingredients || []);
+    const recArr = Array.isArray(recData) ? recData : (recData.recipes || []);
     ingArr.forEach(ing => { ingredientsMap[ing.id] = ing; });
     recipesArray = recArr;
     nutritionDataLoaded = true;
@@ -1473,7 +1476,7 @@ async function loadNutritionData() {
 // ---------- 2. calculateRecipeNutrition ---------------------
 const NUTRIENT_KEYS = [
   'calories','protein','fat','carbs','fiber','sugar',
-  'vitamin_a','vitamin_b1','vitamin_b2','vitamin_b3','vitamin_b6',
+  'vitamin_a','vitamin_b1','vitamin_b2','vitamin_b3','vitamin_b5','vitamin_b6',
   'vitamin_b9','vitamin_b12','vitamin_c','vitamin_d','vitamin_e','vitamin_k',
   'calcium','iron','magnesium','phosphorus','potassium',
   'sodium','zinc','selenium','iodine',
@@ -1634,12 +1637,15 @@ function filterRecipes(dietType, mealType, excludedIngIds = []) {
   const tag = DIET_TAG_MAP[dietType] || 'omnivore';
 
   return recipesArray.filter(r => {
-    // Must match diet tag (or be omnivore fallback)
+    // Must match diet tag (or omnivore fallback)
     const diets = r.tags?.diets || [];
     if (!diets.includes(tag) && !diets.includes('omnivore')) return false;
 
-    // Must match meal type
-    if (!r.tags?.meal_type?.includes(mealType)) return false;
+    // meal_type is top-level array on each recipe (e.g. ["breakfast"] or ["lunch","dinner"])
+    const mealTypes = Array.isArray(r.meal_type)
+      ? r.meal_type.join(',')          // flatten e.g. "lunch,dinner"
+      : (r.meal_type || '');
+    if (!mealTypes.includes(mealType)) return false;
 
     // Must not contain excluded ingredients
     if (excludedIngIds.length) {
