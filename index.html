@@ -1865,8 +1865,73 @@ function toggleDay(d) {
   }
 }
 
+function renderDayMealsFromEngine(d, engineMeals) {
+  const container = document.getElementById('dayMealsContainer');
+  const _dietBadge = DIET_LABELS[state.dietType];
+  const _dietBadgeHtml = _dietBadge
+    ? `<div style="display:inline-block;background:rgba(34,197,94,.15);border:1.5px solid #22c55e;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#4ade80;margin-bottom:10px;">${_dietBadge}</div>`
+    : '';
+
+  const MEAL_TYPE_RU = { breakfast:'Завтрак', lunch:'Обед', dinner:'Ужин', snack:'Перекус' };
+
+  container.innerHTML = `<div class="section-label" style="margin-top:12px;">День ${d}</div>${_dietBadgeHtml}` +
+    engineMeals.map((m, i) => {
+      const nut = m.nutrition;
+      const ingList = m.scaledIngredients.map(ing => {
+        const ingData = ingredientsMap[ing.id];
+        const ingName = ingData ? ingData.name : ing.id;
+        return `<li><span>${ingName}</span><span class="ig">${ing.amount_g} г</span></li>`;
+      }).join('');
+      const stepsList = (m.instructions || []).map((s,si) =>
+        `<li><div class="step-num">${si+1}</div><span>${s}</span></li>`
+      ).join('');
+      return `
+    <div class="meal-card">
+      <div class="meal-img-wrap" onclick="toggleDayRecipe(${d},${i})">
+        <img src="${m.image_url || m.recipe?.image_url || ''}" alt="${m.recipe?.name || ''}" loading="lazy"
+          onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.recipe?.name||'')}'">
+        <div class="meal-img-overlay">
+          <div class="meal-type">${MEAL_TYPE_RU[m.mealType] || m.mealType}</div>
+          <div class="meal-name">${m.recipe?.name || ''}</div>
+        </div>
+        <div class="meal-tap-hint">👆 рецепт</div>
+      </div>
+      <div class="recipe-block" id="dr-${d}-${i}">
+        <div class="recipe-macros">
+          <div class="macro-chip">🔥 ${Math.round(nut.calories)} ккал</div>
+          <div class="macro-chip">🥩 Б: ${Math.round(nut.protein)}г</div>
+          <div class="macro-chip">🥑 Ж: ${Math.round(nut.fat)}г</div>
+          <div class="macro-chip">🍚 У: ${Math.round(nut.carbs)}г</div>
+        </div>
+        <div class="recipe-section-title">Продукты</div>
+        <ul class="ingredient-list">${ingList}</ul>
+        <div class="recipe-section-title">Приготовление</div>
+        <ul class="steps-list">${stepsList}</ul>
+      </div>
+    </div>`;
+    }).join('');
+  container.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Cache of generated day menus (keyed by day number)
+const dayMenuCache = {};
+
 function renderDayMeals(d) {
   const container = document.getElementById('dayMealsContainer');
+
+  // If engine data is loaded — use it
+  if (nutritionDataLoaded && state.kcal > 0) {
+    // Use cache to keep menus stable across re-opens
+    if (!dayMenuCache[d]) {
+      const profile = buildUserProfile();
+      const tracker = window._globalTracker || new NutrientTracker();
+      dayMenuCache[d] = buildDayMenu(profile, d, tracker);
+    }
+    renderDayMealsFromEngine(d, dayMenuCache[d]);
+    return;
+  }
+
+  // Fallback — legacy hardcoded meal sets
   const meals = getMealSet(state.dietType);
   const _dietBadge = DIET_LABELS[state.dietType];
   const _dietBadgeHtml = _dietBadge
@@ -1985,6 +2050,8 @@ async function sendFoodPref() {
     if (state.kcal > 0) {
       renderMeals([], state.dietType);
     }
+    // сброс кэша меню при смене диеты
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
     // обновить открытый день в сетке 28 дней
     const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
     if (openDay) renderDayMeals(parseInt(openDay));
