@@ -1,3 +1,18 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/ingredients"
+  to = "/.netlify/functions/ingredients"
+  status = 200
+
+[[redirects]]
+  from = "/api/meal-plan"
+  to = "/.netlify/functions/meal-plan"
+  status = 200
+
+[[redirects]]
+  from = "/api/recipe"
+  to = "/.netlify/functions/recipe"
+  status = 200
