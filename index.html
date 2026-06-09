@@ -657,20 +657,33 @@ async function loadNutritionData() {
   if (nutritionDataLoaded || nutritionDataLoading) return;
   nutritionDataLoading = true;
   try {
-    const [ingRes, recRes] = await Promise.all([
-      fetch('/ingredients.json'),
-      fetch('/recipes.json')
-    ]);
-    if (!ingRes.ok || !recRes.ok) throw new Error('JSON files not found');
-    const ingData = await ingRes.json();
-    const recData = await recRes.json();
-    // Support both array format and {ingredients:[...], recipes:[...]} wrapper
-    const ingArr = Array.isArray(ingData) ? ingData : (ingData.ingredients || []);
-    const recArr = Array.isArray(recData) ? recData : (recData.recipes || []);
-    ingArr.forEach(ing => { ingredientsMap[ing.id] = ing; });
-    recipesArray = recArr;
+    // Load ingredients from Supabase API
+    const ingRes = await fetch('/api/ingredients');
+    if (!ingRes.ok) throw new Error('API not available');
+    const ingArr = await ingRes.json();
+    // Transform Supabase flat format → engine per_100g format
+    ingArr.forEach(ing => {
+      ingredientsMap[ing.id] = {
+        ...ing,
+        per_100g: {
+          calories: ing.calories || 0,
+          protein:  ing.protein  || 0,
+          fat:      ing.fat      || 0,
+          carbs:    ing.carbs    || 0,
+          fiber:    ing.fiber    || 0,
+        }
+      };
+    });
+    // Keep static recipes.json as engine fallback (320 recipes)
+    try {
+      const recRes = await fetch('/recipes.json');
+      if (recRes.ok) {
+        const recData = await recRes.json();
+        recipesArray = Array.isArray(recData) ? recData : (recData.recipes || []);
+      }
+    } catch {}
     nutritionDataLoaded = true;
-    console.log(`✅ Nutrition data loaded: ${ingArr.length} ingredients, ${recArr.length} recipes`);
+    console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);
   } catch(e) {
     console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);
   } finally {
@@ -924,6 +937,96 @@ function buildUserProfile() {
 loadNutritionData();
 
 // ============================================================
+// ========== API MEAL PLAN (Supabase) ========================
+// ============================================================
+
+let _apiPlan = null;
+
+async function loadMealPlanFromAPI() {
+  const excluded = state.excludedIngredientIds || [];
+  try {
+    const res = await fetch('/api/meal-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ excluded }),
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    _apiPlan = data.days;
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    return true;
+  } catch (e) {
+    console.warn('⚠️ meal-plan API failed:', e.message);
+    return false;
+  }
+}
+
+function buildMealCardHTML_API(recipe, mealType, cardId) {
+  const cal   = Math.round(recipe.calories_per_serving || 0);
+  const prot  = Math.round(recipe.protein_per_serving  || 0);
+  const fat   = Math.round(recipe.fat_per_serving      || 0);
+  const carbs = Math.round(recipe.carbs_per_serving    || 0);
+  return `
+<div class="meal-card">
+  <div class="meal-img-wrap" onclick="loadAndToggleRecipe('${cardId}','${recipe.id}')">
+    <img src="" alt="${recipe.name}" loading="lazy"
+      onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(recipe.name)}'">
+    <div class="meal-img-overlay">
+      <div class="meal-type">${MEAL_TYPE_RU[mealType] || mealType}</div>
+      <div class="meal-name">${recipe.name}</div>
+    </div>
+    <div class="meal-tap-hint">👆 рецепт</div>
+  </div>
+  <div class="recipe-block" id="${cardId}">
+    <div class="recipe-macros">
+      <div class="macro-chip">🔥 ${cal} ккал</div>
+      <div class="macro-chip">🥩 Б: ${prot}г</div>
+      <div class="macro-chip">🥑 Ж: ${fat}г</div>
+      <div class="macro-chip">🍚 У: ${carbs}г</div>
+    </div>
+    <div id="${cardId}-details"><div style="text-align:center;color:var(--muted);padding:12px 0;font-size:13px;">👆 Нажми для просмотра рецепта</div></div>
+  </div>
+</div>`;
+}
+
+const _recipeCache = {};
+
+async function loadAndToggleRecipe(cardId, recipeId) {
+  const block = document.getElementById(cardId);
+  if (!block) return;
+  const isOpen = block.classList.toggle('open');
+  block.closest('.meal-card').querySelector('.meal-tap-hint').textContent =
+    isOpen ? '👆 закрыть' : '👆 рецепт';
+  if (!isOpen) return;
+  const detailsEl = document.getElementById(cardId + '-details');
+  if (!detailsEl) return;
+  if (_recipeCache[recipeId]) { _renderRecipeDetails(detailsEl, _recipeCache[recipeId]); return; }
+  detailsEl.innerHTML = '<div style="text-align:center;padding:12px 0;font-size:13px;color:var(--muted)">⏳ Загружаем рецепт...</div>';
+  try {
+    const res = await fetch('/api/recipe?id=' + encodeURIComponent(recipeId));
+    const data = await res.json();
+    _recipeCache[recipeId] = data;
+    _renderRecipeDetails(detailsEl, data);
+  } catch {
+    detailsEl.innerHTML = '<div style="color:var(--muted);padding:8px 0;font-size:13px;">Не удалось загрузить рецепт</div>';
+  }
+}
+
+function _renderRecipeDetails(el, recipe) {
+  const ingList = (recipe.ingredients || []).map(ing =>
+    `<li><span>${ing.name}</span><span class="ig">${ing.amount_g} г</span></li>`
+  ).join('') || '<li>—</li>';
+  const stepsList = (recipe.steps || []).map((s, i) =>
+    `<li><div class="step-num">${i+1}</div><span>${s}</span></li>`
+  ).join('') || '<li>—</li>';
+  el.innerHTML = `
+    <div class="recipe-section-title">Продукты</div>
+    <ul class="ingredient-list">${ingList}</ul>
+    <div class="recipe-section-title">Приготовление</div>
+    <ul class="steps-list">${stepsList}</ul>`;
+}
+
+// ============================================================
 // ========== END RECIPE ENGINE ===============================
 // ============================================================
 
@@ -1009,11 +1112,32 @@ function clearExclusions() {
 }
 
 function renderMeals() {
-  if (!nutritionDataLoaded || state.kcal <= 0) return;
+  if (state.kcal <= 0) return;
+  const banner = buildExclusionBannerHtml();
+
+  // API plan has priority
+  if (_apiPlan && _apiPlan[0]) {
+    const day0 = _apiPlan[0];
+    const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+    const cards = slots.filter(s => day0[s])
+      .map(s => buildMealCardHTML_API(day0[s], s, 'preview-' + s));
+    document.getElementById('mealsContainer').innerHTML = banner + cards.join('');
+    return;
+  }
+
+  // Kick off API load in background, show engine/loading meanwhile
+  if (!_apiPlan) {
+    loadMealPlanFromAPI().then(ok => { if (ok) renderMeals(); });
+  }
+
+  if (!nutritionDataLoaded) {
+    document.getElementById('mealsContainer').innerHTML =
+      banner + '<div style="text-align:center;padding:20px;color:var(--muted);">⏳ Загружаем меню из базы...</div>';
+    return;
+  }
   const profile = buildUserProfile();
   const tracker = new NutrientTracker();
   const engineMeals = buildDayMenu(profile, 1, tracker);
-  const banner = buildExclusionBannerHtml();
   document.getElementById('mealsContainer').innerHTML =
     banner + engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');
 }
@@ -1110,6 +1234,22 @@ const dayMenuCache = {};
 
 function renderDayMeals(d) {
   const container = document.getElementById('dayMealsContainer');
+
+  // API plan takes priority over engine
+  if (_apiPlan && state.kcal > 0) {
+    const dayData = _apiPlan[d - 1];
+    if (dayData) {
+      const banner = buildExclusionBannerHtml();
+      const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+      const cards = slots.filter(s => dayData[s])
+        .map(s => buildMealCardHTML_API(dayData[s], s, 'd' + d + '-' + s));
+      container.innerHTML =
+        '<div class="section-label" style="margin-top:12px;">День ' + d + '</div>' +
+        banner + cards.join('');
+      container.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  }
 
   // If engine data is loaded — use it
   if (nutritionDataLoaded && state.kcal > 0) {
@@ -1247,6 +1387,7 @@ async function sendFoodPref() {
     // New exclusions detected
     state.excludedIngredientIds = exclusionResult;
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    _apiPlan = null; // force reload from API with new exclusions
     if (state.kcal > 0) {
       renderMeals();
       setTimeout(() => document.getElementById('meal-section')?.scrollIntoView({behavior:'smooth',block:'start'}), 300);
