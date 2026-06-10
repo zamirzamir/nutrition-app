@@ -449,7 +449,7 @@ function calculate() {
   }
   kcal = Math.round(kcal);
 
-  const protein = Math.round(isLoss||isGain ? tw*1.8 : cw*1.6);
+  const protein = Math.round(isLoss||isGain ? tw*1.8 : cw*1.4);
   const fat     = Math.round(isLoss||isGain ? tw*0.8 : cw*0.8);
   const fiber   = Math.round((kcal/1000)*14);
   const carbs   = Math.max(0, Math.round((kcal-protein*4-fat*9)/4));
