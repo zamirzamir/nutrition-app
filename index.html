@@ -447,6 +447,12 @@ function setMarquee(text) {
   const el2 = document.getElementById('marqueeText2');
   if (el1) el1.textContent = text;
   if (el2) el2.textContent = text;
+  const track = document.querySelector('.marquee-track');
+  if (track) {
+    track.style.animation = 'none';
+    void track.offsetWidth;
+    track.style.animation = '';
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => setMarquee(MARQUEE_FORM));
