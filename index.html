@@ -1130,11 +1130,11 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
 function buildExclusionBannerHtml() {
   const ids = state.excludedIngredientIds || [];
   if (!ids.length) return '';
-  const names = ids.map(id => ingredientsMap[id]?.name || id).join(', ');
-  return `<div style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">
-    🚫 Исключено из меню: <b>${names}</b>
-    <span onclick="clearExclusions()" style="margin-left:8px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span>
-  </div>`;
+    const items = ids.map(id => {
+    const nm = ingredientsMap[id]?.name || id;
+    return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
+  }).join('');
+  return `<div style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">🚫 Исключено из меню:<div style="margin-top:5px;line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span></div>`;
 }
 
 function clearExclusions() {
@@ -1145,6 +1145,24 @@ function clearExclusions() {
   if (openDay) renderDayMeals(parseInt(openDay));
   openPopup('✅', 'Ограничения сброшены. Меню обновлено.');
 }
+function confirmRemoveExclusion(id, evt) {
+  evt.stopPropagation();
+  const name = ingredientsMap[id]?.name || id;
+  const ov = document.createElement('div');
+  ov.id = 'excl-confirm';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML = `<div style="background:#1a1a24;border:1.5px solid #fb923c;border-radius:18px;padding:22px 20px;max-width:280px;width:90%;text-align:center;"><div style="font-size:14px;color:#f1f0ff;margin-bottom:6px;">Убрать из списка?</div><div style="font-size:13px;color:#fb923c;margin-bottom:18px;">${name}</div><div style="display:flex;gap:10px;"><button onclick="doRemoveExclusion('${id}')" style="flex:1;background:#fb923c;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;">Да</button><button onclick="document.getElementById('excl-confirm')?.remove()" style="flex:1;background:#2e2e3e;color:#f1f0ff;border:none;border-radius:10px;padding:11px;font-size:14px;cursor:pointer;">Нет</button></div></div>`;
+  ov.onclick = e => { if(e.target===ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+
+function doRemoveExclusion(id) {
+  document.getElementById('excl-confirm')?.remove();
+  state.excludedIngredientIds = (state.excludedIngredientIds || []).filter(x => x !== id);
+  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
+  if (openDay && state.kcal > 0) renderDayMeals(parseInt(openDay));
+}
+
 
 function renderMeals() {
   if (state.kcal <= 0) return;
@@ -1432,12 +1450,10 @@ async function sendFoodPref() {
       .filter((v,i,a) => a.indexOf(v)===i)
       .slice(0, 4).join(', ');
     openPopup('🚫', `Понял! Исключаю из меню: ${names}. Рецепты обновлены.`);
-    const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open);
-    if (openDay1) renderDayMeals(parseInt(openDay1));
+        const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
+    if (openDay1 && state.kcal > 0) renderDayMeals(parseInt(openDay1));
     return;
-  }
-
-  // 2. Everything else → OpenAI
+  }// 2. Everything else → OpenAI
   openPopupLoading();
 
   try {
