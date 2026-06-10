@@ -253,10 +253,11 @@ body {
   display:flex; align-items:center;
   z-index:2;
 }
-.marquee-text { animation:marquee 18s linear infinite; white-space:nowrap; display:inline-block; }
-@keyframes marquee {
-  0% { transform:translateX(100%); }
-  100% { transform:translateX(-100%); }
+.marquee-track { display:flex; flex-shrink:0; animation:marquee-scroll 20s linear infinite; }
+.marquee-text { white-space:nowrap; flex-shrink:0; padding-right:80px; }
+@keyframes marquee-scroll {
+  from { transform:translateX(0); }
+  to { transform:translateX(-50%); }
 }
 .mic-btn {
   width:44px; height:44px; border-radius:50%; border:none;
@@ -417,7 +418,10 @@ body {
         onfocus="document.getElementById('marqueeHint').style.opacity='0'"
         onblur="if(!this.value) document.getElementById('marqueeHint').style.opacity='1'">
       <div class="marquee-hint" id="marqueeHint">
-        <span class="marquee-text" id="marqueeText"></span>
+        <div class="marquee-track">
+          <span class="marquee-text" id="marqueeText1"></span>
+          <span class="marquee-text" id="marqueeText2"></span>
+        </div>
       </div>
     </div>
     <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
@@ -430,8 +434,10 @@ const MARQUEE_FORM    = 'Не можешь выбрать уровень акт�
 const MARQUEE_RESULTS = 'Попробуй написать: «Поменяй завтрак», «Я не ем курицу», «Убери это блюдо» — меню обновится автоматически';
 
 function setMarquee(text) {
-  const el = document.getElementById('marqueeText');
-  if (el) el.innerHTML = text + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + text;
+  const el1 = document.getElementById('marqueeText1');
+  const el2 = document.getElementById('marqueeText2');
+  if (el1) el1.textContent = text;
+  if (el2) el2.textContent = text;
 }
 
 window.addEventListener('DOMContentLoaded', () => setMarquee(MARQUEE_FORM));
