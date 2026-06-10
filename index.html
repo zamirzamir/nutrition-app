@@ -1653,7 +1653,6 @@ function swapConfirmYes() {
   p.hist.push(p.nextRec.id);
   _swapPos[p.cardId] = p.hist.length - 1;
   _applySwapDOM(p.cardId, p.nextRec);
-  openPopup('✅','Блюдо заменено! Следующий приём пищи будет скорректирован автоматически.');
 }
 
 function swapConfirmNo() {
@@ -1664,9 +1663,6 @@ function swapConfirmNo() {
   p.hist.push(p.nextRec.id);
   _swapPos[p.cardId] = p.hist.length - 1;
   _applySwapDOM(p.cardId, p.nextRec);
-  setTimeout(function(){
-    openPopup('💡','Окей, сохранил замену. КБЖУ немного изменилось — вы можете вручную скорректировать другие приёмы пищи, и план подстроится под нужный баланс.');
-  }, 300);
 }
 
 // ========== PAYMENT ==========
