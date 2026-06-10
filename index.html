@@ -1658,6 +1658,21 @@ function _applySwapDOM(cardId, recipe) {
   if (detailsEl) {
     detailsEl.innerHTML = '<div style="text-align:center;color:var(--muted);padding:12px 0;font-size:13px;">👆 Нажми для просмотра рецепта</div>';
   }
+  // Update inline ingredient list and steps for engine cards
+  var ingListEl = el.querySelector('.ingredient-list');
+  if (ingListEl) {
+    ingListEl.innerHTML = (recipe.ingredients || []).map(function(i) {
+      var d = ingredientsMap[i.id];
+      return '<li><span>' + (d ? d.name : (i.name || i.id)) + '</span><span class="ig">' + (i.amount_g || i.amount || 0) + ' г</span></li>';
+    }).join('') || '<li>—</li>';
+  }
+  var stepsListEl = el.querySelector('.steps-list');
+  if (stepsListEl) {
+    var instr = recipe.instructions || recipe.steps || [];
+    stepsListEl.innerHTML = instr.map(function(s, si) {
+      return '<li><div class="step-num">' + (si+1) + '</div><span>' + s + '</span></li>';
+    }).join('') || '<li>—</li>';
+  }
   // Update cache
   var r2 = _parseCard(cardId);
   if (dayMenuCache[r2.day] && dayMenuCache[r2.day][r2.idx]) dayMenuCache[r2.day][r2.idx].recipe = recipe;
