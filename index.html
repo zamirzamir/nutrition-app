@@ -500,23 +500,48 @@ function calculate() {
 
 // --- Ingredient groups for text detection ---
 const EXCLUSION_PATTERNS = [
-  { words: ['мясо','мяса','мясной','мясных','мясные','без мяса','не ем мяс','не ест мяс','не едим мяс','отказ от мяса','говядин','свинин','баранин','телятин','колбас','сосиск','вегетариан','vegetarian'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
+
+  { words: ['мясо','мяса','мясной','мясных','мясные','мясным','мясного','мясному','без мяса','не ем мяс','не ест мяс','не едим мяс','отказ от мяса','говядин','свинин','баранин','телятин','колбас','сосиск'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
   { words: ['рыб','лосос','треск','тунец','скумбри','сельд','сардин','форел','палтус','тилапи','минтай','окун','анчоус','без рыбы','не ем рыб','не ест рыб','рыбу не ем'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
-  { words: ['морепродукт','креветк','кальмар','краб','мидий','гребешок','устриц','без морепродуктов','не ем морепродукт','seafood'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
-  { words: ['молочн','молоко','молока','сыр','творог','кефир','йогурт','сметан','сливки','лактоз','без молочк','без молока','без сыра','не ем молочн','dairy','lactose'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
-  { words: ['яйц','яйцо','яйца','egg','без яиц','не ем яйц','аллергия на яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
-  { words: ['мёд','без мёда','без меда','не ем мёд','honey'], ids: ['honey'] },
+  { words: ['морепродукт','креветк','кальмар','краб','мидий','гребешок','устриц','без морепродуктов','не ем морепродукт'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['молочн','молоко','молока','сыр ','сыра','творог','кефир','йогурт','сметан','сливки','сливочн','лактоз','непереносимость лактоз','без молочк','без молока','без сыра','не ем молочн'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
+  { words: ['без топлёного масла','без ги','без ghee'], ids: ['ghee'] },
+  { words: ['яйц','яйцо','яйца','без яиц','не ем яйц','аллергия на яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
+  { words: ['мёд','без мёда','без меда','не ем мёд','не ем мед'], ids: ['honey'] },
   { words: ['свинин','свиной','свиная','без свинины','не ем свинину','халяль','halal','кошерн','kosher'], ids: ['pork_loin','pork_minced'] },
   { words: ['без курицы','без курятины','не ем курицу','не ем курятин'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken'] },
   { words: ['без говядины','не ем говядин'], ids: ['beef_lean','beef_minced','liver_beef','broth_beef'] },
   { words: ['красное мясо','красного мяса','без красного мяса','не ем красное мясо'], ids: ['beef_lean','beef_minced','liver_beef','lamb_leg','pork_loin','pork_minced'] },
   { words: ['орех','миндал','грецк','кешью','фундук','фисташ','макадами','пекан','бразильск','без орехов','аллергия на орехи'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
+  { words: ['без семян','семечки не ем','не ем семечки'], ids: ['sunflower_seeds','pumpkin_seeds','hemp_seeds','sesame_seeds','flaxseeds','chia_seeds'] },
   { words: ['глютен','клейковин','gluten','целиак','без глютена','без пшениц','непереносимость глютен','пшеница','ржан'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
-  { words: ['бобов','фасол','нут ','нута','чечевиц','горох','тофу','темпе','натто','соев','edamame','бобы','без бобовых','legumes'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
-  { words: ['соль','солёное','без соли','мало соли','несолёное','не ем соль','salt','ограничение соли'], ids: ['salt','miso_paste','soy_sauce','fish_sauce','worcestershire_sauce','anchovy','herring'] },
-  { words: ['сахар','sugar','без сахара','диабет','не ем сахар','без сладкого'], ids: ['sugar','honey','sugar_maple','coconut_sugar'] },
+  { words: ['бобов','фасол','нут ','нута','чечевиц','горох','тофу','темпе','натто','соев','edamame','бобы','без бобовых'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
+  { words: ['без соли','мало соли','несолёное','не ем соль','ограничение соли'], ids: ['salt','miso_paste','soy_sauce','fish_sauce','worcestershire_sauce','anchovy','herring'] },
+  { words: ['без сахара','диабет','не ем сахар','исключи сахар','без сладкого'], ids: ['sugar','honey','sugar_maple','coconut_sugar'] },
+
+];
+
+// Диетические типы (ЗАМЕНЯЮТ exclusions целиком)
+const DIET_PATTERNS = [
   { words: ['пескатариан','pescatarian','pescetarian','ем рыбу но не мясо','рыбу ем мясо нет'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
-  { words: ['веган','vegan','plant-based','plant based','растительное питани','растительн рацион','животного происхождени','продукты животн','не ем ничего животн','отказ от животных','ничего животного'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters','milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese','egg_chicken','egg_white','egg_yolk','honey','protein_whey'] },
+  { words: ['вегетариан','vegetarian'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['веган','vegan','plant-based','plant based','растительное питани','растительн рацион','отказ от животных','ничего животного'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters','milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese','egg_chicken','egg_white','egg_yolk','honey','protein_whey'] },
+];
+
+// Позитивные упоминания (УБИРАЮТ из exclusions)
+const INCLUSION_PATTERNS = [
+  { words: ['ем мяс','хочу мяс','верни мяс','снова ем мяс','можно мяс','буду есть мяс','ем курицу','хочу курицу','верни курицу','ем говядину','хочу говядину','верни говядину'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
+  { words: ['ем рыб','хочу рыб','верни рыб','снова ем рыб','можно рыб','буду есть рыб'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
+  { words: ['ем морепродукт','хочу морепродукт','верни морепродукт','ем креветк','хочу креветк'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['ем молоч','ем молок','хочу молок','верни молок','снова ем молок','ем сметан','хочу сметан','верни сметан','ем творог','хочу творог','верни творог','ем кефир','хочу кефир','верни кефир','ем йогурт','хочу йогурт','верни йогурт','ем сыр','хочу сыр','верни сыр','ем сливк','хочу сливк'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
+  { words: ['ем яйц','хочу яйц','верни яйц','снова ем яйц','можно яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
+  { words: ['ем мёд','ем мед','хочу мёд','хочу мед','верни мёд','верни мед'], ids: ['honey'] },
+  { words: ['ем свинин','хочу свинин','верни свинин'], ids: ['pork_loin','pork_minced'] },
+  { words: ['ем орех','хочу орех','верни орех','ем миндал','ем кешью','ем фундук'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
+  { words: ['ем глютен','ем пшениц','хочу пшениц','верни пшениц','ем хлеб','хочу хлеб','ем пасту','хочу пасту','ем макарон','хочу макарон'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
+  { words: ['ем бобов','ем фасол','ем нут','хочу нут','ем чечевиц','хочу чечевиц','ем тофу','хочу тофу','верни бобов'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
+  { words: ['ем соль','можно соль','верни соль','снова с солью'], ids: ['salt','miso_paste','worcestershire_sauce'] },
+  { words: ['ем сахар','можно сахар','верни сахар','снова сахар'], ids: ['sugar','sugar_maple','coconut_sugar'] },
 ];
 
 // Reset phrases — убираем все ограничения
@@ -582,19 +607,43 @@ function parseExclusions(text) {
   const t = text.toLowerCase();
   const excluded = new Set(state.excludedIngredientIds || []);
 
-  // Check reset
+  // 1. Полный сброс
   if (RESET_EXCLUSION_WORDS.some(w => t.includes(w))) {
-    return null; // null = full reset
+    return null;
   }
 
-  let found = false;
-  for (const pattern of EXCLUSION_PATTERNS) {
+  let changed = false;
+
+  // 2. Диетический тип → ЗАМЕНЯЕТ все текущие exclusions
+  let dietMatched = false;
+  for (const pattern of DIET_PATTERNS) {
     if (pattern.words.some(w => t.includes(w))) {
+      excluded.clear();
       pattern.ids.forEach(id => excluded.add(id));
-      found = true;
+      changed = true;
+      dietMatched = true;
+      break;
     }
   }
-  return found ? [...excluded] : false; // false = nothing matched
+
+  if (!dietMatched) {
+    // 3. Позитивное упоминание → УБИРАЕМ ids из exclusions
+    for (const pattern of INCLUSION_PATTERNS) {
+      if (pattern.words.some(w => t.includes(w))) {
+        pattern.ids.forEach(id => excluded.delete(id));
+        changed = true;
+      }
+    }
+    // 4. Конкретное ограничение → ДОБАВЛЯЕМ ids к exclusions
+    for (const pattern of EXCLUSION_PATTERNS) {
+      if (pattern.words.some(w => t.includes(w))) {
+        pattern.ids.forEach(id => excluded.add(id));
+        changed = true;
+      }
+    }
+  }
+
+  return changed ? [...excluded] : false;
 }
 
 // --- Try to substitute excluded ingredients in a recipe ---
