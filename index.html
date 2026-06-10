@@ -62,6 +62,7 @@ body {
   cursor:pointer; transition:all .2s; text-align:left;
 }
 .option-btn.selected { border-color:var(--accent); background:rgba(124,106,247,.15); color:var(--accent2); }
+.option-btn small { display:block; font-size:11px; font-weight:400; margin-top:2px; opacity:.75; }
 
 /* CALC BUTTON */
 .calc-btn {
@@ -304,11 +305,13 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title">🏃 Активность</div>
+    <div class="card-title">🏃 Активность (шагов в день)</div>
     <div class="option-grid" id="activityGrid">
-      <div class="option-btn selected" onclick="selectActivity('none',this)">🚶 Отсутствует (×30)</div>
-      <div class="option-btn" onclick="selectActivity('moderate',this)">🚶‍♂️ Умеренная активность (×33)</div>
-      <div class="option-btn" onclick="selectActivity('sport',this)">🏋️ Занятия спортом (×36)</div>
+      <div class="option-btn selected" onclick="selectActivity('sedentary',this)">🛋️ &lt; 3 000 шагов<br><small>Офис, работа за ПК</small></div>
+      <div class="option-btn" onclick="selectActivity('light',this)">🚶 3 000–6 000 шагов<br><small>Магазин 1–2 раза/нед</small></div>
+      <div class="option-btn" onclick="selectActivity('moderate',this)">🚶‍♂️ 6 000–10 000 шагов<br><small>Прогулки, лёгкий спорт</small></div>
+      <div class="option-btn" onclick="selectActivity('active',this)">🏋️ 10 000–15 000 шагов<br><small>Спортзал 4–5 раз/нед, бег</small></div>
+      <div class="option-btn" onclick="selectActivity('very_active',this)">🏃 &gt; 15 000 шагов<br><small>Ежедневный бег, активная работа</small></div>
     </div>
   </div>
 
@@ -404,7 +407,7 @@ body {
 <script>
 // ========== STATE ==========
 const state = {
-  activity: 'none',
+  activity: 'sedentary',
   kcal: 0, protein: 0, fat: 0, carbs: 0,
   cw: 0, tw: 0,
   context: '',
@@ -428,7 +431,8 @@ function calculate() {
 
   state.cw = cw; state.tw = tw;
 
-  const mult = state.activity==='none'?30:state.activity==='moderate'?33:36;
+  const multMap = {sedentary:29, light:31, moderate:33, active:36, very_active:38};
+  const mult = multMap[state.activity] ?? 29;
   const maintenance = cw * mult;
   const isLoss = tw < cw, isGain = tw > cw;
 
@@ -475,7 +479,8 @@ function calculate() {
       <p>Разбей путь на этапы:<br><br><strong>${cw} → ${mid} кг</strong> — Этап 1<br><strong>${mid} → ${tw} кг</strong> — Этап 2</p></div>`;}
   else wb.innerHTML='';
 
-  const actLbl=state.activity==='none'?'без активности':state.activity==='moderate'?'умеренная активность':'занятия спортом';
+  const actLblMap = {sedentary:'менее 3000 шагов (офис)', light:'3000–6000 шагов (лёгкая активность)', moderate:'6000–10000 шагов (умеренная активность)', active:'10000–15000 шагов (спортзал/бег)', very_active:'более 15000 шагов (высокая активность)'};
+  const actLbl = actLblMap[state.activity] ?? 'минимальная активность';
   const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';
   state.context=`Цель: ${goalLbl}, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;
 
