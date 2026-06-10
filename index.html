@@ -251,6 +251,7 @@ body {
   font-size:13px; color:var(--muted); pointer-events:none;
   overflow:hidden; white-space:nowrap;
   display:flex; align-items:center;
+  z-index:2;
 }
 .marquee-text { animation:marquee 18s linear infinite; white-space:nowrap; display:inline-block; }
 @keyframes marquee {
@@ -413,10 +414,10 @@ body {
     <div class="sticky-input-wrap">
       <input class="sticky-input" id="foodPrefInput" type="text"
         onkeydown="if(event.key==='Enter') sendFoodPref()"
-        onfocus="document.querySelector('.marquee-hint').style.opacity='0'"
-        onblur="if(!this.value) document.querySelector('.marquee-hint').style.opacity='1'">
-      <div class="marquee-hint">
-        <span class="marquee-text">Не можешь выбрать уровень активности? Опиши, как проходит твой обычный день — я подберу подходящий вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Не можешь выбрать уровень активности? Опиши, как проходит твой обычный день — я подберу подходящий вариант</span>
+        onfocus="document.getElementById('marqueeHint').style.opacity='0'"
+        onblur="if(!this.value) document.getElementById('marqueeHint').style.opacity='1'">
+      <div class="marquee-hint" id="marqueeHint">
+        <span class="marquee-text" id="marqueeText"></span>
       </div>
     </div>
     <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
@@ -424,6 +425,17 @@ body {
 </div>
 
 <script>
+// ========== MARQUEE ==========
+const MARQUEE_FORM    = 'Не можешь выбрать уровень активности? Опиши, как проходит твой обычный день — я подберу подходящий вариант';
+const MARQUEE_RESULTS = 'Попробуй написать: «Поменяй завтрак», «Я не ем курицу», «Убери это блюдо» — меню обновится автоматически';
+
+function setMarquee(text) {
+  const el = document.getElementById('marqueeText');
+  if (el) el.innerHTML = text + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + text;
+}
+
+window.addEventListener('DOMContentLoaded', () => setMarquee(MARQUEE_FORM));
+
 // ========== STATE ==========
 const state = {
   gender: 'female',
@@ -533,6 +545,7 @@ function calculate() {
 
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  setMarquee(MARQUEE_RESULTS);
 }
 
 // ========== EXCLUSION & SUBSTITUTION SYSTEM ==========
@@ -1431,7 +1444,7 @@ function toggleMic() {
   recognition.onresult=e=>{
     const t=e.results[0][0].transcript;
     document.getElementById('foodPrefInput').value=t;
-    document.querySelector('.marquee-hint').style.opacity='0';
+    document.getElementById('marqueeHint').style.opacity='0';
     sendFoodPref();
   };
   recognition.onend=()=>{ micActive=false; document.getElementById('micBtn').classList.remove('listening'); };
@@ -1465,7 +1478,7 @@ async function sendFoodPref() {
   if (!val) return;
 
   document.getElementById('foodPrefInput').value = '';
-  document.querySelector('.marquee-hint').style.opacity = '1';
+  document.getElementById('marqueeHint').style.opacity = '1';
 
   // 1. Detect ingredient exclusions locally (fast, no API)
   const exclusionResult = parseExclusions(val);
