@@ -1429,6 +1429,13 @@ function renderShoppingList() {
     const section = document.getElementById('shopping-list-section');
     if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }
     const ingTotals = {};
+    if (nutritionDataLoaded) {
+      const _sl_profile = buildUserProfile();
+      const _sl_tracker = window._globalTracker || new NutrientTracker();
+      for (let d = 1; d <= 7; d++) {
+        if (!dayMenuCache[d]) dayMenuCache[d] = buildDayMenu(_sl_profile, d, _sl_tracker);
+      }
+    }
     for (let d = 1; d <= 7; d++) {
       const cache = dayMenuCache[d];
       if (!cache) continue;
