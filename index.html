@@ -378,6 +378,7 @@ body {
 
   <!-- DAY MENU -->
   <div id="meal-section">
+    <div id="exclusion-banner-top"></div>
     <div class="section-label">Вот меню на день с рецептами 👇</div>
     <div id="mealsContainer"></div>
   </div>
@@ -388,8 +389,6 @@ body {
     <div class="days-grid" id="daysGrid"></div>
     <div id="dayMealsContainer"></div>
   </div>
-
-  <div id="exclusion-banner-top"></div>
   <div id="shopping-list-section" style="display:none"></div>
   <!-- PURCHASE -->
   <div id="purchase-section" class="purchase-section">
@@ -1410,11 +1409,19 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
 function buildExclusionBannerHtml() {
   const ids = state.excludedIngredientIds || [];
   if (!ids.length) return '';
-    const items = ids.map(id => {
+  const items = ids.map(id => {
     const nm = ingredientsMap[id]?.name || id;
     return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
   }).join('');
-  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">🚫 Исключено из меню:<div style="margin-top:5px;line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span></div>`;
+  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.08);border:1px solid #fb923c;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div onclick="toggleExclBanner()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;"><span style="font-size:13px;font-weight:600;color:#fb923c;">🚫 Исключено из меню (${ids.length})</span><span id="excl-toggle-icon" style="color:#fb923c;font-size:14px;">▾</span></div><div id="excl-body" style="padding:0 14px 10px;"><div style="line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить всё]</span></div></div>`;
+}
+function toggleExclBanner() {
+  const body = document.getElementById('excl-body');
+  const icon = document.getElementById('excl-toggle-icon');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (icon) icon.textContent = open ? '▾' : '▴';
 }
 
 function clearExclusions() {
@@ -1522,7 +1529,7 @@ function renderShoppingList() {
     const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
     const cards = slots.filter(s => day0[s])
       .map(s => buildMealCardHTML_API(day0[s], s, 'preview-' + s));
-    document.getElementById('mealsContainer').innerHTML = banner + cards.join('');
+    document.getElementById('mealsContainer').innerHTML = cards.join('');
     return;
   }
 
@@ -1533,14 +1540,14 @@ function renderShoppingList() {
 
   if (!nutritionDataLoaded) {
     document.getElementById('mealsContainer').innerHTML =
-      banner + '<div style="text-align:center;padding:20px;color:var(--muted);">⏳ Загружаем меню из базы...</div>';
+      '<div style="text-align:center;padding:20px;color:var(--muted);">⏳ Загружаем меню из базы...</div>';
     return;
   }
   const profile = buildUserProfile();
   const tracker = new NutrientTracker();
   const engineMeals = buildDayMenu(profile, 1, tracker);
   document.getElementById('mealsContainer').innerHTML =
-    banner + engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');
+    engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');
 }
 
 function toggleRecipe(id) {
