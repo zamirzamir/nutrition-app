@@ -467,6 +467,8 @@ const state = {
   purchased: false,
   excludedIngredientIds: [], // ingredient IDs the user can't eat
   activeDayBtn: null,
+  ingredientSwaps: {},   // { fromId: toId }
+  mealOverrides: {},     // { mealType: recipeObject }
 };
 
 // ========== GENDER ==========
@@ -725,6 +727,74 @@ function parseExclusions(text) {
   }
 
   return changed ? [...excluded] : false;
+}
+
+function parseFoodSubstitution(text) {
+  const t = text.toLowerCase().trim();
+  const verbs = ['замени ', 'поменяй ', 'смени '];
+  const hasVerb = verbs.some(v => t.includes(v));
+  if (!hasVerb) return false;
+  const naIdx = t.indexOf(' на ');
+  if (naIdx === -1) return false;
+  let fromPart = '';
+  for (const verb of verbs) {
+    const idx = t.indexOf(verb);
+    if (idx !== -1) { fromPart = t.substring(idx + verb.length, naIdx).trim(); break; }
+  }
+  const toPart = t.substring(naIdx + 4).trim();
+  if (!fromPart || !toPart) return false;
+  const MEAL_WORDS = {
+    breakfast: ['завтрак','завтраку','завтрака'],
+    lunch: ['обед','обеду','обеда','обедом'],
+    dinner: ['ужин','ужину','ужина','ужином'],
+    snack: ['перекус','перекуса','перекусу'],
+  };
+  for (const [mealType, words] of Object.entries(MEAL_WORDS)) {
+    if (words.some(w => fromPart.includes(w))) return { type: 'meal', mealType, dishName: toPart };
+  }
+  return { type: 'ingredient', fromName: fromPart, toName: toPart };
+}
+
+function applyMealReplacement(mealType, dishName) {
+  if (!recipesArray.length) return null;
+  const dn = dishName.toLowerCase().trim();
+  let recipe = recipesArray.find(r => r.name.toLowerCase().includes(dn));
+  if (!recipe) recipe = recipesArray.find(r => {
+    const words = dn.split(' ');
+    return words.some(w => w.length > 3 && r.name.toLowerCase().includes(w));
+  });
+  if (!recipe) return null;
+  state.mealOverrides[mealType] = recipe;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return recipe.name;
+}
+
+function applyIngredientSwap(fromName, toName) {
+  const fn = fromName.toLowerCase().trim();
+  const tn = toName.toLowerCase().trim();
+  const fromId = Object.keys(ingredientsMap).find(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(fn) || fn.includes(n.split(' ')[0]);
+  });
+  const toId = Object.keys(ingredientsMap).find(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(tn) || tn.includes(n.split(' ')[0]);
+  });
+  if (!fromId || !toId) return null;
+  state.ingredientSwaps = state.ingredientSwaps || {};
+  state.ingredientSwaps[fromId] = toId;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { fromName: ingredientsMap[fromId].name, toName: ingredientsMap[toId].name };
 }
 
 // --- Try to substitute excluded ingredients in a recipe ---
@@ -995,23 +1065,37 @@ function buildDayMenu(userProfile, dayIndex, tracker) {
 
   const dayMeals = [];
   const usedIds  = new Set();
+  const swaps = state.ingredientSwaps || {};
 
   for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack']) {
     const targetCal = Math.round(calories_target * MEAL_SPLIT[mealType]);
     if (!recipesArray.length) continue;
 
-    const picked = pickMealForSlot(mealType, excluded_ingredient_ids, usedIds);
+    let picked;
+    const overrideRecipe = state.mealOverrides && state.mealOverrides[mealType];
+    if (overrideRecipe) {
+      picked = { recipe: overrideRecipe, substituted: [], modifiedIngredients: overrideRecipe.ingredients };
+    } else {
+      picked = pickMealForSlot(mealType, excluded_ingredient_ids, usedIds);
+    }
     if (!picked) continue;
 
     usedIds.add(picked.recipe.id);
+
+    const swappedIngredients = picked.modifiedIngredients.map(ing => {
+      const swapTo = swaps[ing.id];
+      if (swapTo && ingredientsMap[swapTo]) return { ...ing, id: swapTo, substitutedFrom: ing.substitutedFrom || ing.id };
+      return ing;
+    });
+
     const { ingredients: scaledIngredients, nutrition } =
-      scaleRecipe({ ...picked.recipe, ingredients: picked.modifiedIngredients }, targetCal);
+      scaleRecipe({ ...picked.recipe, ingredients: swappedIngredients }, targetCal);
 
     dayMeals.push({
       mealType,
       recipe:             picked.recipe,
       substituted:        picked.substituted,
-      modifiedIngredients: picked.modifiedIngredients,
+      modifiedIngredients: swappedIngredients,
       scaledIngredients,
       nutrition,
       instructions: picked.recipe.instructions,
@@ -1221,6 +1305,8 @@ function buildExclusionBannerHtml() {
 
 function clearExclusions() {
   state.excludedIngredientIds = [];
+  state.ingredientSwaps = {};
+  state.mealOverrides = {};
   Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
   renderMeals();
   const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
@@ -1546,6 +1632,16 @@ async function sendFoodPref() {
     highlightReconstra();
     return;
   }// 2. Everything else → OpenAI
+  const subResult = parseFoodSubstitution(val);
+  if (subResult !== false) {
+    if (subResult.type === 'meal') {
+      const rName = applyMealReplacement(subResult.mealType, subResult.dishName);
+      if (rName) { openPopup('🍽️', `Заменил ${MEAL_TYPE_RU[subResult.mealType]||subResult.mealType} на «${rName}». Меню обновлено.`); return; }
+    } else if (subResult.type === 'ingredient') {
+      const res = applyIngredientSwap(subResult.fromName, subResult.toName);
+      if (res) { openPopup('🔄', `Заменил ${res.fromName} на ${res.toName} во всех блюдах. Меню пересчитано.`); return; }
+    }
+  }
   openPopupLoading();
 
   try {
