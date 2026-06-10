@@ -1439,12 +1439,12 @@ function renderShoppingList() {
     for (let d = 1; d <= 7; d++) {
       const cache = dayMenuCache[d];
       if (!cache) continue;
-      ['breakfast','lunch','dinner','snack'].forEach(mt => {
-        const meal = cache[mt];
+      const _meals = Array.isArray(cache) ? cache : ['breakfast','lunch','dinner','snack'].map(mt => cache[mt]).filter(Boolean);
+      _meals.forEach(meal => {
         if (!meal || !meal.recipe) return;
-        const ings = meal.modifiedIngredients || meal.recipe.ingredients || [];
+        const ings = meal.modifiedIngredients || meal.scaledIngredients || meal.recipe.ingredients || [];
         ings.forEach(ing => {
-          const g = ing.amount || 100;
+          const g = ing.amount_g || ing.amount || 100;
           ingTotals[ing.id] = (ingTotals[ing.id] || 0) + g;
         });
       });
