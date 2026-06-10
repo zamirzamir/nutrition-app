@@ -1637,6 +1637,18 @@ function _applySwapDOM(cardId, recipe) {
       '<div class="macro-chip">🥑 Ж: ' + fat + 'г</div>' +
       '<div class="macro-chip">🍚 У: ' + carbs + 'г</div>';
   }
+  // Pre-populate recipe cache with ingredient names from ingredientsMap
+  // so loadAndToggleRecipe renders immediately without API fetch
+  if (typeof _recipeCache !== 'undefined' && recipe.id) {
+    _recipeCache[recipe.id] = {
+      name: recipe.name,
+      ingredients: (recipe.ingredients || []).map(function(i) {
+        var d = ingredientsMap[i.id];
+        return { name: d ? d.name : (i.name || i.id), amount_g: i.amount_g || i.amount || 0 };
+      }),
+      steps: recipe.instructions || recipe.steps || []
+    };
+  }
   // Close recipe block + reset details placeholder
   var recipeBlock = document.getElementById(cardId);
   if (recipeBlock) recipeBlock.classList.remove('open');
