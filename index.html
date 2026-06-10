@@ -729,6 +729,52 @@ function parseExclusions(text) {
   return changed ? [...excluded] : false;
 }
 
+function parseIngredientRequest(text) {
+  const t = text.toLowerCase().trim();
+  const verbs = ['хочу','хочется','дай','поставь','добавь','сделай','положи','хочу чтобы'];
+  const hasVerb = verbs.some(v => t.includes(v));
+  if (!hasVerb) return false;
+  const MEAL_WORDS = {
+    breakfast: ['завтрак','завтраку','завтрака'],
+    lunch:     ['обед','обеду','обеда','обедом'],
+    dinner:    ['ужин','ужину','ужина','ужином'],
+    snack:     ['перекус','перекуса','перекусу'],
+  };
+  let mealType = null, mealWord = null;
+  for (const [mt, words] of Object.entries(MEAL_WORDS)) {
+    const found = words.find(w => t.includes(w));
+    if (found) { mealType = mt; mealWord = found; break; }
+  }
+  if (!mealType) return false;
+  let cleaned = t;
+  verbs.forEach(v => { cleaned = cleaned.replace(new RegExp(v + '\\s*', 'g'), ''); });
+  cleaned = cleaned.replace(/\bна\b/g,'').replace(/\bс\b/g,'').replace(mealWord,'').trim();
+  const ingName = cleaned.replace(/[.,!?]/g,'').trim();
+  if (!ingName || ingName.length < 2) return false;
+  return { type: 'ingredient_request', mealType, ingredientName: ingName };
+}
+
+function applyIngredientRequest(mealType, ingName) {
+  if (!recipesArray.length) return null;
+  const q = ingName.toLowerCase().trim();
+  const matchIds = Object.keys(ingredientsMap).filter(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(q) || q.includes(n.split(' ')[0]);
+  });
+  if (!matchIds.length) return null;
+  const pool = filterRecipes(mealType);
+  const recipe = pool.find(r => r.ingredients && r.ingredients.some(i => matchIds.includes(i.id)));
+  if (!recipe) return null;
+  state.mealOverrides[mealType] = recipe;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { recipeName: recipe.name, ingDisplayName: ingredientsMap[matchIds[0]]?.name || ingName };
+}
+
 function parseFoodSubstitution(text) {
   const t = text.toLowerCase().trim();
   const verbs = ['замени ', 'поменяй ', 'смени '];
@@ -839,6 +885,8 @@ let ingredientsMap = {};   // { id: ingredientObject }
 let recipesArray   = [];   // [ recipeObject, ... ]
 let nutritionDataLoaded = false;
 let nutritionDataLoading = false;
+let recipeScores = {};
+let topRecipeIds = new Set();
 
 async function loadNutritionData() {
   if (nutritionDataLoaded || nutritionDataLoading) return;
@@ -870,6 +918,7 @@ async function loadNutritionData() {
       }
     } catch {}
     nutritionDataLoaded = true;
+    computeRecipeScores();
     console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);
   } catch(e) {
     console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);
@@ -1016,15 +1065,37 @@ const MEAL_SPLIT = {
   snack:     0.10
 };
 
+// ---------- 6b. computeRecipeScores -----------------------
+function computeRecipeScores() {
+  const ingFreq = {};
+  recipesArray.forEach(r => {
+    (r.ingredients || []).forEach(ing => { ingFreq[ing.id] = (ingFreq[ing.id] || 0) + 1; });
+  });
+  recipesArray.forEach(r => {
+    const ings = r.ingredients || [];
+    if (!ings.length) { recipeScores[r.id] = 0; return; }
+    const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;
+    const simBonus = Math.max(0, 15 - ings.length) * 8;
+    const imgBonus = r.image_url ? 40 : 0;
+    recipeScores[r.id] = avgFreq + simBonus + imgBonus;
+  });
+  const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));
+  topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
+  console.log('✅ Recipe scores computed, top-1000 ready');
+}
+
 // ---------- 7. filterRecipes --------------------------------
 // No diet-tag filtering — only by meal_type.
 // Recipes with excluded ingredients are handled via substituteRecipe().
 function filterRecipes(mealType) {
-  return recipesArray.filter(r => {
-    const mealTypes = Array.isArray(r.meal_type)
-      ? r.meal_type.join(',')
-      : (r.meal_type || '');
-    return mealTypes.includes(mealType);
+  const pool = recipesArray.filter(r => {
+    const mt = Array.isArray(r.meal_type) ? r.meal_type.join(',') : (r.meal_type || '');
+    return mt.includes(mealType);
+  });
+  return pool.sort((a, b) => {
+    const aTop = topRecipeIds.has(a.id) ? 1 : 0, bTop = topRecipeIds.has(b.id) ? 1 : 0;
+    if (aTop !== bTop) return bTop - aTop;
+    return (recipeScores[b.id]||0) - (recipeScores[a.id]||0);
   });
 }
 
@@ -1632,6 +1703,11 @@ async function sendFoodPref() {
     highlightReconstra();
     return;
   }// 2. Everything else → OpenAI
+  const ingReq = parseIngredientRequest(val);
+  if (ingReq !== false) {
+    const res = applyIngredientRequest(ingReq.mealType, ingReq.ingredientName);
+    if (res) { openPopup('🍽️', `Понял! Ставлю ${res.ingDisplayName} на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType} — «${res.recipeName}». Меню обновлено.`); return; }
+  }
   const subResult = parseFoodSubstitution(val);
   if (subResult !== false) {
     if (subResult.type === 'meal') {
