@@ -729,7 +729,25 @@ function parseExclusions(text) {
   return changed ? [...excluded] : false;
 }
 
-function parseIngredientRequest(text) {
+function parseMenuReset(text) {
+    const t = text.toLowerCase().trim();
+    const triggers = ['обнови меню','новое меню','другое меню','замени все меню','замени всё меню','сбрось меню','пересчитай меню','поменяй меню','измени меню','сделай новое меню','перегенерируй','перегенери меню','хочу другое меню'];
+    return triggers.some(tr => t.includes(tr)) ? { type: 'menu_reset' } : false;
+  }
+
+  function applyMenuReset() {
+    state.mealOverrides = {};
+    state.ingredientSwaps = {};
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    if (state.kcal > 0) {
+      renderMeals();
+      const d = Object.keys(dayStates).find(ds => dayStates[ds].open) || '1';
+      renderDayMeals(parseInt(d));
+    }
+    openPopup('🔄', 'Готово! Всё меню пересчитано заново с учётом твоих настроек.');
+  }
+
+  function parseIngredientRequest(text) {
   const t = text.toLowerCase().trim();
   const verbs = ['хочу','хочется','дай','поставь','добавь','сделай','положи','хочу чтобы'];
   const hasVerb = verbs.some(v => t.includes(v));
@@ -804,11 +822,13 @@ function parseFoodSubstitution(text) {
 function applyMealReplacement(mealType, dishName) {
   if (!recipesArray.length) return null;
   const dn = dishName.toLowerCase().trim();
-  let recipe = recipesArray.find(r => r.name.toLowerCase().includes(dn));
-  if (!recipe) recipe = recipesArray.find(r => {
+  const scoredPool = filterRecipes(mealType);
+  let recipe = scoredPool.find(r => r.name.toLowerCase().includes(dn));
+  if (!recipe) recipe = scoredPool.find(r => {
     const words = dn.split(' ');
     return words.some(w => w.length > 3 && r.name.toLowerCase().includes(w));
   });
+  if (!recipe) recipe = recipesArray.find(r => r.name.toLowerCase().includes(dn));
   if (!recipe) return null;
   state.mealOverrides[mealType] = recipe;
   Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
@@ -1105,7 +1125,7 @@ function filterRecipes(mealType) {
 function pickMealForSlot(mealType, excludedIds, usedRecipeIds = new Set()) {
   let pool = filterRecipes(mealType);
   // Shuffle for variety
-  pool = [...pool].sort(() => Math.random() - 0.5);
+  pool = [...pool.slice(0, 30)].sort(() => Math.random() - 0.5);
 
   // 1st pass: find recipe with no excluded ingredients
   for (const r of pool) {
@@ -1705,6 +1725,8 @@ async function sendFoodPref() {
     highlightReconstra();
     return;
   }// 2. Everything else → OpenAI
+  const menuReset = parseMenuReset(val);
+  if (menuReset !== false) { applyMenuReset(); return; }
   const ingReq = parseIngredientRequest(val);
   if (ingReq !== false) {
     const res = applyIngredientRequest(ingReq.mealType, ingReq.ingredientName);
