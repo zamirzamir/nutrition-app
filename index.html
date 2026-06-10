@@ -501,7 +501,10 @@ function calculate() {
   }
   kcal = Math.round(kcal);
 
-  const protein = Math.round(isLoss||isGain ? tw*1.8 : cw*1.4);
+  const proteinGoalMap  = {sedentary:1.6, light:1.7, moderate:1.8, active:2.0, very_active:2.2};
+  const proteinMaintMap = {sedentary:1.2, light:1.3, moderate:1.4, active:1.6, very_active:1.8};
+  const protCoef = isLoss||isGain ? (proteinGoalMap[state.activity]??1.8) : (proteinMaintMap[state.activity]??1.4);
+  const protein = Math.round((isLoss||isGain ? tw : cw) * protCoef);
   const fat     = Math.round(isLoss||isGain ? tw*0.8 : cw*0.8);
   const fiber   = Math.round((kcal/1000)*14);
   const carbs   = Math.max(0, Math.round((kcal-protein*4-fat*9)/4));
