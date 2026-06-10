@@ -341,7 +341,6 @@ body {
       <div class="option-btn" onclick="selectActivity('light',this)">🚶 Выхожу на работу и обратно<br><small>≈ 3 000–6 000 шагов/день</small></div>
       <div class="option-btn" onclick="selectActivity('moderate',this)">🚶‍♂️ Работа, магазин, прогулки<br><small>≈ 6 000–10 000 шагов/день</small></div>
       <div class="option-btn" onclick="selectActivity('active',this)">🏋️ Работа, магазин, прогулки, спортзал<br><small>≈ 10 000–15 000 шагов/день</small></div>
-      <div class="option-btn" onclick="selectActivity('very_active',this)">🏃 Работа, магазин, прогулки, спортзал, бег ++<br><small>≈ более 15 000 шагов/день</small></div>
     </div>
   </div>
 
@@ -502,7 +501,7 @@ function calculate() {
   const bmr = state.gender === 'male'
     ? 10*cw + 6.25*height - 5*age + 5
     : 10*cw + 6.25*height - 5*age - 161;
-  const actFactorMap = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725, very_active:1.9};
+  const actFactorMap = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725};
   const actFactor = actFactorMap[state.activity] ?? 1.2;
   const maintenance = Math.round(bmr * actFactor);
   const isLoss = tw < cw, isGain = tw > cw;
@@ -520,8 +519,8 @@ function calculate() {
   }
   kcal = Math.round(kcal);
 
-  const proteinGoalMap  = {sedentary:1.4, light:1.5, moderate:1.6, active:1.8, very_active:2.0};
-  const proteinMaintMap = {sedentary:1.0, light:1.1, moderate:1.2, active:1.4, very_active:1.6};
+  const proteinGoalMap  = {sedentary:1.4, light:1.5, moderate:1.6, active:1.8};
+  const proteinMaintMap = {sedentary:1.0, light:1.1, moderate:1.2, active:1.4};
   const protCoef = isLoss||isGain ? (proteinGoalMap[state.activity]??1.8) : (proteinMaintMap[state.activity]??1.4);
   const protein = Math.round((isLoss||isGain ? tw : cw) * protCoef);
   const fat     = Math.round(isLoss||isGain ? tw*0.8 : cw*0.8);
@@ -554,7 +553,7 @@ function calculate() {
       <p>Разбей путь на этапы:<br><br><strong>${cw} → ${mid} кг</strong> — Этап 1<br><strong>${mid} → ${tw} кг</strong> — Этап 2</p></div>`;}
   else wb.innerHTML='';
 
-  const actLblMap = {sedentary:'менее 3000 шагов (офис)', light:'3000–6000 шагов (лёгкая активность)', moderate:'6000–10000 шагов (умеренная активность)', active:'10000–15000 шагов (спортзал/бег)', very_active:'более 15000 шагов (высокая активность)'};
+  const actLblMap = {sedentary:'менее 3000 шагов (офис)', light:'3000–6000 шагов (лёгкая активность)', moderate:'6000–10000 шагов (умеренная активность)', active:'10000–15000 шагов (спортзал/бег)'};
   const actLbl = actLblMap[state.activity] ?? 'минимальная активность';
   const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';
   state.context=`Цель: ${goalLbl}, пол: ${state.gender==='male'?'мужской':'женский'}, возраст: ${age} лет, рост: ${height} см, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;
