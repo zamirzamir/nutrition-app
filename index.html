@@ -1598,13 +1598,55 @@ function _applySwapDOM(cardId, recipe) {
   if (!el) return;
   var card = el.closest('.meal-card');
   if (!card) return;
+  // Update image
   var img = card.querySelector('img');
-  var nameEl = card.querySelector('.meal-name');
   if (img) {
     img.src = recipe.image_url || '';
-    img.onerror = function() { img.src = 'https://via.placeholder.com/600x300/1a1a24/a78bfa?text=' + encodeURIComponent(recipe.name); };
+    img.onerror = function() { this.src = 'https://via.placeholder.com/600x300/1a1a24/a78bfa?text=' + encodeURIComponent(recipe.name); };
   }
+  // Update name
+  var nameEl = card.querySelector('.meal-name');
   if (nameEl) nameEl.textContent = recipe.name;
+  // Update onclick so next tap loads new recipe
+  var imgWrap = card.querySelector('.meal-img-wrap');
+  if (imgWrap) {
+    var oc = imgWrap.getAttribute('onclick') || '';
+    if (oc.indexOf('loadAndToggleRecipe') !== -1) {
+      imgWrap.setAttribute('onclick', "loadAndToggleRecipe('" + cardId + "','" + recipe.id + "')");
+    }
+  }
+  // Compute macros from recipe
+  var cal = 0, prot = 0, fat = 0, carbs = 0;
+  if (recipe.calories_per_serving) {
+    cal = Math.round(recipe.calories_per_serving);
+    prot = Math.round(recipe.protein_per_serving || 0);
+    fat = Math.round(recipe.fat_per_serving || 0);
+    carbs = Math.round(recipe.carbs_per_serving || 0);
+  } else {
+    (recipe.ingredients || []).forEach(function(i) {
+      var d = ingredientsMap[i.id];
+      if (d) { var g = i.amount_g || i.amount || 100; cal += (d.calories||0)*g/100; prot += (d.protein||0)*g/100; fat += (d.fat||0)*g/100; carbs += (d.carbs||0)*g/100; }
+    });
+    cal = Math.round(cal); prot = Math.round(prot); fat = Math.round(fat); carbs = Math.round(carbs);
+  }
+  // Update macros chips
+  var macrosEl = card.querySelector('.recipe-macros');
+  if (macrosEl) {
+    macrosEl.innerHTML = '<div class="macro-chip">🔥 ' + cal + ' ккал</div>' +
+      '<div class="macro-chip">🥩 Б: ' + prot + 'г</div>' +
+      '<div class="macro-chip">🥑 Ж: ' + fat + 'г</div>' +
+      '<div class="macro-chip">🍚 У: ' + carbs + 'г</div>';
+  }
+  // Close recipe block + reset details placeholder
+  var recipeBlock = document.getElementById(cardId);
+  if (recipeBlock) recipeBlock.classList.remove('open');
+  var tapHint = card.querySelector('.meal-tap-hint');
+  if (tapHint) tapHint.textContent = '👆 рецепт';
+  var detailsEl = document.getElementById(cardId + '-details');
+  if (detailsEl) {
+    detailsEl.innerHTML = '<div style="text-align:center;color:var(--muted);padding:12px 0;font-size:13px;">👆 Нажми для просмотра рецепта</div>';
+  }
+  // Update cache
   var r2 = _parseCard(cardId);
   if (dayMenuCache[r2.day] && dayMenuCache[r2.day][r2.idx]) dayMenuCache[r2.day][r2.idx].recipe = recipe;
   renderShoppingList();
