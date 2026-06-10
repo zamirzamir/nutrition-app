@@ -1066,7 +1066,8 @@ const MEAL_SPLIT = {
 };
 
 // ---------- 6b. computeRecipeScores -----------------------
-function computeRecipeScores() {
+const PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','pork_minced','shrimp','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','cottage_cheese','kefir','butter','cream_cheese','broccoli','spinach','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','zucchini','eggplant','cauliflower','cabbage_white','potato','mushroom_champignon','beet','pollock','herring','mackerel','pumpkin','corn','green_beans','apple','banana','orange','avocado','lemon','kiwi','pear','oats','rice_white','buckwheat','pasta_wheat','quinoa','bulgur','millet','couscous','wheat_flour','lentils_red','chickpeas','black_beans','kidney_beans','tofu','green_peas','lentils_green','lentils_black','white_beans','almonds','walnuts','cashews','hazelnuts','sunflower_oil','olive_oil','oat_milk','almond_milk','coconut_milk','soy_milk','soy_sauce','tomato_paste','apple_cider_vinegar','mustard','broth_chicken','broth_beef','bone_broth','black_pepper','parsley_fresh','dill_fresh','cilantro_fresh','salt','turmeric','cinnamon','cumin','paprika','sugar','green_tea','water']);
+  function computeRecipeScores() {
   const ingFreq = {};
   recipesArray.forEach(r => {
     (r.ingredients || []).forEach(ing => { ingFreq[ing.id] = (ingFreq[ing.id] || 0) + 1; });
@@ -1077,7 +1078,8 @@ function computeRecipeScores() {
     const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;
     const simBonus = Math.max(0, 15 - ings.length) * 8;
     const imgBonus = r.image_url ? 40 : 0;
-    recipeScores[r.id] = avgFreq + simBonus + imgBonus;
+    const priorityBonus = ings.filter(i => PRIORITY_IDS.has(i.id)).length * 300;
+      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus;
   });
   const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));
   topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
