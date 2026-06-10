@@ -1109,8 +1109,10 @@ const PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','po
     const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;
     const simBonus = Math.max(0, 15 - ings.length) * 8;
     const imgBonus = r.image_url ? 40 : 0;
+    const SUPER_PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','butter','cottage_cheese','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','cabbage_white','potato','mushroom_champignon','apple','banana','oats','rice_white','buckwheat','almonds','walnuts','sunflower_oil','salt','tomato_paste','water','sugar','black_pepper']);
     const priorityBonus = ings.filter(i => PRIORITY_IDS.has(i.id)).length * 300;
-      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus;
+    const superBonus = ings.filter(i => SUPER_PRIORITY_IDS.has(i.id)).length * 600;
+      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus + superBonus;
   });
   const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));
   topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
