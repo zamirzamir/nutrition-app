@@ -380,6 +380,8 @@ body {
     <div id="dayMealsContainer"></div>
   </div>
 
+  <div id="exclusion-banner-top"></div>
+  <div id="shopping-list-section" style="display:none"></div>
   <!-- PURCHASE -->
   <div id="purchase-section" class="purchase-section">
     <p>А вот тебе меню на 28 дней с рецептами, согласно твоим данным 👇</p>
@@ -1424,9 +1426,41 @@ function doRemoveExclusion(id) {
 }
 
 
-function renderMeals() {
+function renderShoppingList() {
+    const section = document.getElementById('shopping-list-section');
+    if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }
+    const ingTotals = {};
+    for (let d = 1; d <= 7; d++) {
+      const cache = dayMenuCache[d];
+      if (!cache) continue;
+      ['breakfast','lunch','dinner','snack'].forEach(mt => {
+        const meal = cache[mt];
+        if (!meal || !meal.recipe) return;
+        const ings = meal.modifiedIngredients || meal.recipe.ingredients || [];
+        ings.forEach(ing => {
+          const g = ing.amount || 100;
+          ingTotals[ing.id] = (ingTotals[ing.id] || 0) + g;
+        });
+      });
+    }
+    const items = Object.entries(ingTotals)
+      .map(([id, g]) => ({ name: ingredientsMap[id]?.name || id, grams: Math.round(g) }))
+      .filter(i => i.grams > 0)
+      .sort((a, b) => b.grams - a.grams);
+    if (!items.length) { section.style.display = 'none'; return; }
+    const rows = items.map(i =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text)">${i.name}</span><span style="color:var(--muted);font-size:13px;white-space:nowrap;margin-left:8px">${i.grams} г</span></div>`
+    ).join('');
+    section.style.display = 'block';
+    section.innerHTML = `<div style="font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text)">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>${rows}`;
+  }
+
+  function renderMeals() {
   if (state.kcal <= 0) return;
   const banner = buildExclusionBannerHtml();
+  const topBannerEl = document.getElementById('exclusion-banner-top');
+  if (topBannerEl) topBannerEl.innerHTML = banner;
+  renderShoppingList();
 
   // API plan has priority
   if (_apiPlan && _apiPlan[0]) {
