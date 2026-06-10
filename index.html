@@ -1463,16 +1463,16 @@ function renderShoppingList() {
     const section = document.getElementById('shopping-list-section');
     if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }
     const ingTotals = {};
+    const isPurchased = state.purchased;
+    const daysToShow = isPurchased ? [1,2,3,4,5,6,7] : [1];
     if (nutritionDataLoaded) {
       const _sl_profile = buildUserProfile();
       const _sl_tracker = window._globalTracker || new NutrientTracker();
-      for (let d = 1; d <= 7; d++) {
-        if (!dayMenuCache[d]) dayMenuCache[d] = buildDayMenu(_sl_profile, d, _sl_tracker);
-      }
+      daysToShow.forEach(function(d) { if (!dayMenuCache[d]) dayMenuCache[d] = buildDayMenu(_sl_profile, d, _sl_tracker); });
     }
-    for (let d = 1; d <= 7; d++) {
+    daysToShow.forEach(function(d) {
       const cache = dayMenuCache[d];
-      if (!cache) continue;
+      if (!cache) return;
       const _meals = Array.isArray(cache) ? cache : ['breakfast','lunch','dinner','snack'].map(mt => cache[mt]).filter(Boolean);
       _meals.forEach(meal => {
         if (!meal || !meal.recipe) return;
@@ -1482,20 +1482,21 @@ function renderShoppingList() {
           ingTotals[ing.id] = (ingTotals[ing.id] || 0) + g;
         });
       });
-    }
+    });
     const items = Object.entries(ingTotals)
       .map(([id, g]) => ({ name: ingredientsMap[id]?.name || id, grams: Math.round(g) }))
       .filter(i => i.grams > 0)
       .sort((a, b) => b.grams - a.grams);
     if (!items.length) { section.style.display = 'none'; return; }
+    const title = isPurchased ? 'Вот продукты которые тебе нужны на ближайшие 7 дней 👇' : 'Вот продукты которые тебе нужны на этот день 👇';
     const rows = items.map(i =>
       `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text)">${i.name}</span><span style="color:var(--muted);font-size:13px;white-space:nowrap;margin-left:8px">${i.grams} г</span></div>`
     ).join('');
     section.style.display = 'block';
     section.innerHTML =
+      '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px">' + title + '</div>'+
       '<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)">'+
-      '<div style="padding:14px 16px 0">'+
-      '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>'+
+      '<div style="padding:14px 16px 0">'+'
       '<div id="sl-inner" style="max-height:190px;overflow:hidden;position:relative;transition:max-height .35s ease">'+
       rows +
       '<div id="sl-fade" style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,var(--surface));pointer-events:none"></div>'+
@@ -1596,6 +1597,7 @@ function _applySwapDOM(cardId, recipe) {
   if (nameEl) nameEl.textContent = recipe.name;
   var r2 = _parseCard(cardId);
   if (dayMenuCache[r2.day] && dayMenuCache[r2.day][r2.idx]) dayMenuCache[r2.day][r2.idx].recipe = recipe;
+  renderShoppingList();
 }
 
 function swapPrev(cardId, e) {
@@ -1682,6 +1684,7 @@ function completePurchase() {
   document.getElementById('purchase-section').style.display='none';
   document.getElementById('days-section').style.display='block';
   renderDaysGrid();
+  renderShoppingList();
   document.getElementById('days-section').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
