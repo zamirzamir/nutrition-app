@@ -1435,8 +1435,8 @@ async function sendFoodPref() {
     state.excludedIngredientIds = [];
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
     if (state.kcal > 0) renderMeals();
-    const openDay0 = Object.keys(dayStates).find(d => dayStates[d].open);
-    if (openDay0) renderDayMeals(parseInt(openDay0));
+    const openDay0 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
+    if (openDay0 && state.kcal > 0) renderDayMeals(parseInt(openDay0));
     openPopup('✅', 'Ограничения сброшены. Меню обновлено.');
     return;
   }
