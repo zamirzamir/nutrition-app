@@ -371,10 +371,10 @@ body {
 </div>
 
 <!-- ========== AI POPUP ========== -->
-<div id="aiPopup" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); padding:20px; display:none; align-items:center; justify-content:center;">
-  <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:22px; padding:24px 20px 20px; max-width:420px; width:100%; position:relative; animation:fadeUp .25s ease both; max-height:80vh; overflow-y:auto;">
+<div id="aiPopup" onclick="if(event.target===this)closePopup()" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); padding:20px; display:none; align-items:center; justify-content:center;">
+  <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:22px; padding:24px 20px 20px; max-width:360px; width:90vw; position:relative; animation:fadeUp .25s ease both; max-height:80vh; overflow-y:auto;">
     <button onclick="closePopup()" style="position:absolute;top:14px;right:14px;background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;">✕</button>
-    <div id="aiPopupIcon" style="font-size:36px;text-align:center;margin-bottom:10px;">🤖</div>
+    <div id="aiPopupIcon" style="font-size:36px;text-align:center;margin-bottom:10px;">🤝</div>
     <div id="aiPopupText" style="font-size:14px;line-height:1.7;color:var(--muted);text-align:center;"></div>
     <div id="aiPopupLoader" style="display:none;text-align:center;padding:10px 0;">
       <div style="display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>
@@ -635,7 +635,12 @@ function parseExclusions(text) {
     }
     // 4. Позитивное упоминание → УБИРАЕМ ids (после exclusion, поэтому побеждает)
     for (const pattern of INCLUSION_PATTERNS) {
-      if (pattern.words.some(w => t.includes(w))) {
+      if (pattern.words.some(w => {
+        const idx = t.indexOf(w);
+        if (idx === -1) return false;
+        const before = t.substring(Math.max(0, idx - 5), idx);
+        return !before.includes('не');
+      })) {
         pattern.ids.forEach(id => excluded.delete(id));
         changed = true;
       }
@@ -1403,7 +1408,7 @@ function openPopup(icon, text) {
 }
 function openPopupLoading() {
   const p = document.getElementById('aiPopup');
-  document.getElementById('aiPopupIcon').textContent = '🤖';
+  document.getElementById('aiPopupIcon').textContent = '🤝';
   document.getElementById('aiPopupText').textContent = '';
   document.getElementById('aiPopupLoader').style.display = 'block';
   p.style.display = 'flex';
@@ -1482,7 +1487,7 @@ async function sendFoodPref() {
     if (isOffTopic) {
       openPopup('🚫', 'Этот вопрос выходит за рамки питания и КБЖУ. Попробуй спросить что-то про еду, рацион или ингредиенты — с удовольствием помогу! 😊');
     } else {
-      openPopup('🤖', reply);
+      openPopup('🤝', reply);
     }
   } catch {
     openPopup('⚠️', 'Нет соединения с сервером. Проверь интернет и попробуй снова.');
