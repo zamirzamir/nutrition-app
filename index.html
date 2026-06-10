@@ -1629,23 +1629,20 @@ function swapNext(cardId, e) {
     return;
   }
   var used = {}; hist.forEach(function(id){ used[id]=1; });
-  var nextRec = filterRecipes(mealType).find(function(r){ return !used[r.id]; });
-  if (!nextRec) { openPopup('😔','Все подходящие варианты уже показаны'); return; }
   var refKcal = _kcalForRecipe(recipesArray.find(function(r){return r.id===hist[0];}));
-  var newKcal = _kcalForRecipe(nextRec);
-  var diff = refKcal > 0 ? Math.abs(newKcal - refKcal) / refKcal : 0;
-  if (diff > 0.05) {
-    _swapPending = {cardId:cardId, nextRec:nextRec, hist:hist};
-    var pct = Math.round(diff * 100);
-    var pctEl = document.getElementById('swap-diff-pct');
-    if (pctEl) pctEl.textContent = pct + '%';
-    var popup = document.getElementById('swap-popup');
-    if (popup) popup.style.display = 'flex';
-  } else {
-    hist.push(nextRec.id);
-    _swapPos[cardId] = hist.length - 1;
-    _applySwapDOM(cardId, nextRec);
+  var candidates = filterRecipes(mealType).filter(function(r){ return !used[r.id]; });
+  var nextRec = candidates.find(function(r){
+    return refKcal <= 0 || Math.abs(_kcalForRecipe(r) - refKcal) / refKcal <= 0.03;
+  });
+  if (!nextRec && candidates.length) {
+    nextRec = candidates.reduce(function(best, r){
+      return Math.abs(_kcalForRecipe(r) - refKcal) < Math.abs(_kcalForRecipe(best) - refKcal) ? r : best;
+    });
   }
+  if (!nextRec) { openPopup('😔','Все подходящие варианты уже показаны'); return; }
+  hist.push(nextRec.id);
+  _swapPos[cardId] = hist.length - 1;
+  _applySwapDOM(cardId, nextRec);
 }
 
 function swapConfirmYes() {
