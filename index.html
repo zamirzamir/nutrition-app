@@ -136,7 +136,7 @@ body {
 .meal-img-overlay .meal-name { font-size:17px; font-weight:800; color:#fff; }
 .meal-img-overlay .meal-type { font-size:11px; color:rgba(255,255,255,.7); margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
 .meal-nav-bar {
-  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
   display:flex; align-items:center; gap:4px;
   background:rgba(0,0,0,.6); border-radius:20px;
   padding:5px 10px; pointer-events:auto;
@@ -1442,6 +1442,23 @@ function doRemoveExclusion(id) {
 }
 
 
+
+function toggleSlList() {
+  var inner = document.getElementById('sl-inner');
+  var fade  = document.getElementById('sl-fade');
+  var btn   = document.getElementById('sl-btn');
+  if (!inner) return;
+  var expanded = inner.style.maxHeight === 'none';
+  if (expanded) {
+    inner.style.maxHeight = '190px';
+    if (fade) fade.style.display = 'block';
+    if (btn) btn.innerHTML = btn.innerHTML.replace('▴ Свернуть', 'Показать все').replace('▲','▾');
+  } else {
+    inner.style.maxHeight = 'none';
+    if (fade) fade.style.display = 'none';
+    if (btn) { var t = btn.textContent; btn.textContent = '▴ Свернуть'; }
+  }
+}
 function renderShoppingList() {
     const section = document.getElementById('shopping-list-section');
     if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }
@@ -1475,7 +1492,17 @@ function renderShoppingList() {
       `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text)">${i.name}</span><span style="color:var(--muted);font-size:13px;white-space:nowrap;margin-left:8px">${i.grams} г</span></div>`
     ).join('');
     section.style.display = 'block';
-    section.innerHTML = `<div style="font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text)">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>${rows}`;
+    section.innerHTML =
+      '<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)">'+
+      '<div style="padding:14px 16px 0">'+
+      '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>'+
+      '<div id="sl-inner" style="max-height:190px;overflow:hidden;position:relative;transition:max-height .35s ease">'+
+      rows +
+      '<div id="sl-fade" style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,var(--surface));pointer-events:none"></div>'+
+      '</div></div>'+
+      '<div onclick="toggleSlList()" id="sl-btn" style="padding:12px 16px;text-align:center;cursor:pointer;color:var(--accent);font-size:13px;font-weight:600;border-top:1px solid var(--border);margin-top:0">'+
+      'Показать все ' + items.length + ' продуктов ▾'+
+      '</div></div>';
   }
 
   function renderMeals() {
