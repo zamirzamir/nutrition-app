@@ -266,8 +266,17 @@ body {
   flex-shrink:0; transition:opacity .2s;
 }
 .mic-btn:active { opacity:.8; }
-.mic-btn.listening { background:var(--red); animation:pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.mic-btn.listening { background:#fb923c; }
+@keyframes reconstra-border {
+  0%,100% { border-color:var(--border); box-shadow:none; }
+  10%,90% { border-color:#fb923c; box-shadow:0 0 0 2px rgba(251,146,60,.35); }
+}
+.meal-card.reconstra-hl { animation:reconstra-border 5s ease forwards; }
+@keyframes reconstra-banner {
+  0%,100% { box-shadow:none; }
+  10%,90% { box-shadow:0 0 0 3px rgba(251,146,60,.5); }
+}
+.reconstra-banner-hl { animation:reconstra-banner 5s ease forwards; }
 
 /* ANIMATIONS */
 @keyframes fadeUp {
@@ -1201,7 +1210,7 @@ function buildExclusionBannerHtml() {
     const nm = ingredientsMap[id]?.name || id;
     return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
   }).join('');
-  return `<div style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">🚫 Исключено из меню:<div style="margin-top:5px;line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span></div>`;
+  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">🚫 Исключено из меню:<div style="margin-top:5px;line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span></div>`;
 }
 
 function clearExclusions() {
@@ -1210,7 +1219,6 @@ function clearExclusions() {
   renderMeals();
   const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
   if (openDay) renderDayMeals(parseInt(openDay));
-  openPopup('✅', 'Ограничения сброшены. Меню обновлено.');
 }
 function confirmRemoveExclusion(id, evt) {
   evt.stopPropagation();
@@ -1482,6 +1490,24 @@ document.getElementById('aiPopup').addEventListener('click', function(e) {
   if (e.target === this) closePopup();
 });
 
+function highlightReconstra() {
+  setTimeout(() => {
+    const banner = document.getElementById('exclusion-banner');
+    if (banner) {
+      banner.classList.remove('reconstra-banner-hl');
+      void banner.offsetWidth;
+      banner.classList.add('reconstra-banner-hl');
+      setTimeout(() => banner.classList.remove('reconstra-banner-hl'), 5000);
+    }
+    document.querySelectorAll('.meal-card').forEach(card => {
+      card.classList.remove('reconstra-hl');
+      void card.offsetWidth;
+      card.classList.add('reconstra-hl');
+      setTimeout(() => card.classList.remove('reconstra-hl'), 5000);
+    });
+  }, 400);
+}
+
 async function sendFoodPref() {
   const val = document.getElementById('foodPrefInput').value.trim();
   if (!val) return;
@@ -1493,32 +1519,25 @@ async function sendFoodPref() {
   const exclusionResult = parseExclusions(val);
 
   if (exclusionResult === null) {
-    // Full reset
     state.excludedIngredientIds = [];
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
     if (state.kcal > 0) renderMeals();
     const openDay0 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
     if (openDay0 && state.kcal > 0) renderDayMeals(parseInt(openDay0));
-    openPopup('✅', 'Ограничения сброшены. Меню обновлено.');
     return;
   }
 
   if (exclusionResult !== false) {
-    // New exclusions detected
     state.excludedIngredientIds = exclusionResult;
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
-    _apiPlan = null; // force reload from API with new exclusions
+    _apiPlan = null;
     if (state.kcal > 0) {
       renderMeals();
       setTimeout(() => document.getElementById('meal-section')?.scrollIntoView({behavior:'smooth',block:'start'}), 300);
     }
-    const names = exclusionResult
-      .map(id => ingredientsMap[id]?.name || id)
-      .filter((v,i,a) => a.indexOf(v)===i)
-      .slice(0, 4).join(', ');
-    openPopup('🚫', `Понял! Исключаю из меню: ${names}. Рецепты обновлены.`);
-        const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
+    const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
     if (openDay1 && state.kcal > 0) renderDayMeals(parseInt(openDay1));
+    highlightReconstra();
     return;
   }// 2. Everything else → OpenAI
   openPopupLoading();
