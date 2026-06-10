@@ -461,8 +461,7 @@ function calculate() {
   const sign = isGain?1:isLoss?-1:0;
   const wk = weeklyChange*sign;
   document.getElementById('forecastGrid').innerHTML=
-    [{d:'7 дней',w:+(cw+wk).toFixed(1)},{d:'30 дней',w:+(cw+wk*(30/7)).toFixed(1)},
-     {d:'60 дней',w:+(cw+wk*(60/7)).toFixed(1)},{d:'90 дней',w:+(cw+wk*(90/7)).toFixed(1)}]
+    [{d:'30 дней',w:+(cw+wk*(30/7)).toFixed(1)},{d:'60 дней',w:+(cw+wk*(60/7)).toFixed(1)},{d:'90 дней',w:+(cw+wk*(90/7)).toFixed(1)},{d:'120 дней',w:+(cw+wk*(120/7)).toFixed(1)}]
     .map(f=>`<div class="forecast-card">
       <div class="fday">📅 Через ${f.d}</div>
       <div class="fweight">${f.w}</div><div class="funit">кг</div>
