@@ -292,6 +292,14 @@ body {
 <div class="wrap" style="margin-top:24px;">
 
   <div class="card">
+    <div class="card-title">👤 Пол</div>
+    <div class="option-grid" id="genderGrid">
+      <div class="option-btn selected" onclick="selectGender('female',this)">♀️ Женский</div>
+      <div class="option-btn" onclick="selectGender('male',this)">♂️ Мужской</div>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">⚖️ Вес</div>
     <div class="input-row">
       <div class="input-group">
@@ -408,6 +416,7 @@ body {
 <script>
 // ========== STATE ==========
 const state = {
+  gender: 'female',
   activity: 'sedentary',
   kcal: 0, protein: 0, fat: 0, carbs: 0,
   cw: 0, tw: 0,
@@ -416,6 +425,13 @@ const state = {
   excludedIngredientIds: [], // ingredient IDs the user can't eat
   activeDayBtn: null,
 };
+
+// ========== GENDER ==========
+function selectGender(val, el) {
+  document.querySelectorAll('#genderGrid .option-btn').forEach(b => b.className='option-btn');
+  el.classList.add('selected');
+  state.gender = val;
+}
 
 // ========== ACTIVITY ==========
 function selectActivity(val, el) {
@@ -439,7 +455,8 @@ function calculate() {
 
   let kcal, weeklyChange;
   if (isLoss) {
-    kcal = Math.max(maintenance * 0.80, 1200);
+    const kcalMin = state.gender === 'male' ? 1500 : 1200;
+    kcal = Math.max(maintenance * 0.80, kcalMin);
     weeklyChange = ((maintenance - kcal) * 7) / 7700;
   } else if (isGain) {
     kcal = maintenance * 1.10;
