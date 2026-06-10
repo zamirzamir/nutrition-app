@@ -1,1 +1,1970 @@
-{"value":"<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">\n<meta name=\"format-detection\" content=\"telephone=no\">\n<title>Калькулятор КБЖУ</title>\n<style>\n* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }\n:root {\n  --bg:#0f0f13; --surface:#1a1a24; --surface2:#22222f; --border:#2e2e3e;\n  --accent:#7c6af7; --accent2:#a78bfa; --green:#22c55e; --yellow:#f59e0b;\n  --red:#ef4444; --text:#f1f0ff; --muted:#8b8aa0; --radius:18px;\n}\nhtml { scroll-behavior:smooth; }\nbody {\n  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;\n  background:var(--bg); color:var(--text);\n  max-width:480px; margin:0 auto;\n  padding-bottom:90px;\n}\n\n/* HEADER */\n.header { padding:28px 20px 0; text-align:center; }\n.header-badge {\n  display:inline-block;\n  background:linear-gradient(135deg,#7c6af7,#a855f7);\n  border-radius:30px; padding:6px 16px;\n  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;\n}\n.header h1 {\n  font-size:26px; font-weight:800; line-height:1.2;\n  background:linear-gradient(135deg,#fff,#a78bfa);\n  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;\n}\n.header p { color:var(--muted); font-size:14px; margin-top:6px; }\n\n/* CARDS */\n.card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }\n.card-title { font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }\n\n/* INPUTS */\n.wrap { padding:0 20px; }\n.input-row { display:flex; gap:10px; }\n.input-group { flex:1; }\n.input-group label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }\n.input-group input {\n  width:100%; background:var(--surface2); border:1.5px solid var(--border);\n  border-radius:12px; padding:12px 14px; color:var(--text);\n  font-size:18px; font-weight:700; outline:none; transition:border-color .2s;\n  -moz-appearance:textfield;\n}\n.input-group input::-webkit-outer-spin-button,\n.input-group input::-webkit-inner-spin-button { -webkit-appearance:none; }\n.input-group input:focus { border-color:var(--accent); }\n\n/* OPTION BUTTONS */\n.option-grid { display:flex; flex-direction:column; gap:8px; }\n.option-btn {\n  flex:1; padding:12px 14px; border-radius:12px;\n  border:1.5px solid var(--border); background:var(--surface2);\n  color:var(--muted); font-size:13px; font-weight:600;\n  cursor:pointer; transition:all .2s; text-align:left;\n}\n.option-btn.selected { border-color:var(--accent); background:rgba(124,106,247,.15); color:var(--accent2); }\n.option-btn small { display:block; font-size:11px; font-weight:400; margin-top:2px; opacity:.75; }\n\n/* CALC BUTTON */\n.calc-btn {\n  width:100%; padding:16px; border-radius:16px; border:none;\n  background:linear-gradient(135deg,#7c6af7,#a855f7);\n  color:#fff; font-size:16px; font-weight:700; cursor:pointer;\n  margin-top:4px; transition:opacity .2s, transform .1s;\n}\n.calc-btn:active { transform:scale(.98); opacity:.9; }\n\n/* SECTION LABEL */\n.section-label {\n  font-size:15px; font-weight:700; color:var(--text);\n  margin:20px 0 10px; line-height:1.4;\n}\n\n/* RESULTS GRID */\n.results-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }\n.res-card {\n  background:var(--surface); border:1.5px solid var(--border);\n  border-radius:var(--radius); padding:16px 14px; text-align:center;\n  animation:fadeUp .4s ease both;\n}\n.res-card.full { grid-column:1/-1; }\n.res-card .icon { font-size:22px; margin-bottom:6px; }\n.res-card .val {\n  font-size:28px; font-weight:800;\n  background:linear-gradient(135deg,#fff,#a78bfa);\n  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;\n}\n.res-card .unit { font-size:11px; color:var(--muted); margin-top:2px; }\n.res-card .lbl { font-size:12px; color:var(--muted); margin-top:4px; font-weight:600; }\n\n/* FORECAST */\n.forecast-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }\n.forecast-card {\n  background:var(--surface2); border:1.5px solid var(--border);\n  border-radius:14px; padding:14px; text-align:center;\n  animation:fadeUp .5s ease both;\n}\n.forecast-card .fday { font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:600; }\n.forecast-card .fweight { font-size:22px; font-weight:800; }\n.forecast-card .funit { font-size:11px; color:var(--muted); }\n\n/* WARNING */\n.warning-card {\n  background:rgba(245,158,11,.1); border:1.5px solid var(--yellow);\n  border-radius:var(--radius); padding:16px; margin-bottom:12px;\n}\n.warning-card h3 { font-size:14px; color:#fbbf24; margin-bottom:8px; }\n.warning-card p { font-size:13px; color:var(--muted); line-height:1.5; }\n\n/* MEAL CARDS */\n.meal-card {\n  background:var(--surface); border:1.5px solid var(--border);\n  border-radius:var(--radius); margin-bottom:12px;\n  overflow:hidden; animation:fadeUp .4s ease both;\n}\n.meal-img-wrap { position:relative; cursor:pointer; overflow:hidden; border-radius:var(--radius) var(--radius) 0 0; }\n.meal-img-wrap img {\n  width:100%; height:200px; object-fit:cover; display:block;\n  transition:transform .3s;\n}\n.meal-img-wrap:active img { transform:scale(.97); }\n.meal-img-overlay {\n  position:absolute; inset:0;\n  background:linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 50%);\n  display:flex; flex-direction:column; justify-content:flex-end; padding:14px;\n}\n.meal-img-overlay .meal-name { font-size:17px; font-weight:800; color:#fff; }\n.meal-img-overlay .meal-type { font-size:11px; color:rgba(255,255,255,.7); margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; }\n.meal-nav-bar {\n  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);\n  display:flex; align-items:center; gap:4px;\n  background:rgba(0,0,0,.6); border-radius:20px;\n  padding:5px 10px; pointer-events:auto;\n}\n.meal-nav-btn {\n  background:none; border:none; color:rgba(255,255,255,.95);\n  font-size:20px; cursor:pointer; padding:0 2px; line-height:1;\n}\n.meal-tap-hint {\n  font-size:11px; color:rgba(255,255,255,.85); cursor:pointer;\n  padding:0 6px; white-space:nowrap;\n}\n\n/* RECIPE */\n.recipe-block {\n  display:none; padding:16px 18px 18px;\n  border-top:1px solid var(--border);\n  animation:fadeUp .3s ease both;\n}\n.recipe-block.open { display:block; }\n.recipe-macros {\n  display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;\n}\n.macro-chip {\n  background:var(--surface2); border-radius:20px;\n  padding:5px 12px; font-size:12px; font-weight:600; color:var(--accent2);\n}\n.recipe-section-title {\n  font-size:12px; font-weight:700; text-transform:uppercase;\n  letter-spacing:.7px; color:var(--muted); margin-bottom:8px;\n}\n.ingredient-list { list-style:none; margin-bottom:14px; }\n.ingredient-list li {\n  display:flex; justify-content:space-between;\n  font-size:13px; color:var(--muted);\n  padding:5px 0; border-bottom:1px solid var(--border);\n}\n.ingredient-list li:last-child { border:none; }\n.ingredient-list li .ig { color:var(--text); font-weight:600; font-size:12px; }\n.steps-list { list-style:none; }\n.steps-list li {\n  display:flex; gap:10px; margin-bottom:10px;\n  font-size:13px; color:var(--muted); line-height:1.5;\n}\n.step-num {\n  min-width:22px; height:22px; border-radius:50%;\n  background:var(--accent); color:#fff;\n  font-size:11px; font-weight:700;\n  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;\n}\n\n/* PURCHASE SECTION */\n.purchase-section {\n  background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(168,85,247,.1));\n  border:1.5px solid rgba(124,106,247,.3);\n  border-radius:var(--radius); padding:20px; margin-bottom:12px;\n}\n.purchase-section p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:14px; }\n.buy-btn {\n  width:100%; padding:18px; border-radius:16px; border:none;\n  background:linear-gradient(135deg,#22c55e,#16a34a);\n  color:#fff; font-size:20px; font-weight:800; cursor:pointer;\n  letter-spacing:.5px; transition:opacity .2s, transform .1s;\n}\n.buy-btn:active { transform:scale(.98); opacity:.9; }\n\n/* DAYS GRID */\n.days-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:16px; }\n.day-btn {\n  aspect-ratio:1; border-radius:12px; border:1.5px solid var(--border);\n  background:var(--surface); color:var(--text);\n  font-size:14px; font-weight:700; cursor:pointer;\n  display:flex; align-items:center; justify-content:center;\n  transition:all .2s; user-select:none; -webkit-user-select:none;\n  position:relative;\n}\n.day-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }\n.day-btn.used { background:var(--surface2); border-color:var(--border); color:#555; }\n.day-btn.used::after {\n  content:'✓'; position:absolute; top:2px; right:4px;\n  font-size:9px; color:#555;\n}\n\n/* PAYMENT PAGE */\n#page-payment {\n  display:none; position:fixed; inset:0;\n  background:var(--bg); z-index:200; overflow-y:auto;\n  padding:40px 20px 100px;\n}\n.payment-inner { text-align:center; max-width:420px; margin:0 auto; }\n.payment-inner .pay-icon { font-size:64px; margin-bottom:16px; }\n.payment-inner h2 { font-size:22px; font-weight:800; margin-bottom:12px; }\n.payment-inner p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:28px; }\n.pay-continue-btn {\n  width:100%; padding:18px; border-radius:16px; border:none;\n  background:linear-gradient(135deg,#7c6af7,#a855f7);\n  color:#fff; font-size:16px; font-weight:700; cursor:pointer;\n}\n\n/* STICKY BOTTOM BAR */\n.sticky-bar {\n  position:fixed; bottom:0; left:50%; transform:translateX(-50%);\n  width:100%; max-width:480px;\n  background:rgba(26,26,36,.95); backdrop-filter:blur(16px);\n  border-top:1px solid var(--border);\n  padding:10px 14px 14px;\n  z-index:100;\n}\n.sticky-input-row { display:flex; gap:8px; align-items:center; }\n.sticky-input-wrap { flex:1; position:relative; }\n.sticky-input {\n  width:100%; background:var(--surface2); border:1.5px solid var(--border);\n  border-radius:22px; padding:11px 16px;\n  font-size:13px; color:var(--text); outline:none;\n  font-family:inherit; transition:border-color .2s;\n}\n.sticky-input:focus { border-color:var(--accent); }\n.sticky-input:focus + .marquee-hint { opacity:0; }\n.marquee-hint {\n  position:absolute; inset:0; padding:11px 16px;\n  font-size:13px; color:var(--muted); pointer-events:none;\n  overflow:hidden; white-space:nowrap;\n  display:flex; align-items:center;\n  z-index:2;\n}\n.marquee-track { display:flex; flex-shrink:0; animation:marquee-scroll 10s linear infinite; }\n.marquee-text { white-space:nowrap; flex-shrink:0; padding-right:80px; }\n@keyframes marquee-scroll {\n  from { transform:translateX(0); }\n  to { transform:translateX(-50%); }\n}\n.mic-btn {\n  width:44px; height:44px; border-radius:50%; border:none;\n  background:var(--accent); color:#fff; font-size:18px;\n  cursor:pointer; display:flex; align-items:center; justify-content:center;\n  flex-shrink:0; transition:opacity .2s;\n}\n.mic-btn:active { opacity:.8; }\n.mic-btn.listening { background:#fb923c; }\n@keyframes reconstra-border {\n  0%,100% { border-color:var(--border); box-shadow:none; }\n  10%,90% { border-color:#fb923c; box-shadow:0 0 0 2px rgba(251,146,60,.35); }\n}\n.meal-card.reconstra-hl { animation:reconstra-border 5s ease forwards; }\n@keyframes reconstra-banner {\n  0%,100% { box-shadow:none; }\n  10%,90% { box-shadow:0 0 0 3px rgba(251,146,60,.5); }\n}\n.reconstra-banner-hl { animation:reconstra-banner 5s ease forwards; }\n\n/* ANIMATIONS */\n@keyframes fadeUp {\n  from { opacity:0; transform:translateY(14px); }\n  to { opacity:1; transform:translateY(0); }\n}\n\n/* DAY TOOLTIP */\n.day-tooltip {\n  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);\n  background:var(--surface); border:1.5px solid var(--border);\n  border-radius:12px; padding:10px 16px;\n  font-size:12px; color:var(--muted); text-align:center;\n  z-index:300; max-width:280px; line-height:1.5;\n  animation:fadeUp .3s ease both;\n}\n</style>\n</head>\n<body>\n\n<!-- ========== MAIN PAGE ========== -->\n<div id=\"page-main\">\n\n<div class=\"wrap\" style=\"margin-top:24px;\">\n\n  <div class=\"card\">\n    <div class=\"card-title\">👤 Пол</div>\n    <div class=\"option-grid\" id=\"genderGrid\">\n      <div class=\"option-btn selected\" onclick=\"selectGender('female',this)\">♀️ Женский</div>\n      <div class=\"option-btn\" onclick=\"selectGender('male',this)\">♂️ Мужской</div>\n    </div>\n  </div>\n\n  <div class=\"card\">\n    <div class=\"card-title\">⚖️ Параметры</div>\n    <div class=\"input-row\">\n      <div class=\"input-group\">\n        <label>Текущий вес, кг</label>\n        <input type=\"number\" id=\"currentWeight\" min=\"30\" max=\"300\">\n      </div>\n      <div class=\"input-group\">\n        <label>Желаемый вес, кг</label>\n        <input type=\"number\" id=\"targetWeight\" min=\"30\" max=\"300\">\n      </div>\n    </div>\n    <div class=\"input-row\" style=\"margin-top:10px;\">\n      <div class=\"input-group\">\n        <label>Рост, см</label>\n        <input type=\"number\" id=\"height\" min=\"100\" max=\"250\">\n      </div>\n      <div class=\"input-group\">\n        <label>Возраст, лет</label>\n        <input type=\"number\" id=\"age\" min=\"10\" max=\"100\">\n      </div>\n    </div>\n  </div>\n\n  <div class=\"card\">\n    <div class=\"card-title\">🏃 Какая у тебя планируется активность?</div>\n    <div class=\"option-grid\" id=\"activityGrid\">\n      <div class=\"option-btn selected\" onclick=\"selectActivity('sedentary',this)\">🛋️ Редко выхожу из дома<br><small>≈ менее 3 000 шагов/день</small></div>\n      <div class=\"option-btn\" onclick=\"selectActivity('light',this)\">🚶 Выхожу на работу и обратно<br><small>≈ 3 000–6 000 шагов/день</small></div>\n      <div class=\"option-btn\" onclick=\"selectActivity('moderate',this)\">🚶‍♂️ Работа, магазин, прогулки<br><small>≈ 6 000–10 000 шагов/день</small></div>\n      <div class=\"option-btn\" onclick=\"selectActivity('active',this)\">🏋️ Работа, магазин, прогулки, спортзал<br><small>≈ 10 000–15 000 шагов/день</small></div>\n    </div>\n  </div>\n\n  <button class=\"calc-btn\" onclick=\"calculate()\">⚡ Рассчитать</button>\n\n</div><!-- /wrap -->\n\n<!-- RESULTS -->\n<div id=\"results\" style=\"display:none;\">\n<div class=\"wrap\">\n\n  <div id=\"warningBlock\"></div>\n\n  <div class=\"section-label\">Чтобы прийти к цели, нужно употреблять вот столько 👇</div>\n  <div class=\"results-grid\">\n    <div class=\"res-card\"><div class=\"icon\">🔥</div><div class=\"val\" id=\"r-kcal\">—</div><div class=\"unit\">ккал/день</div><div class=\"lbl\">Калории</div></div>\n    <div class=\"res-card\"><div class=\"icon\">🥩</div><div class=\"val\" id=\"r-prot\">—</div><div class=\"unit\">г/день</div><div class=\"lbl\">Белки</div></div>\n    <div class=\"res-card\"><div class=\"icon\">🥑</div><div class=\"val\" id=\"r-fat\">—</div><div class=\"unit\">г/день</div><div class=\"lbl\">Жиры</div></div>\n    <div class=\"res-card\"><div class=\"icon\">🍚</div><div class=\"val\" id=\"r-carb\">—</div><div class=\"unit\">г/день</div><div class=\"lbl\">Углеводы</div></div>\n    <div class=\"res-card full\"><div class=\"icon\">🥦</div><div class=\"val\" id=\"r-fiber\">—</div><div class=\"unit\">г/день</div><div class=\"lbl\">Клетчатка</div></div>\n  </div>\n\n  <div class=\"section-label\">Вот сколько тебе нужно на это времени 👇</div>\n  <div class=\"forecast-grid\" id=\"forecastGrid\"></div>\n\n  <!-- DAY MENU -->\n  <div id=\"meal-section\">\n    <div class=\"section-label\">Вот меню на день с рецептами 👇</div>\n    <div id=\"mealsContainer\"></div>\n  </div>\n\n  <!-- 30 DAYS GRID (after purchase) -->\n  <div id=\"days-section\" style=\"display:none;\">\n    <div class=\"section-label\">📅 Меню на 28 дней</div>\n    <div class=\"days-grid\" id=\"daysGrid\"></div>\n    <div id=\"dayMealsContainer\"></div>\n  </div>\n\n  <div id=\"exclusion-banner-top\"></div>\n  <div id=\"shopping-list-section\" style=\"display:none\"></div>\n  <!-- PURCHASE -->\n  <div id=\"purchase-section\" class=\"purchase-section\">\n    <p>А вот тебе меню на 28 дней с рецептами, согласно твоим данным 👇</p>\n    <button class=\"buy-btn\" onclick=\"showPayment()\">299 ₽</button>\n  </div>\n\n</div><!-- /wrap -->\n</div><!-- /results -->\n\n</div><!-- /page-main -->\n\n<!-- ========== PAYMENT PAGE ========== -->\n<div id=\"page-payment\">\n  <div class=\"payment-inner\">\n    <div class=\"pay-icon\">💳</div>\n    <h2>Оплата</h2>\n    <p>Тут будет Продамус или Яндекс Пэй.<br>А пока вот кнопка для продолжения 👇</p>\n    <button class=\"pay-continue-btn\" onclick=\"completePurchase()\">✅ Продолжить</button>\n    <br><br>\n    <button onclick=\"showMain()\" style=\"background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;\">← Назад</button>\n  </div>\n</div>\n\n<!-- ========== AI POPUP ========== -->\n<div id=\"aiPopup\" onclick=\"if(event.target===this)closePopup()\" style=\"display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); padding:20px; display:none; align-items:center; justify-content:center;\">\n  <div style=\"background:var(--surface); border:1.5px solid var(--border); border-radius:22px; padding:24px 20px 20px; max-width:360px; width:90vw; position:relative; animation:fadeUp .25s ease both; max-height:80vh; overflow-y:auto;\">\n    <button onclick=\"closePopup()\" style=\"position:absolute;top:14px;right:14px;background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;\">✕</button>\n    <div id=\"aiPopupIcon\" style=\"font-size:36px;text-align:center;margin-bottom:10px;\">🤝</div>\n    <div id=\"aiPopupText\" style=\"font-size:14px;line-height:1.7;color:var(--muted);text-align:center;\"></div>\n    <div id=\"aiPopupLoader\" style=\"display:none;text-align:center;padding:10px 0;\">\n      <div style=\"display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;\"></div>\n    </div>\n  </div>\n</div>\n<style>\n@keyframes spin { to { transform:rotate(360deg); } }\n</style>\n\n<!-- ========== STICKY BOTTOM ========== -->\n<div class=\"sticky-bar\">\n  <div class=\"sticky-input-row\">\n    <div class=\"sticky-input-wrap\">\n      <input class=\"sticky-input\" id=\"foodPrefInput\" type=\"text\"\n        onkeydown=\"if(event.key==='Enter') sendFoodPref()\"\n        onfocus=\"document.getElementById('marqueeHint').style.opacity='0'\"\n        onblur=\"if(!this.value) document.getElementById('marqueeHint').style.opacity='1'\">\n      <div class=\"marquee-hint\" id=\"marqueeHint\">\n        <div class=\"marquee-track\">\n          <span class=\"marquee-text\" id=\"marqueeText1\"></span>\n          <span class=\"marquee-text\" id=\"marqueeText2\"></span>\n        </div>\n      </div>\n    </div>\n    <button class=\"mic-btn\" id=\"micBtn\" onclick=\"toggleMic()\">🎤</button>\n  </div>\n</div>\n\n<script>\n// ========== MARQUEE ==========\nconst MARQUEE_FORM    = 'Не можешь выбрать уровень активности? Опиши, как проходит твой обычный день — я подберу подходящий вариант';\nconst MARQUEE_RESULTS = 'Попробуй написать: «Поменяй завтрак», «Я не ем курицу», «Убери это блюдо» — меню обновится автоматически';\n\nfunction setMarquee(text) {\n  const el1 = document.getElementById('marqueeText1');\n  const el2 = document.getElementById('marqueeText2');\n  if (el1) el1.textContent = text;\n  if (el2) el2.textContent = text;\n  const track = document.querySelector('.marquee-track');\n  if (track) {\n    track.style.animation = 'none';\n    void track.offsetWidth;\n    track.style.animation = '';\n  }\n}\n\nwindow.addEventListener('DOMContentLoaded', () => setMarquee(MARQUEE_FORM));\n\n// ========== STATE ==========\nconst state = {\n  gender: 'female',\n  activity: 'sedentary',\n  kcal: 0, protein: 0, fat: 0, carbs: 0,\n  cw: 0, tw: 0,\n  context: '',\n  purchased: false,\n  excludedIngredientIds: [], // ingredient IDs the user can't eat\n  activeDayBtn: null,\n  ingredientSwaps: {},   // { fromId: toId }\n  mealOverrides: {},     // { mealType: recipeObject }\n};\n\n// ========== GENDER ==========\nfunction selectGender(val, el) {\n  document.querySelectorAll('#genderGrid .option-btn').forEach(b => b.className='option-btn');\n  el.classList.add('selected');\n  state.gender = val;\n}\n\n// ========== ACTIVITY ==========\nfunction selectActivity(val, el) {\n  document.querySelectorAll('#activityGrid .option-btn').forEach(b => b.className='option-btn');\n  el.classList.add('selected');\n  state.activity = val;\n}\n\n// ========== CALCULATE ==========\nfunction calculate() {\n  const cw = parseFloat(document.getElementById('currentWeight').value);\n  const tw = parseFloat(document.getElementById('targetWeight').value);\n  const height = parseFloat(document.getElementById('height').value);\n  const age = parseFloat(document.getElementById('age').value);\n  if (!cw || !tw || cw<30 || tw<30) { alert('Введи корректный вес (от 30 кг)'); return; }\n  if (!height || height<100 || height>250) { alert('Введи корректный рост (от 100 до 250 см)'); return; }\n  if (!age || age<10 || age>100) { alert('Введи корректный возраст (от 10 до 100 лет)'); return; }\n\n  state.cw = cw; state.tw = tw;\n\n  const bmr = state.gender === 'male'\n    ? 10*cw + 6.25*height - 5*age + 5\n    : 10*cw + 6.25*height - 5*age - 161;\n  const actFactorMap = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725};\n  const actFactor = actFactorMap[state.activity] ?? 1.2;\n  const maintenance = Math.round(bmr * actFactor);\n  const isLoss = tw < cw, isGain = tw > cw;\n\n  let kcal, weeklyChange;\n  if (isLoss) {\n    const kcalMin = state.gender === 'male' ? 1500 : 1200;\n    kcal = Math.max(maintenance * 0.80, kcalMin);\n    weeklyChange = ((maintenance - kcal) * 7) / 7700;\n  } else if (isGain) {\n    kcal = maintenance * 1.10;\n    weeklyChange = ((kcal - maintenance) * 7) / 7700;\n  } else {\n    kcal = maintenance; weeklyChange = 0;\n  }\n  kcal = Math.round(kcal);\n\n  const proteinGoalMap  = {sedentary:1.4, light:1.5, moderate:1.6, active:1.8};\n  const proteinMaintMap = {sedentary:1.0, light:1.1, moderate:1.2, active:1.4};\n  const protCoef = isLoss||isGain ? (proteinGoalMap[state.activity]??1.8) : (proteinMaintMap[state.activity]??1.4);\n  const protein = Math.round((isLoss||isGain ? tw : cw) * protCoef);\n  const fat     = Math.round(isLoss||isGain ? tw*0.8 : cw*0.8);\n  const fiber   = Math.round((kcal/1000)*14);\n  const carbs   = Math.max(0, Math.round((kcal-protein*4-fat*9)/4));\n\n  state.kcal=kcal; state.protein=protein; state.fat=fat; state.carbs=carbs;\n\n  document.getElementById('r-kcal').textContent=kcal;\n  document.getElementById('r-prot').textContent=protein;\n  document.getElementById('r-fat').textContent=fat;\n  document.getElementById('r-carb').textContent=carbs;\n  document.getElementById('r-fiber').textContent=fiber;\n\n  // Forecast\n  const sign = isGain?1:isLoss?-1:0;\n  const wk = weeklyChange*sign;\n  document.getElementById('forecastGrid').innerHTML=\n    [{d:'30 дней',w:+(cw+wk*(30/7)).toFixed(1)},{d:'60 дней',w:+(cw+wk*(60/7)).toFixed(1)},{d:'90 дней',w:+(cw+wk*(90/7)).toFixed(1)},{d:'120 дней',w:+(cw+wk*(120/7)).toFixed(1)}]\n    .map(f=>`<div class=\"forecast-card\">\n      <div class=\"fday\">📅 Через ${f.d}</div>\n      <div class=\"fweight\">${f.w}</div><div class=\"funit\">кг</div>\n    </div>`).join('');\n\n  // Warning\n  const wb=document.getElementById('warningBlock');\n  const chPct=Math.abs(tw-cw)/cw*100;\n  if(chPct>25){const mid=Math.round((cw+tw)/2);\n    wb.innerHTML=`<div class=\"warning-card\"><h3>⚠️ Большая цель</h3>\n      <p>Разбей путь на этапы:<br><br><strong>${cw} → ${mid} кг</strong> — Этап 1<br><strong>${mid} → ${tw} кг</strong> — Этап 2</p></div>`;}\n  else wb.innerHTML='';\n\n  const actLblMap = {sedentary:'менее 3000 шагов (офис)', light:'3000–6000 шагов (лёгкая активность)', moderate:'6000–10000 шагов (умеренная активность)', active:'10000–15000 шагов (спортзал/бег)'};\n  const actLbl = actLblMap[state.activity] ?? 'минимальная активность';\n  const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';\n  state.context=`Цель: ${goalLbl}, пол: ${state.gender==='male'?'мужской':'женский'}, возраст: ${age} лет, рост: ${height} см, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;\n\n  // Wait for nutrition data if still loading, then render\n  if (nutritionDataLoading) {\n    const waitAndRender = setInterval(() => {\n      if (!nutritionDataLoading) {\n        clearInterval(waitAndRender);\n        renderMeals();\n      }\n    }, 100);\n  } else {\n    renderMeals();\n  }\n\n  document.getElementById('results').style.display='block';\n  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});\n  setMarquee(MARQUEE_RESULTS);\n}\n\n// ========== EXCLUSION & SUBSTITUTION SYSTEM ==========\n\n// --- Ingredient groups for text detection ---\nconst EXCLUSION_PATTERNS = [\n\n  { words: ['мясо','мяса','мясной','мясных','мясные','мясным','мясного','мясному','без мяса','не ем мяс','не ест мяс','не едим мяс','отказ от мяса','говядин','свинин','баранин','телятин','колбас','сосиск'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },\n  { words: ['рыб','лосос','треск','тунец','скумбри','сельд','сардин','форел','палтус','тилапи','минтай','окун','анчоус','без рыбы','не ем рыб','не ест рыб','рыбу не ем'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },\n  { words: ['морепродукт','креветк','кальмар','краб','мидий','гребешок','устриц','без морепродуктов','не ем морепродукт'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },\n  { words: ['молочн','молоко','молока','сыр ','сыра','творог','кефир','йогурт','сметан','сливки','сливочн','лактоз','непереносимость лактоз','без молочк','без молока','без сыра','не ем молочн'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },\n  { words: ['без топлёного масла','без ги','без ghee'], ids: ['ghee'] },\n  { words: ['яйц','яйцо','яйца','без яиц','не ем яйц','аллергия на яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },\n  { words: ['мёд','без мёда','без меда','не ем мёд','не ем мед'], ids: ['honey'] },\n  { words: ['свинин','свиной','свиная','без свинины','не ем свинину','халяль','halal','кошерн','kosher'], ids: ['pork_loin','pork_minced'] },\n  { words: ['без курицы','без курятины','не ем курицу','не ем курятин'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken'] },\n  { words: ['без говядины','не ем говядин'], ids: ['beef_lean','beef_minced','liver_beef','broth_beef'] },\n  { words: ['красное мясо','красного мяса','без красного мяса','не ем красное мясо'], ids: ['beef_lean','beef_minced','liver_beef','lamb_leg','pork_loin','pork_minced'] },\n  { words: ['орех','миндал','грецк','кешью','фундук','фисташ','макадами','пекан','бразильск','без орехов','аллергия на орехи'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },\n  { words: ['без семян','семечки не ем','не ем семечки'], ids: ['sunflower_seeds','pumpkin_seeds','hemp_seeds','sesame_seeds','flaxseeds','chia_seeds'] },\n  { words: ['глютен','клейковин','gluten','целиак','без глютена','без пшениц','непереносимость глютен','пшеница','ржан'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },\n  { words: ['бобов','фасол','нут ','нута','чечевиц','горох','тофу','темпе','натто','соев','edamame','бобы','без бобовых'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },\n  { words: ['без соли','мало соли','несолёное','не ем соль','ограничение соли'], ids: ['salt','miso_paste','soy_sauce','fish_sauce','worcestershire_sauce','anchovy','herring'] },\n  { words: ['без сахара','диабет','не ем сахар','исключи сахар','без сладкого'], ids: ['sugar','honey','sugar_maple','coconut_sugar'] },\n\n];\n\n// Диетические типы (ЗАМЕНЯЮТ exclusions целиком)\nconst DIET_PATTERNS = [\n  { words: ['пескатариан','pescatarian','pescetarian','ем рыбу но не мясо','рыбу ем мясо нет'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },\n  { words: ['вегетариан','vegetarian'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters'] },\n  { words: ['веган','vegan','plant-based','plant based','растительное питани','растительн рацион','отказ от животных','ничего животного'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters','milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese','egg_chicken','egg_white','egg_yolk','honey','protein_whey'] },\n];\n\n// Позитивные упоминания (УБИРАЮТ из exclusions)\nconst INCLUSION_PATTERNS = [\n  { words: ['ем мяс','хочу мяс','верни мяс','снова ем мяс','можно мяс','буду есть мяс','ем курицу','хочу курицу','верни курицу','ем говядину','хочу говядину','верни говядину'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },\n  { words: ['ем рыб','хочу рыб','верни рыб','снова ем рыб','можно рыб','буду есть рыб'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },\n  { words: ['ем морепродукт','хочу морепродукт','верни морепродукт','ем креветк','хочу креветк'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },\n  { words: ['ем молоч','ем молок','хочу молок','верни молок','снова ем молок','ем сметан','хочу сметан','верни сметан','ем творог','хочу творог','верни творог','ем кефир','хочу кефир','верни кефир','ем йогурт','хочу йогурт','верни йогурт','ем сыр','хочу сыр','верни сыр','ем сливк','хочу сливк'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },\n  { words: ['ем яйц','хочу яйц','верни яйц','снова ем яйц','можно яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },\n  { words: ['ем мёд','ем мед','хочу мёд','хочу мед','верни мёд','верни мед'], ids: ['honey'] },\n  { words: ['ем свинин','хочу свинин','верни свинин'], ids: ['pork_loin','pork_minced'] },\n  { words: ['ем орех','хочу орех','верни орех','ем миндал','ем кешью','ем фундук'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },\n  { words: ['ем глютен','ем пшениц','хочу пшениц','верни пшениц','ем хлеб','хочу хлеб','ем пасту','хочу пасту','ем макарон','хочу макарон'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },\n  { words: ['ем бобов','ем фасол','ем нут','хочу нут','ем чечевиц','хочу чечевиц','ем тофу','хочу тофу','верни бобов'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },\n  { words: ['ем соль','можно соль','верни соль','снова с солью'], ids: ['salt','miso_paste','worcestershire_sauce'] },\n  { words: ['ем сахар','можно сахар','верни сахар','снова сахар'], ids: ['sugar','sugar_maple','coconut_sugar'] },\n];\n\n// Reset phrases — убираем все ограничения\nconst RESET_EXCLUSION_WORDS = [\n  'ем всё', 'ем все', 'снова ем', 'снова буду есть',\n  'верни всё', 'верни все', 'верни мясо', 'верни рыбу', 'верни молоко', 'верни яйца', 'верни сахар',\n  'отмени ограничения', 'убери ограничения', 'отмени запрет', 'убери запрет',\n  'снять ограничения', 'убрать ограничения', 'без ограничений',\n  'я теперь ем всё', 'я теперь ем все', 'я снова ем все', 'я снова ем всё',\n  'обычное меню', 'обычный рацион', 'стандартное меню',\n  'сброс', 'сбросить', 'reset', 'сначала', 'заново', 'обнулить',\n  'нет исключений', 'нет запретов', 'можно всё', 'можно все',\n  'отменить диету', 'отмени диету', 'убери диету',\n  'больше нет ограничений', 'снял ограничения', 'убрал ограничения',\n];\n\n// --- Substitution map: ingredient_id → array of substitute ids ---\nconst INGREDIENT_SUBSTITUTES = {\n  // Meat → plant proteins\n  chicken_breast:    ['tofu_firm','tempeh','chickpeas_cooked','lentils_red_cooked'],\n  chicken_thigh:     ['tofu_firm','tempeh','chickpeas_cooked'],\n  beef_lean:         ['lentils_red_cooked','tofu_firm','tempeh','black_beans_cooked'],\n  beef_ribeye:       ['lentils_red_cooked','tofu_firm','tempeh'],\n  pork_lean:         ['tofu_firm','tempeh','chickpeas_cooked'],\n  // Fish & seafood → plant/other proteins\n  salmon:            ['tofu_firm','chickpeas_cooked','lentils_red_cooked'],\n  tuna_canned:       ['chickpeas_cooked','tofu_firm','edamame'],\n  cod:               ['tofu_firm','chickpeas_cooked'],\n  shrimp:            ['edamame','tofu_firm'],\n  // Dairy\n  milk_whole:        ['oats_rolled'],   // oat \"milk\" substitute\n  milk_skim:         ['oats_rolled'],\n  greek_yogurt:      ['tofu_silken'],\n  cottage_cheese_5:  ['tofu_silken'],\n  cheese_cheddar:    ['tofu_firm'],\n  cheese_feta:       ['tofu_firm'],\n  butter:            ['coconut_oil','olive_oil'],\n  ghee:              ['coconut_oil','olive_oil'],\n  kefir:             ['tofu_silken'],\n  // Eggs\n  egg_whole:         ['tofu_silken','chickpeas_cooked'],\n  egg_white:         ['tofu_silken'],\n  // Nuts → seeds\n  almonds:           ['pumpkin_seeds','sunflower_seeds','hemp_seeds'],\n  walnuts:           ['pumpkin_seeds','hemp_seeds'],\n  cashews:           ['pumpkin_seeds','sunflower_seeds'],\n  // Honey → dates\n  honey:             ['dates_medjool'],\n  // Gluten → gluten-free grains\n  bread_white:       ['rice_cakes','buckwheat_cooked'],\n  bread_rye:         ['rice_cakes','buckwheat_cooked'],\n  bread_ww:          ['rice_cakes','buckwheat_cooked'],\n  pasta_cooked:      ['buckwheat_cooked','white_rice_cooked'],\n  // Mushrooms → zucchini/eggplant\n  mushrooms_white:   ['zucchini','eggplant'],\n  // Tofu → legumes\n  tofu_firm:         ['chickpeas_cooked','lentils_red_cooked','tempeh'],\n  tofu_silken:       ['cottage_cheese_5','greek_yogurt'],\n};\n\n// --- Parse free text → set of excluded ingredient IDs ---\nfunction parseExclusions(text) {\n  const t = text.toLowerCase();\n  const excluded = new Set(state.excludedIngredientIds || []);\n\n  // 1. Полный сброс\n  if (RESET_EXCLUSION_WORDS.some(w => t.includes(w))) {\n    return null;\n  }\n\n  let changed = false;\n\n  // 2. Диетический тип → ЗАМЕНЯЕТ все текущие exclusions\n  let dietMatched = false;\n  for (const pattern of DIET_PATTERNS) {\n    if (pattern.words.some(w => t.includes(w))) {\n      excluded.clear();\n      pattern.ids.forEach(id => excluded.add(id));\n      changed = true;\n      dietMatched = true;\n      break;\n    }\n  }\n\n  if (!dietMatched) {\n    // 3. Конкретное ограничение → ДОБАВЛЯЕМ ids к exclusions (сначала)\n    for (const pattern of EXCLUSION_PATTERNS) {\n      if (pattern.words.some(w => t.includes(w))) {\n        pattern.ids.forEach(id => excluded.add(id));\n        changed = true;\n      }\n    }\n    // 4. Позитивное упоминание → УБИРАЕМ ids (после exclusion, поэтому побеждает)\n    for (const pattern of INCLUSION_PATTERNS) {\n      if (pattern.words.some(w => {\n        const idx = t.indexOf(w);\n        if (idx === -1) return false;\n        const before = t.substring(Math.max(0, idx - 5), idx);\n        return !before.includes('не');\n      })) {\n        pattern.ids.forEach(id => excluded.delete(id));\n        changed = true;\n      }\n    }\n  }\n\n  return changed ? [...excluded] : false;\n}\n\nfunction parseMenuReset(text) {\n    const t = text.toLowerCase().trim();\n    const triggers = ['обнови меню','новое меню','другое меню','замени все меню','замени всё меню','сбрось меню','пересчитай меню','поменяй меню','измени меню','сделай новое меню','перегенерируй','перегенери меню','хочу другое меню'];\n    return triggers.some(tr => t.includes(tr)) ? { type: 'menu_reset' } : false;\n  }\n\n  function applyMenuReset() {\n    state.mealOverrides = {};\n    state.ingredientSwaps = {};\n    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n    if (state.kcal > 0) {\n      renderMeals();\n      const d = Object.keys(dayStates).find(ds => dayStates[ds].open) || '1';\n      renderDayMeals(parseInt(d));\n    }\n    openPopup('🔄', 'Готово! Всё меню пересчитано заново с учётом твоих настроек.');\n  }\n\n  function parseIngredientRequest(text) {\n  const t = text.toLowerCase().trim();\n  const verbs = ['хочу','хочется','дай','поставь','добавь','сделай','положи','хочу чтобы'];\n  const hasVerb = verbs.some(v => t.includes(v));\n  if (!hasVerb) return false;\n  const MEAL_WORDS = {\n    breakfast: ['завтрак','завтраку','завтрака'],\n    lunch:     ['обед','обеду','обеда','обедом'],\n    dinner:    ['ужин','ужину','ужина','ужином'],\n    snack:     ['перекус','перекуса','перекусу'],\n  };\n  let mealType = null, mealWord = null;\n  for (const [mt, words] of Object.entries(MEAL_WORDS)) {\n    const found = words.find(w => t.includes(w));\n    if (found) { mealType = mt; mealWord = found; break; }\n  }\n  if (!mealType) return false;\n  let cleaned = t;\n  verbs.forEach(v => { cleaned = cleaned.replace(new RegExp(v + '\\\\s*', 'g'), ''); });\n  cleaned = cleaned.replace(/\\bна\\b/g,'').replace(/\\bс\\b/g,'').replace(mealWord,'').trim();\n  const ingName = cleaned.replace(/[.,!?]/g,'').trim();\n  if (!ingName || ingName.length < 2) return false;\n  return { type: 'ingredient_request', mealType, ingredientName: ingName };\n}\n\nfunction applyIngredientRequest(mealType, ingName) {\n  if (!recipesArray.length) return null;\n  const q = ingName.toLowerCase().trim();\n  const matchIds = Object.keys(ingredientsMap).filter(id => {\n    const n = (ingredientsMap[id].name || '').toLowerCase();\n    return n.includes(q) || q.includes(n.split(' ')[0]);\n  });\n  if (!matchIds.length) return null;\n  const pool = filterRecipes(mealType);\n  const recipe = pool.find(r => r.ingredients && r.ingredients.some(i => matchIds.includes(i.id)));\n  if (!recipe) return null;\n  state.mealOverrides[mealType] = recipe;\n  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n  if (state.kcal > 0) {\n    renderMeals();\n    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';\n    renderDayMeals(parseInt(d));\n  }\n  return { recipeName: recipe.name, ingDisplayName: ingredientsMap[matchIds[0]]?.name || ingName };\n}\n\nfunction parseFoodSubstitution(text) {\n  const t = text.toLowerCase().trim();\n  const verbs = ['замени ', 'поменяй ', 'смени '];\n  const hasVerb = verbs.some(v => t.includes(v));\n  if (!hasVerb) return false;\n  const naIdx = t.indexOf(' на ');\n  if (naIdx === -1) return false;\n  let fromPart = '';\n  for (const verb of verbs) {\n    const idx = t.indexOf(verb);\n    if (idx !== -1) { fromPart = t.substring(idx + verb.length, naIdx).trim(); break; }\n  }\n  const toPart = t.substring(naIdx + 4).trim();\n  if (!fromPart || !toPart) return false;\n  const MEAL_WORDS = {\n    breakfast: ['завтрак','завтраку','завтрака'],\n    lunch: ['обед','обеду','обеда','обедом'],\n    dinner: ['ужин','ужину','ужина','ужином'],\n    snack: ['перекус','перекуса','перекусу'],\n  };\n  for (const [mealType, words] of Object.entries(MEAL_WORDS)) {\n    if (words.some(w => fromPart.includes(w))) return { type: 'meal', mealType, dishName: toPart };\n  }\n  return { type: 'ingredient', fromName: fromPart, toName: toPart };\n}\n\nfunction applyMealReplacement(mealType, dishName) {\n  if (!recipesArray.length) return null;\n  const dn = dishName.toLowerCase().trim();\n  const scoredPool = filterRecipes(mealType);\n  let recipe = scoredPool.find(r => r.name.toLowerCase().includes(dn));\n  if (!recipe) recipe = scoredPool.find(r => {\n    const words = dn.split(' ');\n    return words.some(w => w.length > 3 && r.name.toLowerCase().includes(w));\n  });\n  if (!recipe) recipe = recipesArray.find(r => r.name.toLowerCase().includes(dn));\n  if (!recipe) return null;\n  state.mealOverrides[mealType] = recipe;\n  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n  if (state.kcal > 0) {\n    renderMeals();\n    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';\n    renderDayMeals(parseInt(d));\n  }\n  return recipe.name;\n}\n\nfunction applyIngredientSwap(fromName, toName) {\n  const fn = fromName.toLowerCase().trim();\n  const tn = toName.toLowerCase().trim();\n  const fromId = Object.keys(ingredientsMap).find(id => {\n    const n = (ingredientsMap[id].name || '').toLowerCase();\n    return n.includes(fn) || fn.includes(n.split(' ')[0]);\n  });\n  const toId = Object.keys(ingredientsMap).find(id => {\n    const n = (ingredientsMap[id].name || '').toLowerCase();\n    return n.includes(tn) || tn.includes(n.split(' ')[0]);\n  });\n  if (!fromId || !toId) return null;\n  state.ingredientSwaps = state.ingredientSwaps || {};\n  state.ingredientSwaps[fromId] = toId;\n  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n  if (state.kcal > 0) {\n    renderMeals();\n    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';\n    renderDayMeals(parseInt(d));\n  }\n  return { fromName: ingredientsMap[fromId].name, toName: ingredientsMap[toId].name };\n}\n\n// --- Try to substitute excluded ingredients in a recipe ---\n// Returns { substituted: [{original, replacement}], modifiedIngredients }\n// or null if a core ingredient can't be substituted\nfunction substituteRecipe(recipe, excludedIds) {\n  if (!excludedIds || !excludedIds.length) {\n    return { substituted: [], modifiedIngredients: recipe.ingredients };\n  }\n\n  const substituted = [];\n  const modifiedIngredients = [];\n\n  for (const ing of recipe.ingredients) {\n    if (!excludedIds.includes(ing.id)) {\n      modifiedIngredients.push(ing);\n      continue;\n    }\n\n    // Find a substitute that's not also excluded\n    const subs = INGREDIENT_SUBSTITUTES[ing.id] || [];\n    const validSub = subs.find(s => !excludedIds.includes(s) && ingredientsMap[s]);\n\n    if (validSub) {\n      substituted.push({ original: ing.id, replacement: validSub });\n      modifiedIngredients.push({ ...ing, id: validSub, substitutedFrom: ing.id });\n    } else {\n      // Can't substitute — recipe is unusable for this ingredient\n      return null;\n    }\n  }\n\n  return { substituted, modifiedIngredients };\n}\n\n// ============================================================\n// ========== RECIPE ENGINE v1.0 ==============================\n// ============================================================\n\n// ---------- 1. Data store -----------------------------------\nlet ingredientsMap = {};   // { id: ingredientObject }\nlet recipesArray   = [];   // [ recipeObject, ... ]\nlet nutritionDataLoaded = false;\nlet nutritionDataLoading = false;\nlet recipeScores = {};\nlet topRecipeIds = new Set();\n\nasync function loadNutritionData() {\n  if (nutritionDataLoaded || nutritionDataLoading) return;\n  nutritionDataLoading = true;\n  try {\n    // Load ingredients from Supabase API\n    const ingRes = await fetch('/api/ingredients');\n    if (!ingRes.ok) throw new Error('API not available');\n    const ingArr = await ingRes.json();\n    // Transform Supabase flat format → engine per_100g format\n    ingArr.forEach(ing => {\n      ingredientsMap[ing.id] = {\n        ...ing,\n        per_100g: {\n          calories: ing.calories || 0,\n          protein:  ing.protein  || 0,\n          fat:      ing.fat      || 0,\n          carbs:    ing.carbs    || 0,\n          fiber:    ing.fiber    || 0,\n        }\n      };\n    });\n    // Keep static recipes.json as engine fallback (320 recipes)\n    try {\n      const recRes = await fetch('/recipes.json');\n      if (recRes.ok) {\n        const recData = await recRes.json();\n        recipesArray = Array.isArray(recData) ? recData : (recData.recipes || []);\n      }\n    } catch {}\n    nutritionDataLoaded = true;\n    computeRecipeScores();\n    console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);\n  } catch(e) {\n    console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);\n  } finally {\n    nutritionDataLoading = false;\n  }\n}\n\n// ---------- 2. calculateRecipeNutrition ---------------------\nconst NUTRIENT_KEYS = [\n  'calories','protein','fat','carbs','fiber','sugar',\n  'vitamin_a','vitamin_b1','vitamin_b2','vitamin_b3','vitamin_b5','vitamin_b6',\n  'vitamin_b9','vitamin_b12','vitamin_c','vitamin_d','vitamin_e','vitamin_k',\n  'calcium','iron','magnesium','phosphorus','potassium',\n  'sodium','zinc','selenium','iodine',\n  'omega3','omega6','saturated_fat','cholesterol'\n];\n\nfunction calculateRecipeNutrition(recipe) {\n  const totals = {};\n  NUTRIENT_KEYS.forEach(k => totals[k] = 0);\n\n  for (const ing of recipe.ingredients) {\n    const data = ingredientsMap[ing.id];\n    if (!data) continue;\n    const factor = ing.amount_g / 100;\n    NUTRIENT_KEYS.forEach(k => {\n      totals[k] += (data.per_100g[k] || 0) * factor;\n    });\n  }\n  return totals;\n}\n\n// ---------- 3. scaleRecipe ----------------------------------\nfunction scaleRecipe(recipe, targetCalories) {\n  const base = calculateRecipeNutrition(recipe);\n  if (!base.calories || base.calories < 1) {\n    return { ingredients: recipe.ingredients, nutrition: base };\n  }\n  const factor = targetCalories / base.calories;\n  const scaledIngredients = recipe.ingredients.map(ing => ({\n    ...ing,\n    amount_g: Math.round(ing.amount_g * factor)\n  }));\n  const scaledRecipe = { ...recipe, ingredients: scaledIngredients };\n  const nutrition = calculateRecipeNutrition(scaledRecipe);\n  return { ingredients: scaledIngredients, nutrition };\n}\n\n// ---------- 4. Daily norms ----------------------------------\nconst DAILY_NORMS = {\n  fiber:       25,\n  vitamin_a:   900,\n  vitamin_c:   90,\n  vitamin_d:   15,\n  vitamin_e:   15,\n  vitamin_k:   120,\n  vitamin_b1:  1.2,\n  vitamin_b2:  1.3,\n  vitamin_b3:  16,\n  vitamin_b6:  1.7,\n  vitamin_b9:  400,\n  vitamin_b12: 2.4,\n  calcium:     1000,\n  iron:        18,\n  magnesium:   400,\n  phosphorus:  700,\n  potassium:   3500,\n  sodium:      2300,\n  zinc:        11,\n  selenium:    55,\n  iodine:      150,\n  omega3:      1.6,\n  omega6:      17\n};\n\n// ---------- 5. NutrientTracker ------------------------------\nclass NutrientTracker {\n  constructor() {\n    this.days        = [];   // per-day nutrition totals\n    this.accumulated = {};   // sum of all days\n  }\n\n  addDay(dayMeals) {\n    const dayTotals = {};\n    NUTRIENT_KEYS.forEach(k => dayTotals[k] = 0);\n\n    for (const meal of dayMeals) {\n      if (!meal.nutrition) continue;\n      NUTRIENT_KEYS.forEach(k => {\n        dayTotals[k] += (meal.nutrition[k] || 0);\n      });\n    }\n    this.days.push(dayTotals);\n    NUTRIENT_KEYS.forEach(k => {\n      this.accumulated[k] = (this.accumulated[k] || 0) + dayTotals[k];\n    });\n  }\n\n  getDeficits() {\n    const n = this.days.length;\n    if (!n) return [];\n    const deficits = [];\n    for (const [key, dailyNorm] of Object.entries(DAILY_NORMS)) {\n      const accumulated = this.accumulated[key] || 0;\n      const expected    = dailyNorm * n;\n      if (accumulated / expected < 0.80) deficits.push(key);\n    }\n    return deficits;\n  }\n\n  getPrioritizedRecipes(recipes, deficits) {\n    if (!deficits.length) return recipes;\n    return recipes\n      .map(r => {\n        const nut   = calculateRecipeNutrition(r);\n        let   score = 0;\n        for (const key of deficits) {\n          const norm = DAILY_NORMS[key] || 1;\n          score += (nut[key] || 0) / norm;\n        }\n        return { recipe: r, score };\n      })\n      .sort((a, b) => b.score - a.score)\n      .map(x => x.recipe);\n  }\n\n  getSummary() {\n    const n = this.days.length;\n    if (!n) return {};\n    const avg = {};\n    NUTRIENT_KEYS.forEach(k => {\n      avg[k] = +(this.accumulated[k] / n).toFixed(2);\n    });\n    return avg;\n  }\n}\n\n// ---------- 6. Meal split & diet tag map --------------------\nconst MEAL_SPLIT = {\n  breakfast: 0.25,\n  lunch:     0.35,\n  dinner:    0.30,\n  snack:     0.10\n};\n\n// ---------- 6b. computeRecipeScores -----------------------\nconst PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','pork_minced','shrimp','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','cottage_cheese','kefir','butter','cream_cheese','broccoli','spinach','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','zucchini','eggplant','cauliflower','cabbage_white','potato','mushroom_champignon','beet','pollock','herring','mackerel','pumpkin','corn','green_beans','apple','banana','orange','avocado','lemon','kiwi','pear','oats','rice_white','buckwheat','pasta_wheat','quinoa','bulgur','millet','couscous','wheat_flour','lentils_red','chickpeas','black_beans','kidney_beans','tofu','green_peas','lentils_green','lentils_black','white_beans','almonds','walnuts','cashews','hazelnuts','sunflower_oil','olive_oil','oat_milk','almond_milk','coconut_milk','soy_milk','soy_sauce','tomato_paste','apple_cider_vinegar','mustard','broth_chicken','broth_beef','bone_broth','black_pepper','parsley_fresh','dill_fresh','cilantro_fresh','salt','turmeric','cinnamon','cumin','paprika','sugar','green_tea','water']);\n  function computeRecipeScores() {\n  const ingFreq = {};\n  recipesArray.forEach(r => {\n    (r.ingredients || []).forEach(ing => { ingFreq[ing.id] = (ingFreq[ing.id] || 0) + 1; });\n  });\n  recipesArray.forEach(r => {\n    const ings = r.ingredients || [];\n    if (!ings.length) { recipeScores[r.id] = 0; return; }\n    const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;\n    const simBonus = Math.max(0, 15 - ings.length) * 8;\n    const imgBonus = r.image_url ? 40 : 0;\n    const priorityBonus = ings.filter(i => PRIORITY_IDS.has(i.id)).length * 300;\n      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus;\n  });\n  const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));\n  topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));\n  console.log('✅ Recipe scores computed, top-1000 ready');\n}\n\n// ---------- 7. filterRecipes --------------------------------\n// No diet-tag filtering — only by meal_type.\n// Recipes with excluded ingredients are handled via substituteRecipe().\nfunction filterRecipes(mealType) {\n  const pool = recipesArray.filter(r => {\n    const mt = Array.isArray(r.meal_type) ? r.meal_type.join(',') : (r.meal_type || '');\n    return mt.includes(mealType);\n  });\n  return pool.sort((a, b) => {\n    const aTop = topRecipeIds.has(a.id) ? 1 : 0, bTop = topRecipeIds.has(b.id) ? 1 : 0;\n    if (aTop !== bTop) return bTop - aTop;\n    return (recipeScores[b.id]||0) - (recipeScores[a.id]||0);\n  });\n}\n\n// Get best meal for a slot: prefer no substitution, allow substitution, skip if impossible\nfunction pickMealForSlot(mealType, excludedIds, usedRecipeIds = new Set()) {\n  let pool = filterRecipes(mealType);\n  // Shuffle for variety\n  pool = [...pool.slice(0, 30)].sort(() => Math.random() - 0.5);\n\n  // 1st pass: find recipe with no excluded ingredients\n  for (const r of pool) {\n    if (usedRecipeIds.has(r.id)) continue;\n    const hasExcluded = r.ingredients.some(i => excludedIds.includes(i.id));\n    if (!hasExcluded) return { recipe: r, substituted: [], modifiedIngredients: r.ingredients };\n  }\n  // 2nd pass: try substitution\n  for (const r of pool) {\n    if (usedRecipeIds.has(r.id)) continue;\n    const result = substituteRecipe(r, excludedIds);\n    if (result) return { recipe: r, ...result };\n  }\n  // Fallback: any recipe from pool\n  const fallback = pool.find(r => !usedRecipeIds.has(r.id)) || pool[0];\n  if (fallback) return { recipe: fallback, substituted: [], modifiedIngredients: fallback.ingredients };\n  return null;\n}\n\nfunction pickRandom(arr, n) {\n  return [...arr].sort(() => Math.random() - 0.5).slice(0, n);\n}\n\n// ---------- 8. buildDayMenu ---------------------------------\nfunction buildDayMenu(userProfile, dayIndex, tracker) {\n  const {\n    calories_target,\n    excluded_ingredient_ids = []\n  } = userProfile;\n\n  const dayMeals = [];\n  const usedIds  = new Set();\n  const swaps = state.ingredientSwaps || {};\n\n  for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack']) {\n    const targetCal = Math.round(calories_target * MEAL_SPLIT[mealType]);\n    if (!recipesArray.length) continue;\n\n    let picked;\n    const overrideRecipe = state.mealOverrides && state.mealOverrides[mealType];\n    if (overrideRecipe) {\n      picked = { recipe: overrideRecipe, substituted: [], modifiedIngredients: overrideRecipe.ingredients };\n    } else {\n      picked = pickMealForSlot(mealType, excluded_ingredient_ids, usedIds);\n    }\n    if (!picked) continue;\n\n    usedIds.add(picked.recipe.id);\n\n    const swappedIngredients = picked.modifiedIngredients.map(ing => {\n      const swapTo = swaps[ing.id];\n      if (swapTo && ingredientsMap[swapTo]) return { ...ing, id: swapTo, substitutedFrom: ing.substitutedFrom || ing.id };\n      return ing;\n    });\n\n    const { ingredients: scaledIngredients, nutrition } =\n      scaleRecipe({ ...picked.recipe, ingredients: swappedIngredients }, targetCal);\n\n    dayMeals.push({\n      mealType,\n      recipe:             picked.recipe,\n      substituted:        picked.substituted,\n      modifiedIngredients: swappedIngredients,\n      scaledIngredients,\n      nutrition,\n      instructions: picked.recipe.instructions,\n      image_url:    picked.recipe.image_url\n    });\n  }\n  return dayMeals;\n}\n\n// ---------- 9. generate28DayPlan ----------------------------\nfunction generate28DayPlan(userProfile) {\n  if (!nutritionDataLoaded) {\n    console.warn('generate28DayPlan: nutrition data not ready');\n    return null;\n  }\n  const tracker = new NutrientTracker();\n  const plan    = [];\n\n  for (let d = 1; d <= 28; d++) {\n    const dayMeals = buildDayMenu(userProfile, d, tracker);\n    tracker.addDay(dayMeals);\n    plan.push({ day: d, meals: dayMeals });\n  }\n\n  return { plan, tracker, summary: tracker.getSummary() };\n}\n\n// ---------- 10. Helper: build userProfile from state --------\nfunction buildUserProfile() {\n  return {\n    calories_target:        state.kcal     || 2000,\n    protein_g:              state.protein  || 0,\n    fat_g:                  state.fat      || 0,\n    carbs_g:                state.carbs    || 0,\n    excluded_ingredient_ids: state.excludedIngredientIds || [],\n  };\n}\n\n// Kick off background load — data will be ready by the time user hits \"buy\"\nloadNutritionData();\n\n// ============================================================\n// ========== API MEAL PLAN (Supabase) ========================\n// ============================================================\n\nlet _apiPlan = null;\n\nasync function loadMealPlanFromAPI() {\n  const excluded = state.excludedIngredientIds || [];\n  try {\n    const res = await fetch('/api/meal-plan', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ excluded }),\n    });\n    if (!res.ok) throw new Error('API error ' + res.status);\n    const data = await res.json();\n    _apiPlan = data.days;\n    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n    return true;\n  } catch (e) {\n    console.warn('⚠️ meal-plan API failed:', e.message);\n    return false;\n  }\n}\n\nfunction buildMealCardHTML_API(recipe, mealType, cardId) {\n  const cal   = Math.round(recipe.calories_per_serving || 0);\n  const prot  = Math.round(recipe.protein_per_serving  || 0);\n  const fat   = Math.round(recipe.fat_per_serving      || 0);\n  const carbs = Math.round(recipe.carbs_per_serving    || 0);\n  return `\n<div class=\"meal-card\">\n  <div class=\"meal-img-wrap\" onclick=\"loadAndToggleRecipe('${cardId}','${recipe.id}')\">\n    <img src=\"\" alt=\"${recipe.name}\" loading=\"lazy\"\n      onerror=\"this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(recipe.name)}'\">\n    <div class=\"meal-img-overlay\">\n      <div class=\"meal-type\">${MEAL_TYPE_RU[mealType] || mealType}</div>\n      <div class=\"meal-name\">${recipe.name}</div>\n    </div>\n    <div class=\"meal-nav-bar\">\n      <button class=\"meal-nav-btn\" onclick=\"swapPrev('${cardId}',event)\">‹</button>\n      <span class=\"meal-tap-hint\">👆 рецепт</span>\n      <button class=\"meal-nav-btn\" onclick=\"swapNext('${cardId}',event)\">›</button>\n    </div>\n  </div>\n  <div class=\"recipe-block\" id=\"${cardId}\">\n    <div class=\"recipe-macros\">\n      <div class=\"macro-chip\">🔥 ${cal} ккал</div>\n      <div class=\"macro-chip\">🥩 Б: ${prot}г</div>\n      <div class=\"macro-chip\">🥑 Ж: ${fat}г</div>\n      <div class=\"macro-chip\">🍚 У: ${carbs}г</div>\n    </div>\n    <div id=\"${cardId}-details\"><div style=\"text-align:center;color:var(--muted);padding:12px 0;font-size:13px;\">👆 Нажми для просмотра рецепта</div></div>\n  </div>\n</div>`;\n}\n\nconst _recipeCache = {};\n\nasync function loadAndToggleRecipe(cardId, recipeId) {\n  const block = document.getElementById(cardId);\n  if (!block) return;\n  const isOpen = block.classList.toggle('open');\n  block.closest('.meal-card').querySelector('.meal-tap-hint').textContent =\n    isOpen ? '👆 закрыть' : '👆 рецепт';\n  if (!isOpen) return;\n  const detailsEl = document.getElementById(cardId + '-details');\n  if (!detailsEl) return;\n  if (_recipeCache[recipeId]) { _renderRecipeDetails(detailsEl, _recipeCache[recipeId]); return; }\n  detailsEl.innerHTML = '<div style=\"text-align:center;padding:12px 0;font-size:13px;color:var(--muted)\">⏳ Загружаем рецепт...</div>';\n  try {\n    const res = await fetch('/api/recipe?id=' + encodeURIComponent(recipeId));\n    const data = await res.json();\n    _recipeCache[recipeId] = data;\n    _renderRecipeDetails(detailsEl, data);\n  } catch {\n    detailsEl.innerHTML = '<div style=\"color:var(--muted);padding:8px 0;font-size:13px;\">Не удалось загрузить рецепт</div>';\n  }\n}\n\nfunction _renderRecipeDetails(el, recipe) {\n  const ingList = (recipe.ingredients || []).map(ing =>\n    `<li><span>${ing.name}</span><span class=\"ig\">${ing.amount_g} г</span></li>`\n  ).join('') || '<li>—</li>';\n  const stepsList = (recipe.steps || []).map((s, i) =>\n    `<li><div class=\"step-num\">${i+1}</div><span>${s}</span></li>`\n  ).join('') || '<li>—</li>';\n  el.innerHTML = `\n    <div class=\"recipe-section-title\">Продукты</div>\n    <ul class=\"ingredient-list\">${ingList}</ul>\n    <div class=\"recipe-section-title\">Приготовление</div>\n    <ul class=\"steps-list\">${stepsList}</ul>`;\n}\n\n// ============================================================\n// ========== END RECIPE ENGINE ===============================\n// ============================================================\n\nconst MEAL_TYPE_RU = { breakfast:'Завтрак', lunch:'Обед', dinner:'Ужин', snack:'Перекус' };\n\n// --- Shared helper: build meal card HTML from engine meal object ---\nfunction buildMealCardHTML(m, index, idPrefix='recipe') {\n  const nut = m.nutrition;\n\n  // Substitution banner\n  const subBanner = m.substituted && m.substituted.length\n    ? `<div style=\"background:rgba(251,146,60,.12);border:1px solid #fb923c;border-radius:10px;padding:6px 12px;font-size:11px;color:#fb923c;margin-bottom:8px;\">\n        ⚠️ ${m.substituted.map(s => {\n          const orig = ingredientsMap[s.original]?.name || s.original;\n          const repl = ingredientsMap[s.replacement]?.name || s.replacement;\n          return `<b>${orig}</b> → ${repl}`;\n        }).join(' &nbsp;·&nbsp; ')}\n       </div>`\n    : '';\n\n  // Ingredient list with strikethrough for substituted items\n  const substitutedOriginals = new Set((m.substituted||[]).map(s => s.original));\n  const ingList = m.scaledIngredients.map(ing => {\n    const ingData  = ingredientsMap[ing.id];\n    const ingName  = ingData ? ingData.name : ing.id;\n    const origId   = ing.substitutedFrom;\n    if (origId) {\n      const origName = ingredientsMap[origId]?.name || origId;\n      return `<li><span><s style=\"opacity:.45\">${origName}</s> <span style=\"color:#4ade80\">→ ${ingName}</span></span><span class=\"ig\">${ing.amount_g} г</span></li>`;\n    }\n    return `<li><span>${ingName}</span><span class=\"ig\">${ing.amount_g} г</span></li>`;\n  }).join('');\n\n  const stepsList = (m.instructions || []).map((s, si) =>\n    `<li><div class=\"step-num\">${si+1}</div><span>${s}</span></li>`\n  ).join('');\n\n  return `\n  <div class=\"meal-card\">\n    <div class=\"meal-img-wrap\" onclick=\"toggleRecipe('${idPrefix}-${index}')\">\n      <img src=\"${m.image_url || m.recipe?.image_url || ''}\" alt=\"${m.recipe?.name || ''}\" loading=\"lazy\"\n        onerror=\"this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.recipe?.name||'')}'\">\n      <div class=\"meal-img-overlay\">\n        <div class=\"meal-type\">${MEAL_TYPE_RU[m.mealType] || m.mealType}</div>\n        <div class=\"meal-name\">${m.recipe?.name || ''}</div>\n      </div>\n      <div class=\"meal-nav-bar\">\n        <button class=\"meal-nav-btn\" onclick=\"swapPrev('${idPrefix}-${index}',event)\">‹</button>\n        <span class=\"meal-tap-hint\">👆 рецепт</span>\n        <button class=\"meal-nav-btn\" onclick=\"swapNext('${idPrefix}-${index}',event)\">›</button>\n      </div>\n    </div>\n    <div class=\"recipe-block\" id=\"${idPrefix}-${index}\">\n      ${subBanner}\n      <div class=\"recipe-macros\">\n        <div class=\"macro-chip\">🔥 ${Math.round(nut.calories)} ккал</div>\n        <div class=\"macro-chip\">🥩 Б: ${Math.round(nut.protein)}г</div>\n        <div class=\"macro-chip\">🥑 Ж: ${Math.round(nut.fat)}г</div>\n        <div class=\"macro-chip\">🍚 У: ${Math.round(nut.carbs)}г</div>\n      </div>\n      <div class=\"recipe-section-title\">Продукты</div>\n      <ul class=\"ingredient-list\">${ingList}</ul>\n      <div class=\"recipe-section-title\">Приготовление</div>\n      <ul class=\"steps-list\">${stepsList}</ul>\n    </div>\n  </div>`;\n}\n\n// --- Exclusion banner (shown above meal list when exclusions active) ---\nfunction buildExclusionBannerHtml() {\n  const ids = state.excludedIngredientIds || [];\n  if (!ids.length) return '';\n    const items = ids.map(id => {\n    const nm = ingredientsMap[id]?.name || id;\n    return `<span onclick=\"confirmRemoveExclusion('${id}',event)\" style=\"cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;\">${nm} ×</span>`;\n  }).join('');\n  return `<div id=\"exclusion-banner\" style=\"background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;\">🚫 Исключено из меню:<div style=\"margin-top:5px;line-height:1.8;\">${items}</div><span onclick=\"clearExclusions()\" style=\"display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;\">[сбросить]</span></div>`;\n}\n\nfunction clearExclusions() {\n  state.excludedIngredientIds = [];\n  state.ingredientSwaps = {};\n  state.mealOverrides = {};\n  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n  renderMeals();\n  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);\n  if (openDay) renderDayMeals(parseInt(openDay));\n}\nfunction confirmRemoveExclusion(id, evt) {\n  evt.stopPropagation();\n  const name = ingredientsMap[id]?.name || id;\n  const ov = document.createElement('div');\n  ov.id = 'excl-confirm';\n  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';\n  ov.innerHTML = `<div style=\"background:#1a1a24;border:1.5px solid #fb923c;border-radius:18px;padding:22px 20px;max-width:280px;width:90%;text-align:center;\"><div style=\"font-size:14px;color:#f1f0ff;margin-bottom:6px;\">Убрать из списка?</div><div style=\"font-size:13px;color:#fb923c;margin-bottom:18px;\">${name}</div><div style=\"display:flex;gap:10px;\"><button onclick=\"doRemoveExclusion('${id}')\" style=\"flex:1;background:#fb923c;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;\">Да</button><button onclick=\"document.getElementById('excl-confirm')?.remove()\" style=\"flex:1;background:#2e2e3e;color:#f1f0ff;border:none;border-radius:10px;padding:11px;font-size:14px;cursor:pointer;\">Нет</button></div></div>`;\n  ov.onclick = e => { if(e.target===ov) ov.remove(); };\n  document.body.appendChild(ov);\n}\n\nfunction doRemoveExclusion(id) {\n  document.getElementById('excl-confirm')?.remove();\n  state.excludedIngredientIds = (state.excludedIngredientIds || []).filter(x => x !== id);\n  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);\n  if (openDay && state.kcal > 0) renderDayMeals(parseInt(openDay));\n}\n\n\nfunction renderShoppingList() {\n    const section = document.getElementById('shopping-list-section');\n    if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }\n    const ingTotals = {};\n    if (nutritionDataLoaded) {\n      const _sl_profile = buildUserProfile();\n      const _sl_tracker = window._globalTracker || new NutrientTracker();\n      for (let d = 1; d <= 7; d++) {\n        if (!dayMenuCache[d]) dayMenuCache[d] = buildDayMenu(_sl_profile, d, _sl_tracker);\n      }\n    }\n    for (let d = 1; d <= 7; d++) {\n      const cache = dayMenuCache[d];\n      if (!cache) continue;\n      const _meals = Array.isArray(cache) ? cache : ['breakfast','lunch','dinner','snack'].map(mt => cache[mt]).filter(Boolean);\n      _meals.forEach(meal => {\n        if (!meal || !meal.recipe) return;\n        const ings = meal.modifiedIngredients || meal.scaledIngredients || meal.recipe.ingredients || [];\n        ings.forEach(ing => {\n          const g = ing.amount_g || ing.amount || 100;\n          ingTotals[ing.id] = (ingTotals[ing.id] || 0) + g;\n        });\n      });\n    }\n    const items = Object.entries(ingTotals)\n      .map(([id, g]) => ({ name: ingredientsMap[id]?.name || id, grams: Math.round(g) }))\n      .filter(i => i.grams > 0)\n      .sort((a, b) => b.grams - a.grams);\n    if (!items.length) { section.style.display = 'none'; return; }\n    const rows = items.map(i =>\n      `<div style=\"display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)\"><span style=\"color:var(--text)\">${i.name}</span><span style=\"color:var(--muted);font-size:13px;white-space:nowrap;margin-left:8px\">${i.grams} г</span></div>`\n    ).join('');\n    section.style.display = 'block';\n    section.innerHTML = `<div style=\"font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text)\">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>${rows}`;\n  }\n\n  function renderMeals() {\n  if (state.kcal <= 0) return;\n  const banner = buildExclusionBannerHtml();\n  const topBannerEl = document.getElementById('exclusion-banner-top');\n  if (topBannerEl) topBannerEl.innerHTML = banner;\n  renderShoppingList();\n\n  // API plan has priority\n  if (_apiPlan && _apiPlan[0]) {\n    const day0 = _apiPlan[0];\n    const slots = ['breakfast', 'lunch', 'dinner', 'snack'];\n    const cards = slots.filter(s => day0[s])\n      .map(s => buildMealCardHTML_API(day0[s], s, 'preview-' + s));\n    document.getElementById('mealsContainer').innerHTML = banner + cards.join('');\n    return;\n  }\n\n  // Kick off API load in background, show engine/loading meanwhile\n  if (!_apiPlan) {\n    loadMealPlanFromAPI().then(ok => { if (ok) renderMeals(); });\n  }\n\n  if (!nutritionDataLoaded) {\n    document.getElementById('mealsContainer').innerHTML =\n      banner + '<div style=\"text-align:center;padding:20px;color:var(--muted);\">⏳ Загружаем меню из базы...</div>';\n    return;\n  }\n  const profile = buildUserProfile();\n  const tracker = new NutrientTracker();\n  const engineMeals = buildDayMenu(profile, 1, tracker);\n  document.getElementById('mealsContainer').innerHTML =\n    banner + engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');\n}\n\nfunction toggleRecipe(id) {\n  const el = document.getElementById(id);\n  if (!el) return;\n  el.classList.toggle('open');\n  el.closest('.meal-card').querySelector('.meal-tap-hint').textContent =\n    el.classList.contains('open') ? '👆 закрыть' : '👆 рецепт';\n}\n\n\n// ========== RECIPE SWAP ==========\nvar _swapHist = {};\nvar _swapPos  = {};\nvar _swapPending = null;\n\nfunction _parseCard(cardId) {\n  var e = cardId.match(/^dr-(\\d+)-(\\d+)$/);\n  if (e) return {day:+e[1], idx:+e[2]};\n  var a = cardId.match(/^d(\\d+)-(\\w+)$/);\n  if (a) { var s=['breakfast','lunch','dinner','snack']; return {day:+a[1],idx:s.indexOf(a[2])}; }\n  var p = cardId.match(/^preview-(\\w+)$/);\n  if (p) { var s2=['breakfast','lunch','dinner','snack']; return {day:1,idx:s2.indexOf(p[1])}; }\n  return {day:1,idx:0};\n}\n\nfunction _getMealType(cardId) {\n  var r = _parseCard(cardId);\n  if (dayMenuCache[r.day] && dayMenuCache[r.day][r.idx]) return dayMenuCache[r.day][r.idx].mealType;\n  var card = document.getElementById(cardId);\n  if (card) { var mc = card.closest('.meal-card'); if (mc && mc.dataset.mealtype) return mc.dataset.mealtype; }\n  return cardId.split('-').pop();\n}\n\nfunction _kcalForRecipe(recipe) {\n  if (!recipe) return 0;\n  var c = 0;\n  (recipe.ingredients||[]).forEach(function(i) {\n    var d = ingredientsMap[i.id];\n    if (d) c += (d.calories||0) * (i.amount_g||100) / 100;\n  });\n  return c;\n}\n\nfunction _applySwapDOM(cardId, recipe) {\n  if (!recipe) return;\n  var el = document.getElementById(cardId);\n  if (!el) return;\n  var card = el.closest('.meal-card');\n  if (!card) return;\n  var img = card.querySelector('img');\n  var nameEl = card.querySelector('.meal-name');\n  if (img) {\n    img.src = recipe.image_url || '';\n    img.onerror = function() { img.src = 'https://via.placeholder.com/600x300/1a1a24/a78bfa?text=' + encodeURIComponent(recipe.name); };\n  }\n  if (nameEl) nameEl.textContent = recipe.name;\n  var r2 = _parseCard(cardId);\n  if (dayMenuCache[r2.day] && dayMenuCache[r2.day][r2.idx]) dayMenuCache[r2.day][r2.idx].recipe = recipe;\n}\n\nfunction swapPrev(cardId, e) {\n  e.stopPropagation();\n  var pos = _swapPos[cardId]||0;\n  if (pos <= 0) return;\n  _swapPos[cardId] = pos - 1;\n  var recId = (_swapHist[cardId]||[])[pos-1];\n  _applySwapDOM(cardId, recipesArray.find(function(r){return r.id===recId;}));\n}\n\nfunction swapNext(cardId, e) {\n  e.stopPropagation();\n  var mealType = _getMealType(cardId);\n  if (!_swapHist[cardId]) {\n    var pr = _parseCard(cardId);\n    var curId = (dayMenuCache[pr.day] && dayMenuCache[pr.day][pr.idx] && dayMenuCache[pr.day][pr.idx].recipe) ? dayMenuCache[pr.day][pr.idx].recipe.id : '';\n    _swapHist[cardId] = [curId];\n    _swapPos[cardId] = 0;\n  }\n  var hist = _swapHist[cardId];\n  var pos  = _swapPos[cardId]||0;\n  if (pos < hist.length - 1) {\n    _swapPos[cardId] = pos + 1;\n    _applySwapDOM(cardId, recipesArray.find(function(r){return r.id===hist[pos+1];}));\n    return;\n  }\n  var used = {}; hist.forEach(function(id){ used[id]=1; });\n  var nextRec = filterRecipes(mealType).find(function(r){ return !used[r.id]; });\n  if (!nextRec) { openPopup('😔','Все подходящие варианты уже показаны'); return; }\n  var refKcal = _kcalForRecipe(recipesArray.find(function(r){return r.id===hist[0];}));\n  var newKcal = _kcalForRecipe(nextRec);\n  var diff = refKcal > 0 ? Math.abs(newKcal - refKcal) / refKcal : 0;\n  if (diff > 0.05) {\n    _swapPending = {cardId:cardId, nextRec:nextRec, hist:hist};\n    var pct = Math.round(diff * 100);\n    var pctEl = document.getElementById('swap-diff-pct');\n    if (pctEl) pctEl.textContent = pct + '%';\n    var popup = document.getElementById('swap-popup');\n    if (popup) popup.style.display = 'flex';\n  } else {\n    hist.push(nextRec.id);\n    _swapPos[cardId] = hist.length - 1;\n    _applySwapDOM(cardId, nextRec);\n  }\n}\n\nfunction swapConfirmYes() {\n  var popup = document.getElementById('swap-popup');\n  if (popup) popup.style.display = 'none';\n  if (!_swapPending) return;\n  var p = _swapPending; _swapPending = null;\n  p.hist.push(p.nextRec.id);\n  _swapPos[p.cardId] = p.hist.length - 1;\n  _applySwapDOM(p.cardId, p.nextRec);\n  openPopup('✅','Блюдо заменено! Следующий приём пищи будет скорректирован автоматически.');\n}\n\nfunction swapConfirmNo() {\n  var popup = document.getElementById('swap-popup');\n  if (popup) popup.style.display = 'none';\n  if (!_swapPending) return;\n  var p = _swapPending; _swapPending = null;\n  p.hist.push(p.nextRec.id);\n  _swapPos[p.cardId] = p.hist.length - 1;\n  _applySwapDOM(p.cardId, p.nextRec);\n  setTimeout(function(){\n    openPopup('💡','Окей, сохранил замену. КБЖУ немного изменилось — вы можете вручную скорректировать другие приёмы пищи, и план подстроится под нужный баланс.');\n  }, 300);\n}\n\n// ========== PAYMENT ==========\nfunction showPayment() {\n  document.getElementById('page-payment').style.display='block';\n  window.scrollTo(0,0);\n}\nfunction showMain() {\n  document.getElementById('page-payment').style.display='none';\n}\nfunction completePurchase() {\n  state.purchased = true;\n  document.getElementById('page-payment').style.display='none';\n  document.getElementById('meal-section').style.display='none';\n  document.getElementById('purchase-section').style.display='none';\n  document.getElementById('days-section').style.display='block';\n  renderDaysGrid();\n  document.getElementById('days-section').scrollIntoView({behavior:'smooth',block:'start'});\n}\n\n// ========== 28 DAYS GRID ==========\nconst dayStates = {}; // {1: {used:false, open:false}}\n\nfunction renderDaysGrid() {\n  const grid = document.getElementById('daysGrid');\n  grid.innerHTML = '';\n  for (let d=1; d<=28; d++) {\n    if (!dayStates[d]) dayStates[d]={used:false,open:false};\n    const btn = document.createElement('div');\n    btn.className='day-btn' + (dayStates[d].used?' used':'') + (dayStates[d].open?' active':'');\n    btn.textContent=d;\n    btn.id='day-btn-'+d;\n\n    // click = toggle open\n    btn.addEventListener('click', ()=>toggleDay(d));\n\n    // long press = mark used\n    let pressTimer;\n    btn.addEventListener('pointerdown', ()=>{\n      pressTimer = setTimeout(()=>{\n        dayStates[d].used = !dayStates[d].used;\n        btn.classList.toggle('used', dayStates[d].used);\n        if(dayStates[d].used) btn.classList.remove('active');\n        showTooltip('если день использован, нажми и удерживай 2 сек — станет серым. Хочешь вернуть — снова удержи');\n      }, 2000);\n    });\n    btn.addEventListener('pointerup', ()=>clearTimeout(pressTimer));\n    btn.addEventListener('pointerleave', ()=>clearTimeout(pressTimer));\n    grid.appendChild(btn);\n  }\n}\n\nfunction toggleDay(d) {\n  if (dayStates[d].used) return;\n  const wasOpen = dayStates[d].open;\n\n  // close all\n  for (let i=1;i<=28;i++) {\n    dayStates[i].open=false;\n    const b=document.getElementById('day-btn-'+i);\n    if(b) b.classList.remove('active');\n  }\n\n  if (!wasOpen) {\n    dayStates[d].open=true;\n    document.getElementById('day-btn-'+d).classList.add('active');\n    renderDayMeals(d);\n  } else {\n    document.getElementById('dayMealsContainer').innerHTML='';\n  }\n}\n\nfunction renderDayMealsFromEngine(d, engineMeals) {\n  const container = document.getElementById('dayMealsContainer');\n  const banner = buildExclusionBannerHtml();\n  container.innerHTML =\n    `<div class=\"section-label\" style=\"margin-top:12px;\">День ${d}</div>` + banner +\n    engineMeals.map((m, i) => buildMealCardHTML(m, i, `dr-${d}`)).join('');\n  container.scrollIntoView({behavior:'smooth', block:'start'});\n}\n\n// Cache of generated day menus (keyed by day number)\nconst dayMenuCache = {};\n\nfunction renderDayMeals(d) {\n  const container = document.getElementById('dayMealsContainer');\n\n  // API plan takes priority over engine\n  if (_apiPlan && state.kcal > 0) {\n    const dayData = _apiPlan[d - 1];\n    if (dayData) {\n      const banner = buildExclusionBannerHtml();\n      const slots = ['breakfast', 'lunch', 'dinner', 'snack'];\n      const cards = slots.filter(s => dayData[s])\n        .map(s => buildMealCardHTML_API(dayData[s], s, 'd' + d + '-' + s));\n      container.innerHTML =\n        '<div class=\"section-label\" style=\"margin-top:12px;\">День ' + d + '</div>' +\n        banner + cards.join('');\n      container.scrollIntoView({behavior:'smooth', block:'start'});\n      return;\n    }\n  }\n\n  // If engine data is loaded — use it\n  if (nutritionDataLoaded && state.kcal > 0) {\n    // Use cache to keep menus stable across re-opens\n    if (!dayMenuCache[d]) {\n      const profile = buildUserProfile();\n      const tracker = window._globalTracker || new NutrientTracker();\n      dayMenuCache[d] = buildDayMenu(profile, d, tracker);\n    }\n    renderDayMealsFromEngine(d, dayMenuCache[d]);\n    return;\n  }\n\n  // Fallback — legacy hardcoded meal set (MEALS)\n  const meals = MEALS;\n  container.innerHTML = `<div class=\"section-label\" style=\"margin-top:12px;\">День ${d}</div>` +\n    meals.map((m,i)=>`\n    <div class=\"meal-card\">\n      <div class=\"meal-img-wrap\" onclick=\"toggleDayRecipe(${d},${i})\">\n        <img src=\"${m.img}\" alt=\"${m.name}\" loading=\"lazy\"\n          onerror=\"this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.name)}'\">\n        <div class=\"meal-img-overlay\">\n          <div class=\"meal-type\">${m.type}</div>\n          <div class=\"meal-name\">${m.name}</div>\n        </div>\n        <div class=\"meal-tap-hint\">👆 рецепт</div>\n      </div>\n      <div class=\"recipe-block\" id=\"dr-${d}-${i}\">\n        <div class=\"recipe-macros\">\n          <div class=\"macro-chip\">🔥 ${m.kcal} ккал</div>\n          <div class=\"macro-chip\">🥩 Б: ${m.p}г</div>\n          <div class=\"macro-chip\">🥑 Ж: ${m.f}г</div>\n          <div class=\"macro-chip\">🍚 У: ${m.c}г</div>\n        </div>\n        <div class=\"recipe-section-title\">Продукты</div>\n        <ul class=\"ingredient-list\">\n          ${m.ingredients.map(ing=>`<li><span>${ing.name}</span><span class=\"ig\">${ing.qty}</span></li>`).join('')}\n        </ul>\n        <div class=\"recipe-section-title\">Приготовление</div>\n        <ul class=\"steps-list\">\n          ${m.steps.map((s,si)=>`<li><div class=\"step-num\">${si+1}</div><span>${s}</span></li>`).join('')}\n        </ul>\n      </div>\n    </div>\n  `).join('');\n  container.scrollIntoView({behavior:'smooth',block:'start'});\n}\n\nfunction toggleDayRecipe(d, i) {\n  const el = document.getElementById(`dr-${d}-${i}`);\n  if (!el) return;\n  el.classList.toggle('open');\n  el.closest('.meal-card').querySelector('.meal-tap-hint').textContent =\n    el.classList.contains('open') ? '👆 закрыть' : '👆 рецепт';\n}\n\n// ========== TOOLTIP ==========\nlet tooltipTimer;\nfunction showTooltip(msg) {\n  let t = document.getElementById('dayTooltip');\n  if (!t) { t=document.createElement('div'); t.className='day-tooltip'; t.id='dayTooltip'; document.body.appendChild(t); }\n  t.textContent=msg; t.style.display='block';\n  clearTimeout(tooltipTimer);\n  tooltipTimer=setTimeout(()=>{ if(t) t.style.display='none'; }, 3500);\n}\n\n// ========== FOOD PREFERENCES / MIC ==========\nlet recognition = null;\nlet micActive = false;\n\nfunction toggleMic() {\n  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;\n  if (!SpeechRecognition) { alert('Голосовой ввод не поддерживается в этом браузере'); return; }\n  if (micActive) {\n    recognition && recognition.stop();\n    return;\n  }\n  recognition = new SpeechRecognition();\n  recognition.lang='ru-RU'; recognition.continuous=false; recognition.interimResults=false;\n  recognition.onstart=()=>{ micActive=true; document.getElementById('micBtn').classList.add('listening'); };\n  recognition.onresult=e=>{\n    const t=e.results[0][0].transcript;\n    document.getElementById('foodPrefInput').value=t;\n    document.getElementById('marqueeHint').style.opacity='0';\n    sendFoodPref();\n  };\n  recognition.onend=()=>{ micActive=false; document.getElementById('micBtn').classList.remove('listening'); };\n  recognition.onerror=()=>{ micActive=false; document.getElementById('micBtn').classList.remove('listening'); };\n  recognition.start();\n}\n\nfunction openPopup(icon, text) {\n  const p = document.getElementById('aiPopup');\n  document.getElementById('aiPopupIcon').textContent = icon;\n  document.getElementById('aiPopupText').textContent = text;\n  document.getElementById('aiPopupLoader').style.display = 'none';\n  p.style.display = 'flex';\n}\nfunction openPopupLoading() {\n  const p = document.getElementById('aiPopup');\n  document.getElementById('aiPopupIcon').textContent = '🤝';\n  document.getElementById('aiPopupText').textContent = '';\n  document.getElementById('aiPopupLoader').style.display = 'block';\n  p.style.display = 'flex';\n}\nfunction closePopup() {\n  document.getElementById('aiPopup').style.display = 'none';\n}\ndocument.getElementById('aiPopup').addEventListener('click', function(e) {\n  if (e.target === this) closePopup();\n});\n\nfunction highlightReconstra() {\n  setTimeout(() => {\n    const banner = document.getElementById('exclusion-banner');\n    if (banner) {\n      banner.classList.remove('reconstra-banner-hl');\n      void banner.offsetWidth;\n      banner.classList.add('reconstra-banner-hl');\n      setTimeout(() => banner.classList.remove('reconstra-banner-hl'), 5000);\n    }\n    document.querySelectorAll('.meal-card').forEach(card => {\n      card.classList.remove('reconstra-hl');\n      void card.offsetWidth;\n      card.classList.add('reconstra-hl');\n      setTimeout(() => card.classList.remove('reconstra-hl'), 5000);\n    });\n  }, 400);\n}\n\nasync function sendFoodPref() {\n  const val = document.getElementById('foodPrefInput').value.trim();\n  if (!val) return;\n\n  document.getElementById('foodPrefInput').value = '';\n  document.getElementById('marqueeHint').style.opacity = '1';\n\n  // 1. Detect ingredient exclusions locally (fast, no API)\n  const exclusionResult = parseExclusions(val);\n\n  if (exclusionResult === null) {\n    state.excludedIngredientIds = [];\n    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n    if (state.kcal > 0) renderMeals();\n    const openDay0 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);\n    if (openDay0 && state.kcal > 0) renderDayMeals(parseInt(openDay0));\n    return;\n  }\n\n  if (exclusionResult !== false) {\n    state.excludedIngredientIds = exclusionResult;\n    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);\n    _apiPlan = null;\n    if (state.kcal > 0) {\n      renderMeals();\n      setTimeout(() => document.getElementById('meal-section')?.scrollIntoView({behavior:'smooth',block:'start'}), 300);\n    }\n    const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);\n    if (openDay1 && state.kcal > 0) renderDayMeals(parseInt(openDay1));\n    highlightReconstra();\n    return;\n  }// 2. Everything else → OpenAI\n  const menuReset = parseMenuReset(val);\n  if (menuReset !== false) { applyMenuReset(); return; }\n  const ingReq = parseIngredientRequest(val);\n  if (ingReq !== false) {\n    const res = applyIngredientRequest(ingReq.mealType, ingReq.ingredientName);\n    if (res) { openPopup('🍽️', `Понял! Ставлю ${res.ingDisplayName} на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType} — «${res.recipeName}». Меню обновлено.`); return; }\n  }\n  const subResult = parseFoodSubstitution(val);\n  if (subResult !== false) {\n    if (subResult.type === 'meal') {\n      const rName = applyMealReplacement(subResult.mealType, subResult.dishName);\n      if (rName) { openPopup('🍽️', `Заменил ${MEAL_TYPE_RU[subResult.mealType]||subResult.mealType} на «${rName}». Меню обновлено.`); return; }\n    } else if (subResult.type === 'ingredient') {\n      const res = applyIngredientSwap(subResult.fromName, subResult.toName);\n      if (res) { openPopup('🔄', `Заменил ${res.fromName} на ${res.toName} во всех блюдах. Меню пересчитано.`); return; }\n    }\n  }\n  openPopupLoading();\n\n  try {\n    const res = await fetch('/api/chat', {\n      method: 'POST',\n      headers: {'Content-Type':'application/json'},\n      body: JSON.stringify({\n        message: val,\n        context: state.context ||\n          'Пользователь ещё не рассчитал КБЖУ. Отвечай на общие вопросы про питание.'\n      })\n    });\n    const data = await res.json();\n\n    if (data.error) {\n      openPopup('⚠️', 'Не удалось получить ответ. Попробуй позже.');\n      return;\n    }\n\n    const reply = data.reply || '';\n\n    // Detect off-topic response from AI\n    const offTopicPhrases = ['не могу помочь','не по теме','выходит за рамки','вне моей компетенции','не связан с питанием'];\n    const isOffTopic = offTopicPhrases.some(p => reply.toLowerCase().includes(p));\n\n    if (isOffTopic) {\n      openPopup('🚫', 'Этот вопрос выходит за рамки питания и КБЖУ. Попробуй спросить что-то про еду, рацион или ингредиенты — с удовольствием помогу! 😊');\n    } else {\n      openPopup('🤝', reply);\n    }\n  } catch {\n    openPopup('⚠️', 'Нет соединения с сервером. Проверь интернет и попробуй снова.');\n  }\n}\n</script>\n\n<div id=\"swap-popup\" style=\"display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(0,0,0,.65)\">\n  <div style=\"background:var(--surface);border-radius:18px;padding:24px 20px;max-width:320px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5)\">\n    <div style=\"font-size:28px;margin-bottom:10px\">⚖️</div>\n    <div style=\"font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px\">КБЖУ изменится на <span id=\"swap-diff-pct\" style=\"color:var(--accent)\"></span></div>\n    <div style=\"font-size:13px;color:var(--muted);margin-bottom:20px\">Скорректировать следующий приём пищи под&nbsp;новые цифры?</div>\n    <div style=\"display:flex;gap:10px\">\n      <button onclick=\"swapConfirmNo()\" style=\"flex:1;padding:12px;background:var(--surface2,#2a2a3a);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;cursor:pointer\">Нет</button>\n      <button onclick=\"swapConfirmYes()\" style=\"flex:1;padding:12px;background:var(--accent,#7c3aed);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer\">Да</button>\n    </div>\n  </div>\n</div>\n</body>\n</html>\n"}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<title>Калькулятор КБЖУ</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#0f0f13; --surface:#1a1a24; --surface2:#22222f; --border:#2e2e3e;
+  --accent:#7c6af7; --accent2:#a78bfa; --green:#22c55e; --yellow:#f59e0b;
+  --red:#ef4444; --text:#f1f0ff; --muted:#8b8aa0; --radius:18px;
+}
+html { scroll-behavior:smooth; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--text);
+  max-width:480px; margin:0 auto;
+  padding-bottom:90px;
+}
+
+/* HEADER */
+.header { padding:28px 20px 0; text-align:center; }
+.header-badge {
+  display:inline-block;
+  background:linear-gradient(135deg,#7c6af7,#a855f7);
+  border-radius:30px; padding:6px 16px;
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;
+}
+.header h1 {
+  font-size:26px; font-weight:800; line-height:1.2;
+  background:linear-gradient(135deg,#fff,#a78bfa);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.header p { color:var(--muted); font-size:14px; margin-top:6px; }
+
+/* CARDS */
+.card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }
+.card-title { font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+
+/* INPUTS */
+.wrap { padding:0 20px; }
+.input-row { display:flex; gap:10px; }
+.input-group { flex:1; }
+.input-group label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+.input-group input {
+  width:100%; background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:12px 14px; color:var(--text);
+  font-size:18px; font-weight:700; outline:none; transition:border-color .2s;
+  -moz-appearance:textfield;
+}
+.input-group input::-webkit-outer-spin-button,
+.input-group input::-webkit-inner-spin-button { -webkit-appearance:none; }
+.input-group input:focus { border-color:var(--accent); }
+
+/* OPTION BUTTONS */
+.option-grid { display:flex; flex-direction:column; gap:8px; }
+.option-btn {
+  flex:1; padding:12px 14px; border-radius:12px;
+  border:1.5px solid var(--border); background:var(--surface2);
+  color:var(--muted); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .2s; text-align:left;
+}
+.option-btn.selected { border-color:var(--accent); background:rgba(124,106,247,.15); color:var(--accent2); }
+.option-btn small { display:block; font-size:11px; font-weight:400; margin-top:2px; opacity:.75; }
+
+/* CALC BUTTON */
+.calc-btn {
+  width:100%; padding:16px; border-radius:16px; border:none;
+  background:linear-gradient(135deg,#7c6af7,#a855f7);
+  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  margin-top:4px; transition:opacity .2s, transform .1s;
+}
+.calc-btn:active { transform:scale(.98); opacity:.9; }
+
+/* SECTION LABEL */
+.section-label {
+  font-size:15px; font-weight:700; color:var(--text);
+  margin:20px 0 10px; line-height:1.4;
+}
+
+/* RESULTS GRID */
+.results-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+.res-card {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:var(--radius); padding:16px 14px; text-align:center;
+  animation:fadeUp .4s ease both;
+}
+.res-card.full { grid-column:1/-1; }
+.res-card .icon { font-size:22px; margin-bottom:6px; }
+.res-card .val {
+  font-size:28px; font-weight:800;
+  background:linear-gradient(135deg,#fff,#a78bfa);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.res-card .unit { font-size:11px; color:var(--muted); margin-top:2px; }
+.res-card .lbl { font-size:12px; color:var(--muted); margin-top:4px; font-weight:600; }
+
+/* FORECAST */
+.forecast-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.forecast-card {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:14px; padding:14px; text-align:center;
+  animation:fadeUp .5s ease both;
+}
+.forecast-card .fday { font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:600; }
+.forecast-card .fweight { font-size:22px; font-weight:800; }
+.forecast-card .funit { font-size:11px; color:var(--muted); }
+
+/* WARNING */
+.warning-card {
+  background:rgba(245,158,11,.1); border:1.5px solid var(--yellow);
+  border-radius:var(--radius); padding:16px; margin-bottom:12px;
+}
+.warning-card h3 { font-size:14px; color:#fbbf24; margin-bottom:8px; }
+.warning-card p { font-size:13px; color:var(--muted); line-height:1.5; }
+
+/* MEAL CARDS */
+.meal-card {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:var(--radius); margin-bottom:12px;
+  overflow:hidden; animation:fadeUp .4s ease both;
+}
+.meal-img-wrap { position:relative; cursor:pointer; overflow:hidden; border-radius:var(--radius) var(--radius) 0 0; }
+.meal-img-wrap img {
+  width:100%; height:200px; object-fit:cover; display:block;
+  transition:transform .3s;
+}
+.meal-img-wrap:active img { transform:scale(.97); }
+.meal-img-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 50%);
+  display:flex; flex-direction:column; justify-content:flex-end; padding:14px;
+}
+.meal-img-overlay .meal-name { font-size:17px; font-weight:800; color:#fff; }
+.meal-img-overlay .meal-type { font-size:11px; color:rgba(255,255,255,.7); margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
+.meal-nav-bar {
+  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:4px;
+  background:rgba(0,0,0,.6); border-radius:20px;
+  padding:5px 10px; pointer-events:auto;
+}
+.meal-nav-btn {
+  background:none; border:none; color:rgba(255,255,255,.95);
+  font-size:20px; cursor:pointer; padding:0 2px; line-height:1;
+}
+.meal-tap-hint {
+  font-size:11px; color:rgba(255,255,255,.85); cursor:pointer;
+  padding:0 6px; white-space:nowrap;
+}
+
+/* RECIPE */
+.recipe-block {
+  display:none; padding:16px 18px 18px;
+  border-top:1px solid var(--border);
+  animation:fadeUp .3s ease both;
+}
+.recipe-block.open { display:block; }
+.recipe-macros {
+  display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;
+}
+.macro-chip {
+  background:var(--surface2); border-radius:20px;
+  padding:5px 12px; font-size:12px; font-weight:600; color:var(--accent2);
+}
+.recipe-section-title {
+  font-size:12px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.7px; color:var(--muted); margin-bottom:8px;
+}
+.ingredient-list { list-style:none; margin-bottom:14px; }
+.ingredient-list li {
+  display:flex; justify-content:space-between;
+  font-size:13px; color:var(--muted);
+  padding:5px 0; border-bottom:1px solid var(--border);
+}
+.ingredient-list li:last-child { border:none; }
+.ingredient-list li .ig { color:var(--text); font-weight:600; font-size:12px; }
+.steps-list { list-style:none; }
+.steps-list li {
+  display:flex; gap:10px; margin-bottom:10px;
+  font-size:13px; color:var(--muted); line-height:1.5;
+}
+.step-num {
+  min-width:22px; height:22px; border-radius:50%;
+  background:var(--accent); color:#fff;
+  font-size:11px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+}
+
+/* PURCHASE SECTION */
+.purchase-section {
+  background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(168,85,247,.1));
+  border:1.5px solid rgba(124,106,247,.3);
+  border-radius:var(--radius); padding:20px; margin-bottom:12px;
+}
+.purchase-section p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.buy-btn {
+  width:100%; padding:18px; border-radius:16px; border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#fff; font-size:20px; font-weight:800; cursor:pointer;
+  letter-spacing:.5px; transition:opacity .2s, transform .1s;
+}
+.buy-btn:active { transform:scale(.98); opacity:.9; }
+
+/* DAYS GRID */
+.days-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:16px; }
+.day-btn {
+  aspect-ratio:1; border-radius:12px; border:1.5px solid var(--border);
+  background:var(--surface); color:var(--text);
+  font-size:14px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; user-select:none; -webkit-user-select:none;
+  position:relative;
+}
+.day-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.day-btn.used { background:var(--surface2); border-color:var(--border); color:#555; }
+.day-btn.used::after {
+  content:'✓'; position:absolute; top:2px; right:4px;
+  font-size:9px; color:#555;
+}
+
+/* PAYMENT PAGE */
+#page-payment {
+  display:none; position:fixed; inset:0;
+  background:var(--bg); z-index:200; overflow-y:auto;
+  padding:40px 20px 100px;
+}
+.payment-inner { text-align:center; max-width:420px; margin:0 auto; }
+.payment-inner .pay-icon { font-size:64px; margin-bottom:16px; }
+.payment-inner h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
+.payment-inner p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
+.pay-continue-btn {
+  width:100%; padding:18px; border-radius:16px; border:none;
+  background:linear-gradient(135deg,#7c6af7,#a855f7);
+  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+}
+
+/* STICKY BOTTOM BAR */
+.sticky-bar {
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:480px;
+  background:rgba(26,26,36,.95); backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  padding:10px 14px 14px;
+  z-index:100;
+}
+.sticky-input-row { display:flex; gap:8px; align-items:center; }
+.sticky-input-wrap { flex:1; position:relative; }
+.sticky-input {
+  width:100%; background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:22px; padding:11px 16px;
+  font-size:13px; color:var(--text); outline:none;
+  font-family:inherit; transition:border-color .2s;
+}
+.sticky-input:focus { border-color:var(--accent); }
+.sticky-input:focus + .marquee-hint { opacity:0; }
+.marquee-hint {
+  position:absolute; inset:0; padding:11px 16px;
+  font-size:13px; color:var(--muted); pointer-events:none;
+  overflow:hidden; white-space:nowrap;
+  display:flex; align-items:center;
+  z-index:2;
+}
+.marquee-track { display:flex; flex-shrink:0; animation:marquee-scroll 10s linear infinite; }
+.marquee-text { white-space:nowrap; flex-shrink:0; padding-right:80px; }
+@keyframes marquee-scroll {
+  from { transform:translateX(0); }
+  to { transform:translateX(-50%); }
+}
+.mic-btn {
+  width:44px; height:44px; border-radius:50%; border:none;
+  background:var(--accent); color:#fff; font-size:18px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:opacity .2s;
+}
+.mic-btn:active { opacity:.8; }
+.mic-btn.listening { background:#fb923c; }
+@keyframes reconstra-border {
+  0%,100% { border-color:var(--border); box-shadow:none; }
+  10%,90% { border-color:#fb923c; box-shadow:0 0 0 2px rgba(251,146,60,.35); }
+}
+.meal-card.reconstra-hl { animation:reconstra-border 5s ease forwards; }
+@keyframes reconstra-banner {
+  0%,100% { box-shadow:none; }
+  10%,90% { box-shadow:0 0 0 3px rgba(251,146,60,.5); }
+}
+.reconstra-banner-hl { animation:reconstra-banner 5s ease forwards; }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* DAY TOOLTIP */
+.day-tooltip {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:12px; padding:10px 16px;
+  font-size:12px; color:var(--muted); text-align:center;
+  z-index:300; max-width:280px; line-height:1.5;
+  animation:fadeUp .3s ease both;
+}
+</style>
+</head>
+<body>
+
+<!-- ========== MAIN PAGE ========== -->
+<div id="page-main">
+
+<div class="wrap" style="margin-top:24px;">
+
+  <div class="card">
+    <div class="card-title">👤 Пол</div>
+    <div class="option-grid" id="genderGrid">
+      <div class="option-btn selected" onclick="selectGender('female',this)">♀️ Женский</div>
+      <div class="option-btn" onclick="selectGender('male',this)">♂️ Мужской</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚖️ Параметры</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>Текущий вес, кг</label>
+        <input type="number" id="currentWeight" min="30" max="300">
+      </div>
+      <div class="input-group">
+        <label>Желаемый вес, кг</label>
+        <input type="number" id="targetWeight" min="30" max="300">
+      </div>
+    </div>
+    <div class="input-row" style="margin-top:10px;">
+      <div class="input-group">
+        <label>Рост, см</label>
+        <input type="number" id="height" min="100" max="250">
+      </div>
+      <div class="input-group">
+        <label>Возраст, лет</label>
+        <input type="number" id="age" min="10" max="100">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏃 Какая у тебя планируется активность?</div>
+    <div class="option-grid" id="activityGrid">
+      <div class="option-btn selected" onclick="selectActivity('sedentary',this)">🛋️ Редко выхожу из дома<br><small>≈ менее 3 000 шагов/день</small></div>
+      <div class="option-btn" onclick="selectActivity('light',this)">🚶 Выхожу на работу и обратно<br><small>≈ 3 000–6 000 шагов/день</small></div>
+      <div class="option-btn" onclick="selectActivity('moderate',this)">🚶‍♂️ Работа, магазин, прогулки<br><small>≈ 6 000–10 000 шагов/день</small></div>
+      <div class="option-btn" onclick="selectActivity('active',this)">🏋️ Работа, магазин, прогулки, спортзал<br><small>≈ 10 000–15 000 шагов/день</small></div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">⚡ Рассчитать</button>
+
+</div><!-- /wrap -->
+
+<!-- RESULTS -->
+<div id="results" style="display:none;">
+<div class="wrap">
+
+  <div id="warningBlock"></div>
+
+  <div class="section-label">Чтобы прийти к цели, нужно употреблять вот столько 👇</div>
+  <div class="results-grid">
+    <div class="res-card"><div class="icon">🔥</div><div class="val" id="r-kcal">—</div><div class="unit">ккал/день</div><div class="lbl">Калории</div></div>
+    <div class="res-card"><div class="icon">🥩</div><div class="val" id="r-prot">—</div><div class="unit">г/день</div><div class="lbl">Белки</div></div>
+    <div class="res-card"><div class="icon">🥑</div><div class="val" id="r-fat">—</div><div class="unit">г/день</div><div class="lbl">Жиры</div></div>
+    <div class="res-card"><div class="icon">🍚</div><div class="val" id="r-carb">—</div><div class="unit">г/день</div><div class="lbl">Углеводы</div></div>
+    <div class="res-card full"><div class="icon">🥦</div><div class="val" id="r-fiber">—</div><div class="unit">г/день</div><div class="lbl">Клетчатка</div></div>
+  </div>
+
+  <div class="section-label">Вот сколько тебе нужно на это времени 👇</div>
+  <div class="forecast-grid" id="forecastGrid"></div>
+
+  <!-- DAY MENU -->
+  <div id="meal-section">
+    <div class="section-label">Вот меню на день с рецептами 👇</div>
+    <div id="mealsContainer"></div>
+  </div>
+
+  <!-- 30 DAYS GRID (after purchase) -->
+  <div id="days-section" style="display:none;">
+    <div class="section-label">📅 Меню на 28 дней</div>
+    <div class="days-grid" id="daysGrid"></div>
+    <div id="dayMealsContainer"></div>
+  </div>
+
+  <div id="exclusion-banner-top"></div>
+  <div id="shopping-list-section" style="display:none"></div>
+  <!-- PURCHASE -->
+  <div id="purchase-section" class="purchase-section">
+    <p>А вот тебе меню на 28 дней с рецептами, согласно твоим данным 👇</p>
+    <button class="buy-btn" onclick="showPayment()">299 ₽</button>
+  </div>
+
+</div><!-- /wrap -->
+</div><!-- /results -->
+
+</div><!-- /page-main -->
+
+<!-- ========== PAYMENT PAGE ========== -->
+<div id="page-payment">
+  <div class="payment-inner">
+    <div class="pay-icon">💳</div>
+    <h2>Оплата</h2>
+    <p>Тут будет Продамус или Яндекс Пэй.<br>А пока вот кнопка для продолжения 👇</p>
+    <button class="pay-continue-btn" onclick="completePurchase()">✅ Продолжить</button>
+    <br><br>
+    <button onclick="showMain()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;">← Назад</button>
+  </div>
+</div>
+
+<!-- ========== AI POPUP ========== -->
+<div id="aiPopup" onclick="if(event.target===this)closePopup()" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); padding:20px; display:none; align-items:center; justify-content:center;">
+  <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:22px; padding:24px 20px 20px; max-width:360px; width:90vw; position:relative; animation:fadeUp .25s ease both; max-height:80vh; overflow-y:auto;">
+    <button onclick="closePopup()" style="position:absolute;top:14px;right:14px;background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;">✕</button>
+    <div id="aiPopupIcon" style="font-size:36px;text-align:center;margin-bottom:10px;">🤝</div>
+    <div id="aiPopupText" style="font-size:14px;line-height:1.7;color:var(--muted);text-align:center;"></div>
+    <div id="aiPopupLoader" style="display:none;text-align:center;padding:10px 0;">
+      <div style="display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+
+<!-- ========== STICKY BOTTOM ========== -->
+<div class="sticky-bar">
+  <div class="sticky-input-row">
+    <div class="sticky-input-wrap">
+      <input class="sticky-input" id="foodPrefInput" type="text"
+        onkeydown="if(event.key==='Enter') sendFoodPref()"
+        onfocus="document.getElementById('marqueeHint').style.opacity='0'"
+        onblur="if(!this.value) document.getElementById('marqueeHint').style.opacity='1'">
+      <div class="marquee-hint" id="marqueeHint">
+        <div class="marquee-track">
+          <span class="marquee-text" id="marqueeText1"></span>
+          <span class="marquee-text" id="marqueeText2"></span>
+        </div>
+      </div>
+    </div>
+    <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+  </div>
+</div>
+
+<script>
+// ========== MARQUEE ==========
+const MARQUEE_FORM    = 'Не можешь выбрать уровень активности? Опиши, как проходит твой обычный день — я подберу подходящий вариант';
+const MARQUEE_RESULTS = 'Попробуй написать: «Поменяй завтрак», «Я не ем курицу», «Убери это блюдо» — меню обновится автоматически';
+
+function setMarquee(text) {
+  const el1 = document.getElementById('marqueeText1');
+  const el2 = document.getElementById('marqueeText2');
+  if (el1) el1.textContent = text;
+  if (el2) el2.textContent = text;
+  const track = document.querySelector('.marquee-track');
+  if (track) {
+    track.style.animation = 'none';
+    void track.offsetWidth;
+    track.style.animation = '';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => setMarquee(MARQUEE_FORM));
+
+// ========== STATE ==========
+const state = {
+  gender: 'female',
+  activity: 'sedentary',
+  kcal: 0, protein: 0, fat: 0, carbs: 0,
+  cw: 0, tw: 0,
+  context: '',
+  purchased: false,
+  excludedIngredientIds: [], // ingredient IDs the user can't eat
+  activeDayBtn: null,
+  ingredientSwaps: {},   // { fromId: toId }
+  mealOverrides: {},     // { mealType: recipeObject }
+};
+
+// ========== GENDER ==========
+function selectGender(val, el) {
+  document.querySelectorAll('#genderGrid .option-btn').forEach(b => b.className='option-btn');
+  el.classList.add('selected');
+  state.gender = val;
+}
+
+// ========== ACTIVITY ==========
+function selectActivity(val, el) {
+  document.querySelectorAll('#activityGrid .option-btn').forEach(b => b.className='option-btn');
+  el.classList.add('selected');
+  state.activity = val;
+}
+
+// ========== CALCULATE ==========
+function calculate() {
+  const cw = parseFloat(document.getElementById('currentWeight').value);
+  const tw = parseFloat(document.getElementById('targetWeight').value);
+  const height = parseFloat(document.getElementById('height').value);
+  const age = parseFloat(document.getElementById('age').value);
+  if (!cw || !tw || cw<30 || tw<30) { alert('Введи корректный вес (от 30 кг)'); return; }
+  if (!height || height<100 || height>250) { alert('Введи корректный рост (от 100 до 250 см)'); return; }
+  if (!age || age<10 || age>100) { alert('Введи корректный возраст (от 10 до 100 лет)'); return; }
+
+  state.cw = cw; state.tw = tw;
+
+  const bmr = state.gender === 'male'
+    ? 10*cw + 6.25*height - 5*age + 5
+    : 10*cw + 6.25*height - 5*age - 161;
+  const actFactorMap = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725};
+  const actFactor = actFactorMap[state.activity] ?? 1.2;
+  const maintenance = Math.round(bmr * actFactor);
+  const isLoss = tw < cw, isGain = tw > cw;
+
+  let kcal, weeklyChange;
+  if (isLoss) {
+    const kcalMin = state.gender === 'male' ? 1500 : 1200;
+    kcal = Math.max(maintenance * 0.80, kcalMin);
+    weeklyChange = ((maintenance - kcal) * 7) / 7700;
+  } else if (isGain) {
+    kcal = maintenance * 1.10;
+    weeklyChange = ((kcal - maintenance) * 7) / 7700;
+  } else {
+    kcal = maintenance; weeklyChange = 0;
+  }
+  kcal = Math.round(kcal);
+
+  const proteinGoalMap  = {sedentary:1.4, light:1.5, moderate:1.6, active:1.8};
+  const proteinMaintMap = {sedentary:1.0, light:1.1, moderate:1.2, active:1.4};
+  const protCoef = isLoss||isGain ? (proteinGoalMap[state.activity]??1.8) : (proteinMaintMap[state.activity]??1.4);
+  const protein = Math.round((isLoss||isGain ? tw : cw) * protCoef);
+  const fat     = Math.round(isLoss||isGain ? tw*0.8 : cw*0.8);
+  const fiber   = Math.round((kcal/1000)*14);
+  const carbs   = Math.max(0, Math.round((kcal-protein*4-fat*9)/4));
+
+  state.kcal=kcal; state.protein=protein; state.fat=fat; state.carbs=carbs;
+
+  document.getElementById('r-kcal').textContent=kcal;
+  document.getElementById('r-prot').textContent=protein;
+  document.getElementById('r-fat').textContent=fat;
+  document.getElementById('r-carb').textContent=carbs;
+  document.getElementById('r-fiber').textContent=fiber;
+
+  // Forecast
+  const sign = isGain?1:isLoss?-1:0;
+  const wk = weeklyChange*sign;
+  document.getElementById('forecastGrid').innerHTML=
+    [{d:'30 дней',w:+(cw+wk*(30/7)).toFixed(1)},{d:'60 дней',w:+(cw+wk*(60/7)).toFixed(1)},{d:'90 дней',w:+(cw+wk*(90/7)).toFixed(1)},{d:'120 дней',w:+(cw+wk*(120/7)).toFixed(1)}]
+    .map(f=>`<div class="forecast-card">
+      <div class="fday">📅 Через ${f.d}</div>
+      <div class="fweight">${f.w}</div><div class="funit">кг</div>
+    </div>`).join('');
+
+  // Warning
+  const wb=document.getElementById('warningBlock');
+  const chPct=Math.abs(tw-cw)/cw*100;
+  if(chPct>25){const mid=Math.round((cw+tw)/2);
+    wb.innerHTML=`<div class="warning-card"><h3>⚠️ Большая цель</h3>
+      <p>Разбей путь на этапы:<br><br><strong>${cw} → ${mid} кг</strong> — Этап 1<br><strong>${mid} → ${tw} кг</strong> — Этап 2</p></div>`;}
+  else wb.innerHTML='';
+
+  const actLblMap = {sedentary:'менее 3000 шагов (офис)', light:'3000–6000 шагов (лёгкая активность)', moderate:'6000–10000 шагов (умеренная активность)', active:'10000–15000 шагов (спортзал/бег)'};
+  const actLbl = actLblMap[state.activity] ?? 'минимальная активность';
+  const goalLbl=isLoss?'похудение':isGain?'набор веса':'удержание';
+  state.context=`Цель: ${goalLbl}, пол: ${state.gender==='male'?'мужской':'женский'}, возраст: ${age} лет, рост: ${height} см, текущий вес: ${cw} кг, желаемый: ${tw} кг, активность: ${actLbl}, калории: ${kcal}/день, белки: ${protein}г, жиры: ${fat}г, углеводы: ${carbs}г.`;
+
+  // Wait for nutrition data if still loading, then render
+  if (nutritionDataLoading) {
+    const waitAndRender = setInterval(() => {
+      if (!nutritionDataLoading) {
+        clearInterval(waitAndRender);
+        renderMeals();
+      }
+    }, 100);
+  } else {
+    renderMeals();
+  }
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  setMarquee(MARQUEE_RESULTS);
+}
+
+// ========== EXCLUSION & SUBSTITUTION SYSTEM ==========
+
+// --- Ingredient groups for text detection ---
+const EXCLUSION_PATTERNS = [
+
+  { words: ['мясо','мяса','мясной','мясных','мясные','мясным','мясного','мясному','без мяса','не ем мяс','не ест мяс','не едим мяс','отказ от мяса','говядин','свинин','баранин','телятин','колбас','сосиск'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
+  { words: ['рыб','лосос','треск','тунец','скумбри','сельд','сардин','форел','палтус','тилапи','минтай','окун','анчоус','без рыбы','не ем рыб','не ест рыб','рыбу не ем'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
+  { words: ['морепродукт','креветк','кальмар','краб','мидий','гребешок','устриц','без морепродуктов','не ем морепродукт'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['молочн','молоко','молока','сыр ','сыра','творог','кефир','йогурт','сметан','сливки','сливочн','лактоз','непереносимость лактоз','без молочк','без молока','без сыра','не ем молочн'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
+  { words: ['без топлёного масла','без ги','без ghee'], ids: ['ghee'] },
+  { words: ['яйц','яйцо','яйца','без яиц','не ем яйц','аллергия на яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
+  { words: ['мёд','без мёда','без меда','не ем мёд','не ем мед'], ids: ['honey'] },
+  { words: ['свинин','свиной','свиная','без свинины','не ем свинину','халяль','halal','кошерн','kosher'], ids: ['pork_loin','pork_minced'] },
+  { words: ['без курицы','без курятины','не ем курицу','не ем курятин'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken'] },
+  { words: ['без говядины','не ем говядин'], ids: ['beef_lean','beef_minced','liver_beef','broth_beef'] },
+  { words: ['красное мясо','красного мяса','без красного мяса','не ем красное мясо'], ids: ['beef_lean','beef_minced','liver_beef','lamb_leg','pork_loin','pork_minced'] },
+  { words: ['орех','миндал','грецк','кешью','фундук','фисташ','макадами','пекан','бразильск','без орехов','аллергия на орехи'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
+  { words: ['без семян','семечки не ем','не ем семечки'], ids: ['sunflower_seeds','pumpkin_seeds','hemp_seeds','sesame_seeds','flaxseeds','chia_seeds'] },
+  { words: ['глютен','клейковин','gluten','целиак','без глютена','без пшениц','непереносимость глютен','пшеница','ржан'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
+  { words: ['бобов','фасол','нут ','нута','чечевиц','горох','тофу','темпе','натто','соев','edamame','бобы','без бобовых'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
+  { words: ['без соли','мало соли','несолёное','не ем соль','ограничение соли'], ids: ['salt','miso_paste','soy_sauce','fish_sauce','worcestershire_sauce','anchovy','herring'] },
+  { words: ['без сахара','диабет','не ем сахар','исключи сахар','без сладкого'], ids: ['sugar','honey','sugar_maple','coconut_sugar'] },
+
+];
+
+// Диетические типы (ЗАМЕНЯЮТ exclusions целиком)
+const DIET_PATTERNS = [
+  { words: ['пескатариан','pescatarian','pescetarian','ем рыбу но не мясо','рыбу ем мясо нет'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
+  { words: ['вегетариан','vegetarian'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['веган','vegan','plant-based','plant based','растительное питани','растительн рацион','отказ от животных','ничего животного'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters','milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese','egg_chicken','egg_white','egg_yolk','honey','protein_whey'] },
+];
+
+// Позитивные упоминания (УБИРАЮТ из exclusions)
+const INCLUSION_PATTERNS = [
+  { words: ['ем мяс','хочу мяс','верни мяс','снова ем мяс','можно мяс','буду есть мяс','ем курицу','хочу курицу','верни курицу','ем говядину','хочу говядину','верни говядину'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
+  { words: ['ем рыб','хочу рыб','верни рыб','снова ем рыб','можно рыб','буду есть рыб'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
+  { words: ['ем морепродукт','хочу морепродукт','верни морепродукт','ем креветк','хочу креветк'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
+  { words: ['ем молоч','ем молок','хочу молок','верни молок','снова ем молок','ем сметан','хочу сметан','верни сметан','ем творог','хочу творог','верни творог','ем кефир','хочу кефир','верни кефир','ем йогурт','хочу йогурт','верни йогурт','ем сыр','хочу сыр','верни сыр','ем сливк','хочу сливк'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
+  { words: ['ем яйц','хочу яйц','верни яйц','снова ем яйц','можно яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
+  { words: ['ем мёд','ем мед','хочу мёд','хочу мед','верни мёд','верни мед'], ids: ['honey'] },
+  { words: ['ем свинин','хочу свинин','верни свинин'], ids: ['pork_loin','pork_minced'] },
+  { words: ['ем орех','хочу орех','верни орех','ем миндал','ем кешью','ем фундук'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
+  { words: ['ем глютен','ем пшениц','хочу пшениц','верни пшениц','ем хлеб','хочу хлеб','ем пасту','хочу пасту','ем макарон','хочу макарон'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
+  { words: ['ем бобов','ем фасол','ем нут','хочу нут','ем чечевиц','хочу чечевиц','ем тофу','хочу тофу','верни бобов'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
+  { words: ['ем соль','можно соль','верни соль','снова с солью'], ids: ['salt','miso_paste','worcestershire_sauce'] },
+  { words: ['ем сахар','можно сахар','верни сахар','снова сахар'], ids: ['sugar','sugar_maple','coconut_sugar'] },
+];
+
+// Reset phrases — убираем все ограничения
+const RESET_EXCLUSION_WORDS = [
+  'ем всё', 'ем все', 'снова ем', 'снова буду есть',
+  'верни всё', 'верни все', 'верни мясо', 'верни рыбу', 'верни молоко', 'верни яйца', 'верни сахар',
+  'отмени ограничения', 'убери ограничения', 'отмени запрет', 'убери запрет',
+  'снять ограничения', 'убрать ограничения', 'без ограничений',
+  'я теперь ем всё', 'я теперь ем все', 'я снова ем все', 'я снова ем всё',
+  'обычное меню', 'обычный рацион', 'стандартное меню',
+  'сброс', 'сбросить', 'reset', 'сначала', 'заново', 'обнулить',
+  'нет исключений', 'нет запретов', 'можно всё', 'можно все',
+  'отменить диету', 'отмени диету', 'убери диету',
+  'больше нет ограничений', 'снял ограничения', 'убрал ограничения',
+];
+
+// --- Substitution map: ingredient_id → array of substitute ids ---
+const INGREDIENT_SUBSTITUTES = {
+  // Meat → plant proteins
+  chicken_breast:    ['tofu_firm','tempeh','chickpeas_cooked','lentils_red_cooked'],
+  chicken_thigh:     ['tofu_firm','tempeh','chickpeas_cooked'],
+  beef_lean:         ['lentils_red_cooked','tofu_firm','tempeh','black_beans_cooked'],
+  beef_ribeye:       ['lentils_red_cooked','tofu_firm','tempeh'],
+  pork_lean:         ['tofu_firm','tempeh','chickpeas_cooked'],
+  // Fish & seafood → plant/other proteins
+  salmon:            ['tofu_firm','chickpeas_cooked','lentils_red_cooked'],
+  tuna_canned:       ['chickpeas_cooked','tofu_firm','edamame'],
+  cod:               ['tofu_firm','chickpeas_cooked'],
+  shrimp:            ['edamame','tofu_firm'],
+  // Dairy
+  milk_whole:        ['oats_rolled'],   // oat "milk" substitute
+  milk_skim:         ['oats_rolled'],
+  greek_yogurt:      ['tofu_silken'],
+  cottage_cheese_5:  ['tofu_silken'],
+  cheese_cheddar:    ['tofu_firm'],
+  cheese_feta:       ['tofu_firm'],
+  butter:            ['coconut_oil','olive_oil'],
+  ghee:              ['coconut_oil','olive_oil'],
+  kefir:             ['tofu_silken'],
+  // Eggs
+  egg_whole:         ['tofu_silken','chickpeas_cooked'],
+  egg_white:         ['tofu_silken'],
+  // Nuts → seeds
+  almonds:           ['pumpkin_seeds','sunflower_seeds','hemp_seeds'],
+  walnuts:           ['pumpkin_seeds','hemp_seeds'],
+  cashews:           ['pumpkin_seeds','sunflower_seeds'],
+  // Honey → dates
+  honey:             ['dates_medjool'],
+  // Gluten → gluten-free grains
+  bread_white:       ['rice_cakes','buckwheat_cooked'],
+  bread_rye:         ['rice_cakes','buckwheat_cooked'],
+  bread_ww:          ['rice_cakes','buckwheat_cooked'],
+  pasta_cooked:      ['buckwheat_cooked','white_rice_cooked'],
+  // Mushrooms → zucchini/eggplant
+  mushrooms_white:   ['zucchini','eggplant'],
+  // Tofu → legumes
+  tofu_firm:         ['chickpeas_cooked','lentils_red_cooked','tempeh'],
+  tofu_silken:       ['cottage_cheese_5','greek_yogurt'],
+};
+
+// --- Parse free text → set of excluded ingredient IDs ---
+function parseExclusions(text) {
+  const t = text.toLowerCase();
+  const excluded = new Set(state.excludedIngredientIds || []);
+
+  // 1. Полный сброс
+  if (RESET_EXCLUSION_WORDS.some(w => t.includes(w))) {
+    return null;
+  }
+
+  let changed = false;
+
+  // 2. Диетический тип → ЗАМЕНЯЕТ все текущие exclusions
+  let dietMatched = false;
+  for (const pattern of DIET_PATTERNS) {
+    if (pattern.words.some(w => t.includes(w))) {
+      excluded.clear();
+      pattern.ids.forEach(id => excluded.add(id));
+      changed = true;
+      dietMatched = true;
+      break;
+    }
+  }
+
+  if (!dietMatched) {
+    // 3. Конкретное ограничение → ДОБАВЛЯЕМ ids к exclusions (сначала)
+    for (const pattern of EXCLUSION_PATTERNS) {
+      if (pattern.words.some(w => t.includes(w))) {
+        pattern.ids.forEach(id => excluded.add(id));
+        changed = true;
+      }
+    }
+    // 4. Позитивное упоминание → УБИРАЕМ ids (после exclusion, поэтому побеждает)
+    for (const pattern of INCLUSION_PATTERNS) {
+      if (pattern.words.some(w => {
+        const idx = t.indexOf(w);
+        if (idx === -1) return false;
+        const before = t.substring(Math.max(0, idx - 5), idx);
+        return !before.includes('не');
+      })) {
+        pattern.ids.forEach(id => excluded.delete(id));
+        changed = true;
+      }
+    }
+  }
+
+  return changed ? [...excluded] : false;
+}
+
+function parseMenuReset(text) {
+    const t = text.toLowerCase().trim();
+    const triggers = ['обнови меню','новое меню','другое меню','замени все меню','замени всё меню','сбрось меню','пересчитай меню','поменяй меню','измени меню','сделай новое меню','перегенерируй','перегенери меню','хочу другое меню'];
+    return triggers.some(tr => t.includes(tr)) ? { type: 'menu_reset' } : false;
+  }
+
+  function applyMenuReset() {
+    state.mealOverrides = {};
+    state.ingredientSwaps = {};
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    if (state.kcal > 0) {
+      renderMeals();
+      const d = Object.keys(dayStates).find(ds => dayStates[ds].open) || '1';
+      renderDayMeals(parseInt(d));
+    }
+    openPopup('🔄', 'Готово! Всё меню пересчитано заново с учётом твоих настроек.');
+  }
+
+  function parseIngredientRequest(text) {
+  const t = text.toLowerCase().trim();
+  const verbs = ['хочу','хочется','дай','поставь','добавь','сделай','положи','хочу чтобы'];
+  const hasVerb = verbs.some(v => t.includes(v));
+  if (!hasVerb) return false;
+  const MEAL_WORDS = {
+    breakfast: ['завтрак','завтраку','завтрака'],
+    lunch:     ['обед','обеду','обеда','обедом'],
+    dinner:    ['ужин','ужину','ужина','ужином'],
+    snack:     ['перекус','перекуса','перекусу'],
+  };
+  let mealType = null, mealWord = null;
+  for (const [mt, words] of Object.entries(MEAL_WORDS)) {
+    const found = words.find(w => t.includes(w));
+    if (found) { mealType = mt; mealWord = found; break; }
+  }
+  if (!mealType) return false;
+  let cleaned = t;
+  verbs.forEach(v => { cleaned = cleaned.replace(new RegExp(v + '\\s*', 'g'), ''); });
+  cleaned = cleaned.replace(/\bна\b/g,'').replace(/\bс\b/g,'').replace(mealWord,'').trim();
+  const ingName = cleaned.replace(/[.,!?]/g,'').trim();
+  if (!ingName || ingName.length < 2) return false;
+  return { type: 'ingredient_request', mealType, ingredientName: ingName };
+}
+
+function applyIngredientRequest(mealType, ingName) {
+  if (!recipesArray.length) return null;
+  const q = ingName.toLowerCase().trim();
+  const matchIds = Object.keys(ingredientsMap).filter(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(q) || q.includes(n.split(' ')[0]);
+  });
+  if (!matchIds.length) return null;
+  const pool = filterRecipes(mealType);
+  const recipe = pool.find(r => r.ingredients && r.ingredients.some(i => matchIds.includes(i.id)));
+  if (!recipe) return null;
+  state.mealOverrides[mealType] = recipe;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { recipeName: recipe.name, ingDisplayName: ingredientsMap[matchIds[0]]?.name || ingName };
+}
+
+function parseFoodSubstitution(text) {
+  const t = text.toLowerCase().trim();
+  const verbs = ['замени ', 'поменяй ', 'смени '];
+  const hasVerb = verbs.some(v => t.includes(v));
+  if (!hasVerb) return false;
+  const naIdx = t.indexOf(' на ');
+  if (naIdx === -1) return false;
+  let fromPart = '';
+  for (const verb of verbs) {
+    const idx = t.indexOf(verb);
+    if (idx !== -1) { fromPart = t.substring(idx + verb.length, naIdx).trim(); break; }
+  }
+  const toPart = t.substring(naIdx + 4).trim();
+  if (!fromPart || !toPart) return false;
+  const MEAL_WORDS = {
+    breakfast: ['завтрак','завтраку','завтрака'],
+    lunch: ['обед','обеду','обеда','обедом'],
+    dinner: ['ужин','ужину','ужина','ужином'],
+    snack: ['перекус','перекуса','перекусу'],
+  };
+  for (const [mealType, words] of Object.entries(MEAL_WORDS)) {
+    if (words.some(w => fromPart.includes(w))) return { type: 'meal', mealType, dishName: toPart };
+  }
+  return { type: 'ingredient', fromName: fromPart, toName: toPart };
+}
+
+function applyMealReplacement(mealType, dishName) {
+  if (!recipesArray.length) return null;
+  const dn = dishName.toLowerCase().trim();
+  const scoredPool = filterRecipes(mealType);
+  let recipe = scoredPool.find(r => r.name.toLowerCase().includes(dn));
+  if (!recipe) recipe = scoredPool.find(r => {
+    const words = dn.split(' ');
+    return words.some(w => w.length > 3 && r.name.toLowerCase().includes(w));
+  });
+  if (!recipe) recipe = recipesArray.find(r => r.name.toLowerCase().includes(dn));
+  if (!recipe) return null;
+  state.mealOverrides[mealType] = recipe;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return recipe.name;
+}
+
+function applyIngredientSwap(fromName, toName) {
+  const fn = fromName.toLowerCase().trim();
+  const tn = toName.toLowerCase().trim();
+  const fromId = Object.keys(ingredientsMap).find(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(fn) || fn.includes(n.split(' ')[0]);
+  });
+  const toId = Object.keys(ingredientsMap).find(id => {
+    const n = (ingredientsMap[id].name || '').toLowerCase();
+    return n.includes(tn) || tn.includes(n.split(' ')[0]);
+  });
+  if (!fromId || !toId) return null;
+  state.ingredientSwaps = state.ingredientSwaps || {};
+  state.ingredientSwaps[fromId] = toId;
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { fromName: ingredientsMap[fromId].name, toName: ingredientsMap[toId].name };
+}
+
+// --- Try to substitute excluded ingredients in a recipe ---
+// Returns { substituted: [{original, replacement}], modifiedIngredients }
+// or null if a core ingredient can't be substituted
+function substituteRecipe(recipe, excludedIds) {
+  if (!excludedIds || !excludedIds.length) {
+    return { substituted: [], modifiedIngredients: recipe.ingredients };
+  }
+
+  const substituted = [];
+  const modifiedIngredients = [];
+
+  for (const ing of recipe.ingredients) {
+    if (!excludedIds.includes(ing.id)) {
+      modifiedIngredients.push(ing);
+      continue;
+    }
+
+    // Find a substitute that's not also excluded
+    const subs = INGREDIENT_SUBSTITUTES[ing.id] || [];
+    const validSub = subs.find(s => !excludedIds.includes(s) && ingredientsMap[s]);
+
+    if (validSub) {
+      substituted.push({ original: ing.id, replacement: validSub });
+      modifiedIngredients.push({ ...ing, id: validSub, substitutedFrom: ing.id });
+    } else {
+      // Can't substitute — recipe is unusable for this ingredient
+      return null;
+    }
+  }
+
+  return { substituted, modifiedIngredients };
+}
+
+// ============================================================
+// ========== RECIPE ENGINE v1.0 ==============================
+// ============================================================
+
+// ---------- 1. Data store -----------------------------------
+let ingredientsMap = {};   // { id: ingredientObject }
+let recipesArray   = [];   // [ recipeObject, ... ]
+let nutritionDataLoaded = false;
+let nutritionDataLoading = false;
+let recipeScores = {};
+let topRecipeIds = new Set();
+
+async function loadNutritionData() {
+  if (nutritionDataLoaded || nutritionDataLoading) return;
+  nutritionDataLoading = true;
+  try {
+    // Load ingredients from Supabase API
+    const ingRes = await fetch('/api/ingredients');
+    if (!ingRes.ok) throw new Error('API not available');
+    const ingArr = await ingRes.json();
+    // Transform Supabase flat format → engine per_100g format
+    ingArr.forEach(ing => {
+      ingredientsMap[ing.id] = {
+        ...ing,
+        per_100g: {
+          calories: ing.calories || 0,
+          protein:  ing.protein  || 0,
+          fat:      ing.fat      || 0,
+          carbs:    ing.carbs    || 0,
+          fiber:    ing.fiber    || 0,
+        }
+      };
+    });
+    // Keep static recipes.json as engine fallback (320 recipes)
+    try {
+      const recRes = await fetch('/recipes.json');
+      if (recRes.ok) {
+        const recData = await recRes.json();
+        recipesArray = Array.isArray(recData) ? recData : (recData.recipes || []);
+      }
+    } catch {}
+    nutritionDataLoaded = true;
+    computeRecipeScores();
+    console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);
+  } catch(e) {
+    console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);
+  } finally {
+    nutritionDataLoading = false;
+  }
+}
+
+// ---------- 2. calculateRecipeNutrition ---------------------
+const NUTRIENT_KEYS = [
+  'calories','protein','fat','carbs','fiber','sugar',
+  'vitamin_a','vitamin_b1','vitamin_b2','vitamin_b3','vitamin_b5','vitamin_b6',
+  'vitamin_b9','vitamin_b12','vitamin_c','vitamin_d','vitamin_e','vitamin_k',
+  'calcium','iron','magnesium','phosphorus','potassium',
+  'sodium','zinc','selenium','iodine',
+  'omega3','omega6','saturated_fat','cholesterol'
+];
+
+function calculateRecipeNutrition(recipe) {
+  const totals = {};
+  NUTRIENT_KEYS.forEach(k => totals[k] = 0);
+
+  for (const ing of recipe.ingredients) {
+    const data = ingredientsMap[ing.id];
+    if (!data) continue;
+    const factor = ing.amount_g / 100;
+    NUTRIENT_KEYS.forEach(k => {
+      totals[k] += (data.per_100g[k] || 0) * factor;
+    });
+  }
+  return totals;
+}
+
+// ---------- 3. scaleRecipe ----------------------------------
+function scaleRecipe(recipe, targetCalories) {
+  const base = calculateRecipeNutrition(recipe);
+  if (!base.calories || base.calories < 1) {
+    return { ingredients: recipe.ingredients, nutrition: base };
+  }
+  const factor = targetCalories / base.calories;
+  const scaledIngredients = recipe.ingredients.map(ing => ({
+    ...ing,
+    amount_g: Math.round(ing.amount_g * factor)
+  }));
+  const scaledRecipe = { ...recipe, ingredients: scaledIngredients };
+  const nutrition = calculateRecipeNutrition(scaledRecipe);
+  return { ingredients: scaledIngredients, nutrition };
+}
+
+// ---------- 4. Daily norms ----------------------------------
+const DAILY_NORMS = {
+  fiber:       25,
+  vitamin_a:   900,
+  vitamin_c:   90,
+  vitamin_d:   15,
+  vitamin_e:   15,
+  vitamin_k:   120,
+  vitamin_b1:  1.2,
+  vitamin_b2:  1.3,
+  vitamin_b3:  16,
+  vitamin_b6:  1.7,
+  vitamin_b9:  400,
+  vitamin_b12: 2.4,
+  calcium:     1000,
+  iron:        18,
+  magnesium:   400,
+  phosphorus:  700,
+  potassium:   3500,
+  sodium:      2300,
+  zinc:        11,
+  selenium:    55,
+  iodine:      150,
+  omega3:      1.6,
+  omega6:      17
+};
+
+// ---------- 5. NutrientTracker ------------------------------
+class NutrientTracker {
+  constructor() {
+    this.days        = [];   // per-day nutrition totals
+    this.accumulated = {};   // sum of all days
+  }
+
+  addDay(dayMeals) {
+    const dayTotals = {};
+    NUTRIENT_KEYS.forEach(k => dayTotals[k] = 0);
+
+    for (const meal of dayMeals) {
+      if (!meal.nutrition) continue;
+      NUTRIENT_KEYS.forEach(k => {
+        dayTotals[k] += (meal.nutrition[k] || 0);
+      });
+    }
+    this.days.push(dayTotals);
+    NUTRIENT_KEYS.forEach(k => {
+      this.accumulated[k] = (this.accumulated[k] || 0) + dayTotals[k];
+    });
+  }
+
+  getDeficits() {
+    const n = this.days.length;
+    if (!n) return [];
+    const deficits = [];
+    for (const [key, dailyNorm] of Object.entries(DAILY_NORMS)) {
+      const accumulated = this.accumulated[key] || 0;
+      const expected    = dailyNorm * n;
+      if (accumulated / expected < 0.80) deficits.push(key);
+    }
+    return deficits;
+  }
+
+  getPrioritizedRecipes(recipes, deficits) {
+    if (!deficits.length) return recipes;
+    return recipes
+      .map(r => {
+        const nut   = calculateRecipeNutrition(r);
+        let   score = 0;
+        for (const key of deficits) {
+          const norm = DAILY_NORMS[key] || 1;
+          score += (nut[key] || 0) / norm;
+        }
+        return { recipe: r, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map(x => x.recipe);
+  }
+
+  getSummary() {
+    const n = this.days.length;
+    if (!n) return {};
+    const avg = {};
+    NUTRIENT_KEYS.forEach(k => {
+      avg[k] = +(this.accumulated[k] / n).toFixed(2);
+    });
+    return avg;
+  }
+}
+
+// ---------- 6. Meal split & diet tag map --------------------
+const MEAL_SPLIT = {
+  breakfast: 0.25,
+  lunch:     0.35,
+  dinner:    0.30,
+  snack:     0.10
+};
+
+// ---------- 6b. computeRecipeScores -----------------------
+const PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','pork_minced','shrimp','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','cottage_cheese','kefir','butter','cream_cheese','broccoli','spinach','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','zucchini','eggplant','cauliflower','cabbage_white','potato','mushroom_champignon','beet','pollock','herring','mackerel','pumpkin','corn','green_beans','apple','banana','orange','avocado','lemon','kiwi','pear','oats','rice_white','buckwheat','pasta_wheat','quinoa','bulgur','millet','couscous','wheat_flour','lentils_red','chickpeas','black_beans','kidney_beans','tofu','green_peas','lentils_green','lentils_black','white_beans','almonds','walnuts','cashews','hazelnuts','sunflower_oil','olive_oil','oat_milk','almond_milk','coconut_milk','soy_milk','soy_sauce','tomato_paste','apple_cider_vinegar','mustard','broth_chicken','broth_beef','bone_broth','black_pepper','parsley_fresh','dill_fresh','cilantro_fresh','salt','turmeric','cinnamon','cumin','paprika','sugar','green_tea','water']);
+  function computeRecipeScores() {
+  const ingFreq = {};
+  recipesArray.forEach(r => {
+    (r.ingredients || []).forEach(ing => { ingFreq[ing.id] = (ingFreq[ing.id] || 0) + 1; });
+  });
+  recipesArray.forEach(r => {
+    const ings = r.ingredients || [];
+    if (!ings.length) { recipeScores[r.id] = 0; return; }
+    const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;
+    const simBonus = Math.max(0, 15 - ings.length) * 8;
+    const imgBonus = r.image_url ? 40 : 0;
+    const priorityBonus = ings.filter(i => PRIORITY_IDS.has(i.id)).length * 300;
+      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus;
+  });
+  const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));
+  topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
+  console.log('✅ Recipe scores computed, top-1000 ready');
+}
+
+// ---------- 7. filterRecipes --------------------------------
+// No diet-tag filtering — only by meal_type.
+// Recipes with excluded ingredients are handled via substituteRecipe().
+function filterRecipes(mealType) {
+  const pool = recipesArray.filter(r => {
+    const mt = Array.isArray(r.meal_type) ? r.meal_type.join(',') : (r.meal_type || '');
+    return mt.includes(mealType);
+  });
+  return pool.sort((a, b) => {
+    const aTop = topRecipeIds.has(a.id) ? 1 : 0, bTop = topRecipeIds.has(b.id) ? 1 : 0;
+    if (aTop !== bTop) return bTop - aTop;
+    return (recipeScores[b.id]||0) - (recipeScores[a.id]||0);
+  });
+}
+
+// Get best meal for a slot: prefer no substitution, allow substitution, skip if impossible
+function pickMealForSlot(mealType, excludedIds, usedRecipeIds = new Set()) {
+  let pool = filterRecipes(mealType);
+  // Shuffle for variety
+  pool = [...pool.slice(0, 30)].sort(() => Math.random() - 0.5);
+
+  // 1st pass: find recipe with no excluded ingredients
+  for (const r of pool) {
+    if (usedRecipeIds.has(r.id)) continue;
+    const hasExcluded = r.ingredients.some(i => excludedIds.includes(i.id));
+    if (!hasExcluded) return { recipe: r, substituted: [], modifiedIngredients: r.ingredients };
+  }
+  // 2nd pass: try substitution
+  for (const r of pool) {
+    if (usedRecipeIds.has(r.id)) continue;
+    const result = substituteRecipe(r, excludedIds);
+    if (result) return { recipe: r, ...result };
+  }
+  // Fallback: any recipe from pool
+  const fallback = pool.find(r => !usedRecipeIds.has(r.id)) || pool[0];
+  if (fallback) return { recipe: fallback, substituted: [], modifiedIngredients: fallback.ingredients };
+  return null;
+}
+
+function pickRandom(arr, n) {
+  return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+}
+
+// ---------- 8. buildDayMenu ---------------------------------
+function buildDayMenu(userProfile, dayIndex, tracker) {
+  const {
+    calories_target,
+    excluded_ingredient_ids = []
+  } = userProfile;
+
+  const dayMeals = [];
+  const usedIds  = new Set();
+  const swaps = state.ingredientSwaps || {};
+
+  for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack']) {
+    const targetCal = Math.round(calories_target * MEAL_SPLIT[mealType]);
+    if (!recipesArray.length) continue;
+
+    let picked;
+    const overrideRecipe = state.mealOverrides && state.mealOverrides[mealType];
+    if (overrideRecipe) {
+      picked = { recipe: overrideRecipe, substituted: [], modifiedIngredients: overrideRecipe.ingredients };
+    } else {
+      picked = pickMealForSlot(mealType, excluded_ingredient_ids, usedIds);
+    }
+    if (!picked) continue;
+
+    usedIds.add(picked.recipe.id);
+
+    const swappedIngredients = picked.modifiedIngredients.map(ing => {
+      const swapTo = swaps[ing.id];
+      if (swapTo && ingredientsMap[swapTo]) return { ...ing, id: swapTo, substitutedFrom: ing.substitutedFrom || ing.id };
+      return ing;
+    });
+
+    const { ingredients: scaledIngredients, nutrition } =
+      scaleRecipe({ ...picked.recipe, ingredients: swappedIngredients }, targetCal);
+
+    dayMeals.push({
+      mealType,
+      recipe:             picked.recipe,
+      substituted:        picked.substituted,
+      modifiedIngredients: swappedIngredients,
+      scaledIngredients,
+      nutrition,
+      instructions: picked.recipe.instructions,
+      image_url:    picked.recipe.image_url
+    });
+  }
+  return dayMeals;
+}
+
+// ---------- 9. generate28DayPlan ----------------------------
+function generate28DayPlan(userProfile) {
+  if (!nutritionDataLoaded) {
+    console.warn('generate28DayPlan: nutrition data not ready');
+    return null;
+  }
+  const tracker = new NutrientTracker();
+  const plan    = [];
+
+  for (let d = 1; d <= 28; d++) {
+    const dayMeals = buildDayMenu(userProfile, d, tracker);
+    tracker.addDay(dayMeals);
+    plan.push({ day: d, meals: dayMeals });
+  }
+
+  return { plan, tracker, summary: tracker.getSummary() };
+}
+
+// ---------- 10. Helper: build userProfile from state --------
+function buildUserProfile() {
+  return {
+    calories_target:        state.kcal     || 2000,
+    protein_g:              state.protein  || 0,
+    fat_g:                  state.fat      || 0,
+    carbs_g:                state.carbs    || 0,
+    excluded_ingredient_ids: state.excludedIngredientIds || [],
+  };
+}
+
+// Kick off background load — data will be ready by the time user hits "buy"
+loadNutritionData();
+
+// ============================================================
+// ========== API MEAL PLAN (Supabase) ========================
+// ============================================================
+
+let _apiPlan = null;
+
+async function loadMealPlanFromAPI() {
+  const excluded = state.excludedIngredientIds || [];
+  try {
+    const res = await fetch('/api/meal-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ excluded }),
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    _apiPlan = data.days;
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    return true;
+  } catch (e) {
+    console.warn('⚠️ meal-plan API failed:', e.message);
+    return false;
+  }
+}
+
+function buildMealCardHTML_API(recipe, mealType, cardId) {
+  const cal   = Math.round(recipe.calories_per_serving || 0);
+  const prot  = Math.round(recipe.protein_per_serving  || 0);
+  const fat   = Math.round(recipe.fat_per_serving      || 0);
+  const carbs = Math.round(recipe.carbs_per_serving    || 0);
+  return `
+<div class="meal-card">
+  <div class="meal-img-wrap" onclick="loadAndToggleRecipe('${cardId}','${recipe.id}')">
+    <img src="" alt="${recipe.name}" loading="lazy"
+      onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(recipe.name)}'">
+    <div class="meal-img-overlay">
+      <div class="meal-type">${MEAL_TYPE_RU[mealType] || mealType}</div>
+      <div class="meal-name">${recipe.name}</div>
+    </div>
+    <div class="meal-nav-bar">
+      <button class="meal-nav-btn" onclick="swapPrev('${cardId}',event)">‹</button>
+      <span class="meal-tap-hint">👆 рецепт</span>
+      <button class="meal-nav-btn" onclick="swapNext('${cardId}',event)">›</button>
+    </div>
+  </div>
+  <div class="recipe-block" id="${cardId}">
+    <div class="recipe-macros">
+      <div class="macro-chip">🔥 ${cal} ккал</div>
+      <div class="macro-chip">🥩 Б: ${prot}г</div>
+      <div class="macro-chip">🥑 Ж: ${fat}г</div>
+      <div class="macro-chip">🍚 У: ${carbs}г</div>
+    </div>
+    <div id="${cardId}-details"><div style="text-align:center;color:var(--muted);padding:12px 0;font-size:13px;">👆 Нажми для просмотра рецепта</div></div>
+  </div>
+</div>`;
+}
+
+const _recipeCache = {};
+
+async function loadAndToggleRecipe(cardId, recipeId) {
+  const block = document.getElementById(cardId);
+  if (!block) return;
+  const isOpen = block.classList.toggle('open');
+  block.closest('.meal-card').querySelector('.meal-tap-hint').textContent =
+    isOpen ? '👆 закрыть' : '👆 рецепт';
+  if (!isOpen) return;
+  const detailsEl = document.getElementById(cardId + '-details');
+  if (!detailsEl) return;
+  if (_recipeCache[recipeId]) { _renderRecipeDetails(detailsEl, _recipeCache[recipeId]); return; }
+  detailsEl.innerHTML = '<div style="text-align:center;padding:12px 0;font-size:13px;color:var(--muted)">⏳ Загружаем рецепт...</div>';
+  try {
+    const res = await fetch('/api/recipe?id=' + encodeURIComponent(recipeId));
+    const data = await res.json();
+    _recipeCache[recipeId] = data;
+    _renderRecipeDetails(detailsEl, data);
+  } catch {
+    detailsEl.innerHTML = '<div style="color:var(--muted);padding:8px 0;font-size:13px;">Не удалось загрузить рецепт</div>';
+  }
+}
+
+function _renderRecipeDetails(el, recipe) {
+  const ingList = (recipe.ingredients || []).map(ing =>
+    `<li><span>${ing.name}</span><span class="ig">${ing.amount_g} г</span></li>`
+  ).join('') || '<li>—</li>';
+  const stepsList = (recipe.steps || []).map((s, i) =>
+    `<li><div class="step-num">${i+1}</div><span>${s}</span></li>`
+  ).join('') || '<li>—</li>';
+  el.innerHTML = `
+    <div class="recipe-section-title">Продукты</div>
+    <ul class="ingredient-list">${ingList}</ul>
+    <div class="recipe-section-title">Приготовление</div>
+    <ul class="steps-list">${stepsList}</ul>`;
+}
+
+// ============================================================
+// ========== END RECIPE ENGINE ===============================
+// ============================================================
+
+const MEAL_TYPE_RU = { breakfast:'Завтрак', lunch:'Обед', dinner:'Ужин', snack:'Перекус' };
+
+// --- Shared helper: build meal card HTML from engine meal object ---
+function buildMealCardHTML(m, index, idPrefix='recipe') {
+  const nut = m.nutrition;
+
+  // Substitution banner
+  const subBanner = m.substituted && m.substituted.length
+    ? `<div style="background:rgba(251,146,60,.12);border:1px solid #fb923c;border-radius:10px;padding:6px 12px;font-size:11px;color:#fb923c;margin-bottom:8px;">
+        ⚠️ ${m.substituted.map(s => {
+          const orig = ingredientsMap[s.original]?.name || s.original;
+          const repl = ingredientsMap[s.replacement]?.name || s.replacement;
+          return `<b>${orig}</b> → ${repl}`;
+        }).join(' &nbsp;·&nbsp; ')}
+       </div>`
+    : '';
+
+  // Ingredient list with strikethrough for substituted items
+  const substitutedOriginals = new Set((m.substituted||[]).map(s => s.original));
+  const ingList = m.scaledIngredients.map(ing => {
+    const ingData  = ingredientsMap[ing.id];
+    const ingName  = ingData ? ingData.name : ing.id;
+    const origId   = ing.substitutedFrom;
+    if (origId) {
+      const origName = ingredientsMap[origId]?.name || origId;
+      return `<li><span><s style="opacity:.45">${origName}</s> <span style="color:#4ade80">→ ${ingName}</span></span><span class="ig">${ing.amount_g} г</span></li>`;
+    }
+    return `<li><span>${ingName}</span><span class="ig">${ing.amount_g} г</span></li>`;
+  }).join('');
+
+  const stepsList = (m.instructions || []).map((s, si) =>
+    `<li><div class="step-num">${si+1}</div><span>${s}</span></li>`
+  ).join('');
+
+  return `
+  <div class="meal-card">
+    <div class="meal-img-wrap" onclick="toggleRecipe('${idPrefix}-${index}')">
+      <img src="${m.image_url || m.recipe?.image_url || ''}" alt="${m.recipe?.name || ''}" loading="lazy"
+        onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.recipe?.name||'')}'">
+      <div class="meal-img-overlay">
+        <div class="meal-type">${MEAL_TYPE_RU[m.mealType] || m.mealType}</div>
+        <div class="meal-name">${m.recipe?.name || ''}</div>
+      </div>
+      <div class="meal-nav-bar">
+        <button class="meal-nav-btn" onclick="swapPrev('${idPrefix}-${index}',event)">‹</button>
+        <span class="meal-tap-hint">👆 рецепт</span>
+        <button class="meal-nav-btn" onclick="swapNext('${idPrefix}-${index}',event)">›</button>
+      </div>
+    </div>
+    <div class="recipe-block" id="${idPrefix}-${index}">
+      ${subBanner}
+      <div class="recipe-macros">
+        <div class="macro-chip">🔥 ${Math.round(nut.calories)} ккал</div>
+        <div class="macro-chip">🥩 Б: ${Math.round(nut.protein)}г</div>
+        <div class="macro-chip">🥑 Ж: ${Math.round(nut.fat)}г</div>
+        <div class="macro-chip">🍚 У: ${Math.round(nut.carbs)}г</div>
+      </div>
+      <div class="recipe-section-title">Продукты</div>
+      <ul class="ingredient-list">${ingList}</ul>
+      <div class="recipe-section-title">Приготовление</div>
+      <ul class="steps-list">${stepsList}</ul>
+    </div>
+  </div>`;
+}
+
+// --- Exclusion banner (shown above meal list when exclusions active) ---
+function buildExclusionBannerHtml() {
+  const ids = state.excludedIngredientIds || [];
+  if (!ids.length) return '';
+    const items = ids.map(id => {
+    const nm = ingredientsMap[id]?.name || id;
+    return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
+  }).join('');
+  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">🚫 Исключено из меню:<div style="margin-top:5px;line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span></div>`;
+}
+
+function clearExclusions() {
+  state.excludedIngredientIds = [];
+  state.ingredientSwaps = {};
+  state.mealOverrides = {};
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  renderMeals();
+  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
+  if (openDay) renderDayMeals(parseInt(openDay));
+}
+function confirmRemoveExclusion(id, evt) {
+  evt.stopPropagation();
+  const name = ingredientsMap[id]?.name || id;
+  const ov = document.createElement('div');
+  ov.id = 'excl-confirm';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML = `<div style="background:#1a1a24;border:1.5px solid #fb923c;border-radius:18px;padding:22px 20px;max-width:280px;width:90%;text-align:center;"><div style="font-size:14px;color:#f1f0ff;margin-bottom:6px;">Убрать из списка?</div><div style="font-size:13px;color:#fb923c;margin-bottom:18px;">${name}</div><div style="display:flex;gap:10px;"><button onclick="doRemoveExclusion('${id}')" style="flex:1;background:#fb923c;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;">Да</button><button onclick="document.getElementById('excl-confirm')?.remove()" style="flex:1;background:#2e2e3e;color:#f1f0ff;border:none;border-radius:10px;padding:11px;font-size:14px;cursor:pointer;">Нет</button></div></div>`;
+  ov.onclick = e => { if(e.target===ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+
+function doRemoveExclusion(id) {
+  document.getElementById('excl-confirm')?.remove();
+  state.excludedIngredientIds = (state.excludedIngredientIds || []).filter(x => x !== id);
+  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
+  if (openDay && state.kcal > 0) renderDayMeals(parseInt(openDay));
+}
+
+
+function renderShoppingList() {
+    const section = document.getElementById('shopping-list-section');
+    if (!section || state.kcal <= 0) { if (section) section.style.display = 'none'; return; }
+    const ingTotals = {};
+    if (nutritionDataLoaded) {
+      const _sl_profile = buildUserProfile();
+      const _sl_tracker = window._globalTracker || new NutrientTracker();
+      for (let d = 1; d <= 7; d++) {
+        if (!dayMenuCache[d]) dayMenuCache[d] = buildDayMenu(_sl_profile, d, _sl_tracker);
+      }
+    }
+    for (let d = 1; d <= 7; d++) {
+      const cache = dayMenuCache[d];
+      if (!cache) continue;
+      const _meals = Array.isArray(cache) ? cache : ['breakfast','lunch','dinner','snack'].map(mt => cache[mt]).filter(Boolean);
+      _meals.forEach(meal => {
+        if (!meal || !meal.recipe) return;
+        const ings = meal.modifiedIngredients || meal.scaledIngredients || meal.recipe.ingredients || [];
+        ings.forEach(ing => {
+          const g = ing.amount_g || ing.amount || 100;
+          ingTotals[ing.id] = (ingTotals[ing.id] || 0) + g;
+        });
+      });
+    }
+    const items = Object.entries(ingTotals)
+      .map(([id, g]) => ({ name: ingredientsMap[id]?.name || id, grams: Math.round(g) }))
+      .filter(i => i.grams > 0)
+      .sort((a, b) => b.grams - a.grams);
+    if (!items.length) { section.style.display = 'none'; return; }
+    const rows = items.map(i =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text)">${i.name}</span><span style="color:var(--muted);font-size:13px;white-space:nowrap;margin-left:8px">${i.grams} г</span></div>`
+    ).join('');
+    section.style.display = 'block';
+    section.innerHTML = `<div style="font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text)">Вот продукты которые тебе нужны на ближайшие 7 дней 👇</div>${rows}`;
+  }
+
+  function renderMeals() {
+  if (state.kcal <= 0) return;
+  const banner = buildExclusionBannerHtml();
+  const topBannerEl = document.getElementById('exclusion-banner-top');
+  if (topBannerEl) topBannerEl.innerHTML = banner;
+  renderShoppingList();
+
+  // API plan has priority
+  if (_apiPlan && _apiPlan[0]) {
+    const day0 = _apiPlan[0];
+    const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+    const cards = slots.filter(s => day0[s])
+      .map(s => buildMealCardHTML_API(day0[s], s, 'preview-' + s));
+    document.getElementById('mealsContainer').innerHTML = banner + cards.join('');
+    return;
+  }
+
+  // Kick off API load in background, show engine/loading meanwhile
+  if (!_apiPlan) {
+    loadMealPlanFromAPI().then(ok => { if (ok) renderMeals(); });
+  }
+
+  if (!nutritionDataLoaded) {
+    document.getElementById('mealsContainer').innerHTML =
+      banner + '<div style="text-align:center;padding:20px;color:var(--muted);">⏳ Загружаем меню из базы...</div>';
+    return;
+  }
+  const profile = buildUserProfile();
+  const tracker = new NutrientTracker();
+  const engineMeals = buildDayMenu(profile, 1, tracker);
+  document.getElementById('mealsContainer').innerHTML =
+    banner + engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');
+}
+
+function toggleRecipe(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+  el.closest('.meal-card').querySelector('.meal-tap-hint').textContent =
+    el.classList.contains('open') ? '👆 закрыть' : '👆 рецепт';
+}
+
+
+// ========== RECIPE SWAP ==========
+var _swapHist = {};
+var _swapPos  = {};
+var _swapPending = null;
+
+function _parseCard(cardId) {
+  var e = cardId.match(/^dr-(\d+)-(\d+)$/);
+  if (e) return {day:+e[1], idx:+e[2]};
+  var a = cardId.match(/^d(\d+)-(\w+)$/);
+  if (a) { var s=['breakfast','lunch','dinner','snack']; return {day:+a[1],idx:s.indexOf(a[2])}; }
+  var p = cardId.match(/^preview-(\w+)$/);
+  if (p) { var s2=['breakfast','lunch','dinner','snack']; return {day:1,idx:s2.indexOf(p[1])}; }
+  return {day:1,idx:0};
+}
+
+function _getMealType(cardId) {
+  var r = _parseCard(cardId);
+  if (dayMenuCache[r.day] && dayMenuCache[r.day][r.idx]) return dayMenuCache[r.day][r.idx].mealType;
+  var card = document.getElementById(cardId);
+  if (card) { var mc = card.closest('.meal-card'); if (mc && mc.dataset.mealtype) return mc.dataset.mealtype; }
+  return cardId.split('-').pop();
+}
+
+function _kcalForRecipe(recipe) {
+  if (!recipe) return 0;
+  var c = 0;
+  (recipe.ingredients||[]).forEach(function(i) {
+    var d = ingredientsMap[i.id];
+    if (d) c += (d.calories||0) * (i.amount_g||100) / 100;
+  });
+  return c;
+}
+
+function _applySwapDOM(cardId, recipe) {
+  if (!recipe) return;
+  var el = document.getElementById(cardId);
+  if (!el) return;
+  var card = el.closest('.meal-card');
+  if (!card) return;
+  var img = card.querySelector('img');
+  var nameEl = card.querySelector('.meal-name');
+  if (img) {
+    img.src = recipe.image_url || '';
+    img.onerror = function() { img.src = 'https://via.placeholder.com/600x300/1a1a24/a78bfa?text=' + encodeURIComponent(recipe.name); };
+  }
+  if (nameEl) nameEl.textContent = recipe.name;
+  var r2 = _parseCard(cardId);
+  if (dayMenuCache[r2.day] && dayMenuCache[r2.day][r2.idx]) dayMenuCache[r2.day][r2.idx].recipe = recipe;
+}
+
+function swapPrev(cardId, e) {
+  e.stopPropagation();
+  var pos = _swapPos[cardId]||0;
+  if (pos <= 0) return;
+  _swapPos[cardId] = pos - 1;
+  var recId = (_swapHist[cardId]||[])[pos-1];
+  _applySwapDOM(cardId, recipesArray.find(function(r){return r.id===recId;}));
+}
+
+function swapNext(cardId, e) {
+  e.stopPropagation();
+  var mealType = _getMealType(cardId);
+  if (!_swapHist[cardId]) {
+    var pr = _parseCard(cardId);
+    var curId = (dayMenuCache[pr.day] && dayMenuCache[pr.day][pr.idx] && dayMenuCache[pr.day][pr.idx].recipe) ? dayMenuCache[pr.day][pr.idx].recipe.id : '';
+    _swapHist[cardId] = [curId];
+    _swapPos[cardId] = 0;
+  }
+  var hist = _swapHist[cardId];
+  var pos  = _swapPos[cardId]||0;
+  if (pos < hist.length - 1) {
+    _swapPos[cardId] = pos + 1;
+    _applySwapDOM(cardId, recipesArray.find(function(r){return r.id===hist[pos+1];}));
+    return;
+  }
+  var used = {}; hist.forEach(function(id){ used[id]=1; });
+  var nextRec = filterRecipes(mealType).find(function(r){ return !used[r.id]; });
+  if (!nextRec) { openPopup('😔','Все подходящие варианты уже показаны'); return; }
+  var refKcal = _kcalForRecipe(recipesArray.find(function(r){return r.id===hist[0];}));
+  var newKcal = _kcalForRecipe(nextRec);
+  var diff = refKcal > 0 ? Math.abs(newKcal - refKcal) / refKcal : 0;
+  if (diff > 0.05) {
+    _swapPending = {cardId:cardId, nextRec:nextRec, hist:hist};
+    var pct = Math.round(diff * 100);
+    var pctEl = document.getElementById('swap-diff-pct');
+    if (pctEl) pctEl.textContent = pct + '%';
+    var popup = document.getElementById('swap-popup');
+    if (popup) popup.style.display = 'flex';
+  } else {
+    hist.push(nextRec.id);
+    _swapPos[cardId] = hist.length - 1;
+    _applySwapDOM(cardId, nextRec);
+  }
+}
+
+function swapConfirmYes() {
+  var popup = document.getElementById('swap-popup');
+  if (popup) popup.style.display = 'none';
+  if (!_swapPending) return;
+  var p = _swapPending; _swapPending = null;
+  p.hist.push(p.nextRec.id);
+  _swapPos[p.cardId] = p.hist.length - 1;
+  _applySwapDOM(p.cardId, p.nextRec);
+  openPopup('✅','Блюдо заменено! Следующий приём пищи будет скорректирован автоматически.');
+}
+
+function swapConfirmNo() {
+  var popup = document.getElementById('swap-popup');
+  if (popup) popup.style.display = 'none';
+  if (!_swapPending) return;
+  var p = _swapPending; _swapPending = null;
+  p.hist.push(p.nextRec.id);
+  _swapPos[p.cardId] = p.hist.length - 1;
+  _applySwapDOM(p.cardId, p.nextRec);
+  setTimeout(function(){
+    openPopup('💡','Окей, сохранил замену. КБЖУ немного изменилось — вы можете вручную скорректировать другие приёмы пищи, и план подстроится под нужный баланс.');
+  }, 300);
+}
+
+// ========== PAYMENT ==========
+function showPayment() {
+  document.getElementById('page-payment').style.display='block';
+  window.scrollTo(0,0);
+}
+function showMain() {
+  document.getElementById('page-payment').style.display='none';
+}
+function completePurchase() {
+  state.purchased = true;
+  document.getElementById('page-payment').style.display='none';
+  document.getElementById('meal-section').style.display='none';
+  document.getElementById('purchase-section').style.display='none';
+  document.getElementById('days-section').style.display='block';
+  renderDaysGrid();
+  document.getElementById('days-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ========== 28 DAYS GRID ==========
+const dayStates = {}; // {1: {used:false, open:false}}
+
+function renderDaysGrid() {
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  for (let d=1; d<=28; d++) {
+    if (!dayStates[d]) dayStates[d]={used:false,open:false};
+    const btn = document.createElement('div');
+    btn.className='day-btn' + (dayStates[d].used?' used':'') + (dayStates[d].open?' active':'');
+    btn.textContent=d;
+    btn.id='day-btn-'+d;
+
+    // click = toggle open
+    btn.addEventListener('click', ()=>toggleDay(d));
+
+    // long press = mark used
+    let pressTimer;
+    btn.addEventListener('pointerdown', ()=>{
+      pressTimer = setTimeout(()=>{
+        dayStates[d].used = !dayStates[d].used;
+        btn.classList.toggle('used', dayStates[d].used);
+        if(dayStates[d].used) btn.classList.remove('active');
+        showTooltip('если день использован, нажми и удерживай 2 сек — станет серым. Хочешь вернуть — снова удержи');
+      }, 2000);
+    });
+    btn.addEventListener('pointerup', ()=>clearTimeout(pressTimer));
+    btn.addEventListener('pointerleave', ()=>clearTimeout(pressTimer));
+    grid.appendChild(btn);
+  }
+}
+
+function toggleDay(d) {
+  if (dayStates[d].used) return;
+  const wasOpen = dayStates[d].open;
+
+  // close all
+  for (let i=1;i<=28;i++) {
+    dayStates[i].open=false;
+    const b=document.getElementById('day-btn-'+i);
+    if(b) b.classList.remove('active');
+  }
+
+  if (!wasOpen) {
+    dayStates[d].open=true;
+    document.getElementById('day-btn-'+d).classList.add('active');
+    renderDayMeals(d);
+  } else {
+    document.getElementById('dayMealsContainer').innerHTML='';
+  }
+}
+
+function renderDayMealsFromEngine(d, engineMeals) {
+  const container = document.getElementById('dayMealsContainer');
+  const banner = buildExclusionBannerHtml();
+  container.innerHTML =
+    `<div class="section-label" style="margin-top:12px;">День ${d}</div>` + banner +
+    engineMeals.map((m, i) => buildMealCardHTML(m, i, `dr-${d}`)).join('');
+  container.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Cache of generated day menus (keyed by day number)
+const dayMenuCache = {};
+
+function renderDayMeals(d) {
+  const container = document.getElementById('dayMealsContainer');
+
+  // API plan takes priority over engine
+  if (_apiPlan && state.kcal > 0) {
+    const dayData = _apiPlan[d - 1];
+    if (dayData) {
+      const banner = buildExclusionBannerHtml();
+      const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+      const cards = slots.filter(s => dayData[s])
+        .map(s => buildMealCardHTML_API(dayData[s], s, 'd' + d + '-' + s));
+      container.innerHTML =
+        '<div class="section-label" style="margin-top:12px;">День ' + d + '</div>' +
+        banner + cards.join('');
+      container.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  }
+
+  // If engine data is loaded — use it
+  if (nutritionDataLoaded && state.kcal > 0) {
+    // Use cache to keep menus stable across re-opens
+    if (!dayMenuCache[d]) {
+      const profile = buildUserProfile();
+      const tracker = window._globalTracker || new NutrientTracker();
+      dayMenuCache[d] = buildDayMenu(profile, d, tracker);
+    }
+    renderDayMealsFromEngine(d, dayMenuCache[d]);
+    return;
+  }
+
+  // Fallback — legacy hardcoded meal set (MEALS)
+  const meals = MEALS;
+  container.innerHTML = `<div class="section-label" style="margin-top:12px;">День ${d}</div>` +
+    meals.map((m,i)=>`
+    <div class="meal-card">
+      <div class="meal-img-wrap" onclick="toggleDayRecipe(${d},${i})">
+        <img src="${m.img}" alt="${m.name}" loading="lazy"
+          onerror="this.src='https://via.placeholder.com/600x300/1a1a24/a78bfa?text=${encodeURIComponent(m.name)}'">
+        <div class="meal-img-overlay">
+          <div class="meal-type">${m.type}</div>
+          <div class="meal-name">${m.name}</div>
+        </div>
+        <div class="meal-tap-hint">👆 рецепт</div>
+      </div>
+      <div class="recipe-block" id="dr-${d}-${i}">
+        <div class="recipe-macros">
+          <div class="macro-chip">🔥 ${m.kcal} ккал</div>
+          <div class="macro-chip">🥩 Б: ${m.p}г</div>
+          <div class="macro-chip">🥑 Ж: ${m.f}г</div>
+          <div class="macro-chip">🍚 У: ${m.c}г</div>
+        </div>
+        <div class="recipe-section-title">Продукты</div>
+        <ul class="ingredient-list">
+          ${m.ingredients.map(ing=>`<li><span>${ing.name}</span><span class="ig">${ing.qty}</span></li>`).join('')}
+        </ul>
+        <div class="recipe-section-title">Приготовление</div>
+        <ul class="steps-list">
+          ${m.steps.map((s,si)=>`<li><div class="step-num">${si+1}</div><span>${s}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `).join('');
+  container.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toggleDayRecipe(d, i) {
+  const el = document.getElementById(`dr-${d}-${i}`);
+  if (!el) return;
+  el.classList.toggle('open');
+  el.closest('.meal-card').querySelector('.meal-tap-hint').textContent =
+    el.classList.contains('open') ? '👆 закрыть' : '👆 рецепт';
+}
+
+// ========== TOOLTIP ==========
+let tooltipTimer;
+function showTooltip(msg) {
+  let t = document.getElementById('dayTooltip');
+  if (!t) { t=document.createElement('div'); t.className='day-tooltip'; t.id='dayTooltip'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(tooltipTimer);
+  tooltipTimer=setTimeout(()=>{ if(t) t.style.display='none'; }, 3500);
+}
+
+// ========== FOOD PREFERENCES / MIC ==========
+let recognition = null;
+let micActive = false;
+
+function toggleMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { alert('Голосовой ввод не поддерживается в этом браузере'); return; }
+  if (micActive) {
+    recognition && recognition.stop();
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang='ru-RU'; recognition.continuous=false; recognition.interimResults=false;
+  recognition.onstart=()=>{ micActive=true; document.getElementById('micBtn').classList.add('listening'); };
+  recognition.onresult=e=>{
+    const t=e.results[0][0].transcript;
+    document.getElementById('foodPrefInput').value=t;
+    document.getElementById('marqueeHint').style.opacity='0';
+    sendFoodPref();
+  };
+  recognition.onend=()=>{ micActive=false; document.getElementById('micBtn').classList.remove('listening'); };
+  recognition.onerror=()=>{ micActive=false; document.getElementById('micBtn').classList.remove('listening'); };
+  recognition.start();
+}
+
+function openPopup(icon, text) {
+  const p = document.getElementById('aiPopup');
+  document.getElementById('aiPopupIcon').textContent = icon;
+  document.getElementById('aiPopupText').textContent = text;
+  document.getElementById('aiPopupLoader').style.display = 'none';
+  p.style.display = 'flex';
+}
+function openPopupLoading() {
+  const p = document.getElementById('aiPopup');
+  document.getElementById('aiPopupIcon').textContent = '🤝';
+  document.getElementById('aiPopupText').textContent = '';
+  document.getElementById('aiPopupLoader').style.display = 'block';
+  p.style.display = 'flex';
+}
+function closePopup() {
+  document.getElementById('aiPopup').style.display = 'none';
+}
+document.getElementById('aiPopup').addEventListener('click', function(e) {
+  if (e.target === this) closePopup();
+});
+
+function highlightReconstra() {
+  setTimeout(() => {
+    const banner = document.getElementById('exclusion-banner');
+    if (banner) {
+      banner.classList.remove('reconstra-banner-hl');
+      void banner.offsetWidth;
+      banner.classList.add('reconstra-banner-hl');
+      setTimeout(() => banner.classList.remove('reconstra-banner-hl'), 5000);
+    }
+    document.querySelectorAll('.meal-card').forEach(card => {
+      card.classList.remove('reconstra-hl');
+      void card.offsetWidth;
+      card.classList.add('reconstra-hl');
+      setTimeout(() => card.classList.remove('reconstra-hl'), 5000);
+    });
+  }, 400);
+}
+
+async function sendFoodPref() {
+  const val = document.getElementById('foodPrefInput').value.trim();
+  if (!val) return;
+
+  document.getElementById('foodPrefInput').value = '';
+  document.getElementById('marqueeHint').style.opacity = '1';
+
+  // 1. Detect ingredient exclusions locally (fast, no API)
+  const exclusionResult = parseExclusions(val);
+
+  if (exclusionResult === null) {
+    state.excludedIngredientIds = [];
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    if (state.kcal > 0) renderMeals();
+    const openDay0 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
+    if (openDay0 && state.kcal > 0) renderDayMeals(parseInt(openDay0));
+    return;
+  }
+
+  if (exclusionResult !== false) {
+    state.excludedIngredientIds = exclusionResult;
+    Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+    _apiPlan = null;
+    if (state.kcal > 0) {
+      renderMeals();
+      setTimeout(() => document.getElementById('meal-section')?.scrollIntoView({behavior:'smooth',block:'start'}), 300);
+    }
+    const openDay1 = Object.keys(dayStates).find(d => dayStates[d].open) || (state.kcal > 0 ? '1' : null);
+    if (openDay1 && state.kcal > 0) renderDayMeals(parseInt(openDay1));
+    highlightReconstra();
+    return;
+  }// 2. Everything else → OpenAI
+  const menuReset = parseMenuReset(val);
+  if (menuReset !== false) { applyMenuReset(); return; }
+  const ingReq = parseIngredientRequest(val);
+  if (ingReq !== false) {
+    const res = applyIngredientRequest(ingReq.mealType, ingReq.ingredientName);
+    if (res) { openPopup('🍽️', `Понял! Ставлю ${res.ingDisplayName} на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType} — «${res.recipeName}». Меню обновлено.`); return; }
+  }
+  const subResult = parseFoodSubstitution(val);
+  if (subResult !== false) {
+    if (subResult.type === 'meal') {
+      const rName = applyMealReplacement(subResult.mealType, subResult.dishName);
+      if (rName) { openPopup('🍽️', `Заменил ${MEAL_TYPE_RU[subResult.mealType]||subResult.mealType} на «${rName}». Меню обновлено.`); return; }
+    } else if (subResult.type === 'ingredient') {
+      const res = applyIngredientSwap(subResult.fromName, subResult.toName);
+      if (res) { openPopup('🔄', `Заменил ${res.fromName} на ${res.toName} во всех блюдах. Меню пересчитано.`); return; }
+    }
+  }
+  openPopupLoading();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: val,
+        context: state.context ||
+          'Пользователь ещё не рассчитал КБЖУ. Отвечай на общие вопросы про питание.'
+      })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      openPopup('⚠️', 'Не удалось получить ответ. Попробуй позже.');
+      return;
+    }
+
+    const reply = data.reply || '';
+
+    // Detect off-topic response from AI
+    const offTopicPhrases = ['не могу помочь','не по теме','выходит за рамки','вне моей компетенции','не связан с питанием'];
+    const isOffTopic = offTopicPhrases.some(p => reply.toLowerCase().includes(p));
+
+    if (isOffTopic) {
+      openPopup('🚫', 'Этот вопрос выходит за рамки питания и КБЖУ. Попробуй спросить что-то про еду, рацион или ингредиенты — с удовольствием помогу! 😊');
+    } else {
+      openPopup('🤝', reply);
+    }
+  } catch {
+    openPopup('⚠️', 'Нет соединения с сервером. Проверь интернет и попробуй снова.');
+  }
+}
+</script>
+
+<div id="swap-popup" style="display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(0,0,0,.65)">
+  <div style="background:var(--surface);border-radius:18px;padding:24px 20px;max-width:320px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <div style="font-size:28px;margin-bottom:10px">⚖️</div>
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">КБЖУ изменится на <span id="swap-diff-pct" style="color:var(--accent)"></span></div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Скорректировать следующий приём пищи под&nbsp;новые цифры?</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="swapConfirmNo()" style="flex:1;padding:12px;background:var(--surface2,#2a2a3a);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;cursor:pointer">Нет</button>
+      <button onclick="swapConfirmYes()" style="flex:1;padding:12px;background:var(--accent,#7c3aed);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Да</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
