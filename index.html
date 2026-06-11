@@ -1433,7 +1433,10 @@ function buildExclusionBannerHtml() {
         <span id="excl-rest" style="display:${restDisplay};">${restTags}</span>
         <span id="excl-more" onclick="toggleExclBanner()" style="display:${moreDisplay};cursor:pointer;color:#fb923c;font-size:12px;font-weight:600;margin-left:4px;">+${ids.length - EXCL_PREVIEW} ещё...</span>
       </div>
-      <span id="excl-clear" onclick="clearExclusions()" style="display:${clearDisplay};margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить всё]</span>
+      <div style="display:${clearDisplay};margin-top:4px;gap:10px;align-items:center;" id="excl-footer">
+        <span onclick="clearExclusions()" style="cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить всё]</span>
+        <span onclick="toggleExclBanner()" style="cursor:pointer;color:#fb923c;font-size:11px;margin-left:10px;">▴ свернуть</span>
+      </div>
     </div>
   </div>`;
 }
@@ -1441,7 +1444,7 @@ function toggleExclBanner() {
   exclBannerOpen = !exclBannerOpen;
   const rest = document.getElementById('excl-rest');
   const more = document.getElementById('excl-more');
-  const clear = document.getElementById('excl-clear');
+  const clear = document.getElementById('excl-footer');
   const icon = document.getElementById('excl-toggle-icon');
   if (rest) rest.style.display = exclBannerOpen ? 'inline' : 'none';
   if (more) more.style.display = exclBannerOpen ? 'none' : 'inline-block';
