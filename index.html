@@ -1406,22 +1406,24 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
 }
 
 // --- Exclusion banner (shown above meal list when exclusions active) ---
+let exclBannerOpen = false; // starts collapsed
 function buildExclusionBannerHtml() {
   const ids = state.excludedIngredientIds || [];
-  if (!ids.length) return '';
+  if (!ids.length) { exclBannerOpen = false; return ''; }
   const items = ids.map(id => {
     const nm = ingredientsMap[id]?.name || id;
     return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
   }).join('');
-  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.08);border:1px solid #fb923c;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div onclick="toggleExclBanner()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;"><span style="font-size:13px;font-weight:600;color:#fb923c;">🚫 Исключено из меню (${ids.length})</span><span id="excl-toggle-icon" style="color:#fb923c;font-size:14px;">▾</span></div><div id="excl-body" style="padding:0 14px 10px;"><div style="line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить всё]</span></div></div>`;
+  const bodyDisplay = exclBannerOpen ? 'block' : 'none';
+  const icon = exclBannerOpen ? '▴' : '▾';
+  return `<div id="exclusion-banner" style="background:rgba(251,146,60,.08);border:1px solid #fb923c;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div onclick="toggleExclBanner()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;"><span style="font-size:13px;font-weight:600;color:#fb923c;">🚫 Исключено из меню (${ids.length})</span><span id="excl-toggle-icon" style="color:#fb923c;font-size:14px;">${icon}</span></div><div id="excl-body" style="padding:0 14px 10px;display:${bodyDisplay};"><div style="line-height:1.8;">${items}</div><span onclick="clearExclusions()" style="display:inline-block;margin-top:4px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить всё]</span></div></div>`;
 }
 function toggleExclBanner() {
+  exclBannerOpen = !exclBannerOpen;
   const body = document.getElementById('excl-body');
   const icon = document.getElementById('excl-toggle-icon');
-  if (!body) return;
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : 'block';
-  if (icon) icon.textContent = open ? '▾' : '▴';
+  if (body) body.style.display = exclBannerOpen ? 'block' : 'none';
+  if (icon) icon.textContent = exclBannerOpen ? '▴' : '▾';
 }
 
 function clearExclusions() {
