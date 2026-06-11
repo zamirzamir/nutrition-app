@@ -82,7 +82,9 @@ body {
 
 /* SECTION LABEL */
 .section-label {
-  font-size:15px; font-weight:700; color:var(--text);
+  font-size:15px; font-weight:700;
+  background:linear-gradient(135deg,#8B6914,#C9A84C,#F5D57A,#C9A84C);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   margin:20px 0 10px; line-height:1.4;
 }
 
@@ -202,8 +204,8 @@ body {
 
 /* PURCHASE SECTION */
 .purchase-section {
-  background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(168,85,247,.1));
-  border:1.5px solid rgba(124,106,247,.3);
+  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(139,105,20,.08));
+  border:2px solid rgba(201,168,76,.4);
   border-radius:var(--radius); padding:20px; margin-bottom:12px;
 }
 .purchase-section p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
@@ -245,16 +247,17 @@ body {
 .payment-inner p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
 .pay-continue-btn {
   width:100%; padding:18px; border-radius:16px; border:none;
-  background:linear-gradient(135deg,#7c6af7,#a855f7);
-  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  background:linear-gradient(135deg,#8B6914 0%,#C9A84C 35%,#F5D57A 55%,#C9A84C 75%,#8B6914 100%);
+  color:#2C1500; font-size:16px; font-weight:700; cursor:pointer;
+  box-shadow:0 2px 16px rgba(201,168,76,.5), inset 0 1px 0 rgba(255,240,160,.6);
 }
 
 /* STICKY BOTTOM BAR */
 .sticky-bar {
   position:fixed; bottom:0; left:50%; transform:translateX(-50%);
   width:100%; max-width:480px;
-  background:rgba(26,26,36,.95); backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);
+  background:rgba(13,4,0,.92); backdrop-filter:blur(16px);
+  border-top:1.5px solid var(--border);
   padding:10px 14px 14px;
   z-index:100;
 }
@@ -392,6 +395,9 @@ body {
   <div class="section-label">Вот сколько тебе нужно на это времени 👇</div>
   <div class="forecast-grid" id="forecastGrid"></div>
 
+  <!-- INLINE INPUT BAR placeholder (moved here by JS after calculate) -->
+  <div id="inlineBarPlaceholder"></div>
+
   <!-- DAY MENU -->
   <div id="meal-section">
     <div id="exclusion-banner-top"></div>
@@ -444,8 +450,8 @@ body {
 @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 
-<!-- ========== STICKY BOTTOM ========== -->
-<div class="sticky-bar">
+<!-- ========== STICKY BOTTOM (hidden until calculate) ========== -->
+<div class="sticky-bar" id="stickyBar" style="display:none;">
   <div class="sticky-input-row">
     <div class="sticky-input-wrap">
       <input class="sticky-input" id="foodPrefInput" type="text"
@@ -460,6 +466,25 @@ body {
       </div>
     </div>
     <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+  </div>
+</div>
+
+<!-- ========== INLINE INPUT BAR (shown after calculate, above meals) ========== -->
+<div id="inlineBar" style="display:none;padding:0 20px 12px;">
+  <div class="sticky-input-row">
+    <div class="sticky-input-wrap">
+      <input class="sticky-input" id="foodPrefInputInline" type="text"
+        onkeydown="if(event.key==='Enter') sendFoodPrefInline()"
+        onfocus="document.getElementById('marqueeHintInline').style.opacity='0'"
+        onblur="if(!this.value) document.getElementById('marqueeHintInline').style.opacity='1'">
+      <div class="marquee-hint" id="marqueeHintInline">
+        <div class="marquee-track">
+          <span class="marquee-text" id="marqueeText1Inline"></span>
+          <span class="marquee-text" id="marqueeText2Inline"></span>
+        </div>
+      </div>
+    </div>
+    <button class="mic-btn" id="micBtnInline" onclick="toggleMicInline()">🎤</button>
   </div>
 </div>
 
@@ -598,6 +623,25 @@ function calculate() {
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
   setMarquee(MARQUEE_RESULTS);
+
+  // Show inline bar above meals, hide sticky
+  const bar = document.getElementById('inlineBar');
+  const placeholder = document.getElementById('inlineBarPlaceholder');
+  if (bar && placeholder) {
+    placeholder.appendChild(bar);
+    bar.style.display = 'block';
+  }
+  const sticky = document.getElementById('stickyBar');
+  if (sticky) sticky.style.display = 'none';
+
+  // Sync inline input with main input handlers
+  const inlineInput = document.getElementById('foodPrefInputInline');
+  if (inlineInput) {
+    const m1 = document.getElementById('marqueeText1Inline');
+    const m2 = document.getElementById('marqueeText2Inline');
+    if (m1) m1.textContent = MARQUEE_RESULTS;
+    if (m2) m2.textContent = MARQUEE_RESULTS;
+  }
 }
 
 // ========== EXCLUSION & SUBSTITUTION SYSTEM ==========
@@ -1801,6 +1845,15 @@ function completePurchase() {
   document.getElementById('days-section').style.display='block';
   renderDaysGrid();
   renderShoppingList();
+
+  // Move inline bar to after days-section (before shopping list)
+  const bar = document.getElementById('inlineBar');
+  const shoppingSection = document.getElementById('shopping-list-section');
+  if (bar && shoppingSection && shoppingSection.parentNode) {
+    bar.style.display = 'block';
+    shoppingSection.parentNode.insertBefore(bar, shoppingSection);
+  }
+
   document.getElementById('days-section').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -2015,6 +2068,17 @@ function highlightReconstra() {
     });
   }, 400);
 }
+
+async function sendFoodPrefInline() {
+  const inlineInput = document.getElementById('foodPrefInputInline');
+  const mainInput = document.getElementById('foodPrefInput');
+  if (inlineInput && mainInput) {
+    mainInput.value = inlineInput.value;
+    inlineInput.value = '';
+  }
+  await sendFoodPref();
+}
+function toggleMicInline() { toggleMic(); }
 
 async function sendFoodPref() {
   const val = document.getElementById('foodPrefInput').value.trim();
