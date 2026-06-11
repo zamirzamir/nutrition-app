@@ -9,9 +9,9 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 :root {
-  --bg:#F5EFE4; --surface:#FDF8F0; --surface2:#EDE4D6; --border:#C9A84C;
-  --accent:#C9A84C; --accent2:#E0C070; --green:#4a9c5d; --yellow:#c4820a;
-  --red:#c0392b; --text:#2C1A00; --muted:#8B7355; --radius:18px;
+  --bg:#FFF8EE; --surface:#FFFDF7; --surface2:#FDEFD6; --border:#E6960C;
+  --accent:#E6960C; --accent2:#FFB830; --green:#4a9c5d; --yellow:#d97706;
+  --red:#c0392b; --text:#2C1500; --muted:#9A6F2E; --radius:18px;
 }
 html { scroll-behavior:smooth; }
 body {
@@ -25,13 +25,13 @@ body {
 .header { padding:28px 20px 0; text-align:center; }
 .header-badge {
   display:inline-block;
-  background:linear-gradient(135deg,#C9A84C,#E8C96A);
+  background:linear-gradient(135deg,#E6960C,#FFB830);
   border-radius:30px; padding:6px 16px;
-  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; color:#2C1A00;
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; color:#2C1500;
 }
 .header h1 {
   font-size:26px; font-weight:800; line-height:1.2;
-  background:linear-gradient(135deg,#8B6914,#C9A84C);
+  background:linear-gradient(135deg,#7A4500,#E6960C);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
 .header p { color:var(--muted); font-size:14px; margin-top:6px; }
@@ -63,14 +63,14 @@ body {
   color:var(--muted); font-size:13px; font-weight:600;
   cursor:pointer; transition:all .2s; text-align:left;
 }
-.option-btn.selected { border-color:var(--accent); background:rgba(201,168,76,.18); color:#8B6914; }
+.option-btn.selected { border-color:var(--accent); background:rgba(230,150,12,.15); color:#7A4500; }
 .option-btn small { display:block; font-size:11px; font-weight:400; margin-top:2px; opacity:.75; }
 
 /* CALC BUTTON */
 .calc-btn {
   width:100%; padding:16px; border-radius:16px; border:none;
-  background:linear-gradient(135deg,#C9A84C,#E8C96A);
-  color:#2C1A00; font-size:16px; font-weight:700; cursor:pointer;
+  background:linear-gradient(135deg,#E6960C,#FFB830);
+  color:#2C1500; font-size:16px; font-weight:700; cursor:pointer;
   margin-top:4px; transition:opacity .2s, transform .1s;
 }
 .calc-btn:active { transform:scale(.98); opacity:.9; }
@@ -92,7 +92,7 @@ body {
 .res-card .icon { font-size:22px; margin-bottom:6px; }
 .res-card .val {
   font-size:28px; font-weight:800;
-  background:linear-gradient(135deg,#8B6914,#C9A84C);
+  background:linear-gradient(135deg,#7A4500,#E6960C);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
 .res-card .unit { font-size:11px; color:var(--muted); margin-top:2px; }
