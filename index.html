@@ -9,9 +9,9 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 :root {
-  --bg:#FFF8EE; --surface:#FFFDF7; --surface2:#FDEFD6; --border:#E6960C;
-  --accent:#E6960C; --accent2:#FFB830; --green:#4a9c5d; --yellow:#d97706;
-  --red:#c0392b; --text:#2C1500; --muted:#9A6F2E; --radius:18px;
+  --bg:#E6960C; --surface:#FDF6E8; --surface2:#FDF0D0; --border:#C9A84C;
+  --accent:#C9A84C; --accent2:#E8C96A; --green:#4a9c5d; --yellow:#d97706;
+  --red:#c0392b; --text:#2C1500; --muted:#7A4500; --radius:18px;
 }
 html { scroll-behavior:smooth; }
 body {
@@ -25,9 +25,9 @@ body {
 .header { padding:28px 20px 0; text-align:center; }
 .header-badge {
   display:inline-block;
-  background:linear-gradient(135deg,#E6960C,#FFB830);
+  background:#FDF6E8; border:2.5px solid #C9A84C;
   border-radius:30px; padding:6px 16px;
-  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; color:#2C1500;
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; color:#7A4500;
 }
 .header h1 {
   font-size:26px; font-weight:800; line-height:1.2;
@@ -37,7 +37,7 @@ body {
 .header p { color:var(--muted); font-size:14px; margin-top:6px; }
 
 /* CARDS */
-.card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }
+.card { background:var(--surface); border:2.5px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }
 .card-title { font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
 
 /* INPUTS */
@@ -59,7 +59,7 @@ body {
 .option-grid { display:flex; flex-direction:column; gap:8px; }
 .option-btn {
   flex:1; padding:12px 14px; border-radius:12px;
-  border:1.5px solid var(--border); background:var(--surface2);
+  border:2.5px solid var(--border); background:var(--surface2);
   color:var(--muted); font-size:13px; font-weight:600;
   cursor:pointer; transition:all .2s; text-align:left;
 }
@@ -69,8 +69,8 @@ body {
 /* CALC BUTTON */
 .calc-btn {
   width:100%; padding:16px; border-radius:16px; border:none;
-  background:linear-gradient(135deg,#E6960C,#FFB830);
-  color:#2C1500; font-size:16px; font-weight:700; cursor:pointer;
+  background:#FDF6E8; border:3px solid #C9A84C;
+  color:#7A4500; font-size:16px; font-weight:700; cursor:pointer;
   margin-top:4px; transition:opacity .2s, transform .1s;
 }
 .calc-btn:active { transform:scale(.98); opacity:.9; }
