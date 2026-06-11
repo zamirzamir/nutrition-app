@@ -409,8 +409,10 @@ body {
   <div id="days-section" style="display:none;">
     <div class="section-label">📅 Меню на 28 дней</div>
     <div class="days-grid" id="daysGrid"></div>
-    <div id="dayMealsContainer"></div>
   </div>
+  <!-- inline bar anchor after 28-days block (before expanded day meals) -->
+  <div id="inlineBarAnchor"></div>
+  <div id="dayMealsContainer"></div>
   <div id="shopping-list-section" style="display:none"></div>
   <!-- PURCHASE -->
   <div id="purchase-section" class="purchase-section">
@@ -471,20 +473,20 @@ body {
 
 <!-- ========== INLINE INPUT BAR (shown after calculate, above meals) ========== -->
 <div id="inlineBar" style="display:none;padding:0 20px 12px;">
-  <div class="sticky-input-row">
-    <div class="sticky-input-wrap">
-      <input class="sticky-input" id="foodPrefInputInline" type="text"
-        onkeydown="if(event.key==='Enter') sendFoodPrefInline()"
-        onfocus="document.getElementById('marqueeHintInline').style.opacity='0'"
-        onblur="if(!this.value) document.getElementById('marqueeHintInline').style.opacity='1'">
-      <div class="marquee-hint" id="marqueeHintInline">
-        <div class="marquee-track">
-          <span class="marquee-text" id="marqueeText1Inline"></span>
-          <span class="marquee-text" id="marqueeText2Inline"></span>
-        </div>
+  <div style="position:relative;">
+    <input class="sticky-input" id="foodPrefInputInline" type="text"
+      style="padding-right:52px;"
+      onkeydown="if(event.key==='Enter') sendFoodPrefInline()"
+      onfocus="document.getElementById('marqueeHintInline').style.opacity='0'"
+      onblur="if(!this.value) document.getElementById('marqueeHintInline').style.opacity='1'">
+    <div class="marquee-hint" id="marqueeHintInline" style="right:52px;">
+      <div class="marquee-track">
+        <span class="marquee-text" id="marqueeText1Inline"></span>
+        <span class="marquee-text" id="marqueeText2Inline"></span>
       </div>
     </div>
-    <button class="mic-btn" id="micBtnInline" onclick="toggleMicInline()">🎤</button>
+    <button class="mic-btn" id="micBtnInline" onclick="toggleMicInline()"
+      style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;font-size:16px;">🎤</button>
   </div>
 </div>
 
@@ -1592,7 +1594,7 @@ function renderShoppingList() {
     ).join('');
     section.style.display = 'block';
     section.innerHTML =
-      '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px">' + title + '</div>'+
+      '<div style="font-size:15px;font-weight:700;background:linear-gradient(135deg,#8B6914,#C9A84C,#F5D57A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px">' + title + '</div>'+
       '<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)">'+
       '<div style="padding:14px 16px 0">'+
       '<div id="sl-inner" style="max-height:190px;overflow:hidden;position:relative;transition:max-height .35s ease">'+
@@ -1846,12 +1848,12 @@ function completePurchase() {
   renderDaysGrid();
   renderShoppingList();
 
-  // Move inline bar to after days-section (before shopping list)
+  // Move inline bar into anchor after 28-days grid
   const bar = document.getElementById('inlineBar');
-  const shoppingSection = document.getElementById('shopping-list-section');
-  if (bar && shoppingSection && shoppingSection.parentNode) {
+  const anchor = document.getElementById('inlineBarAnchor');
+  if (bar && anchor) {
+    anchor.appendChild(bar);
     bar.style.display = 'block';
-    shoppingSection.parentNode.insertBefore(bar, shoppingSection);
   }
 
   document.getElementById('days-section').scrollIntoView({behavior:'smooth',block:'start'});
