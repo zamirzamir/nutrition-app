@@ -204,11 +204,11 @@ body {
 
 /* PURCHASE SECTION */
 .purchase-section {
-  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(139,105,20,.08));
-  border:2px solid rgba(201,168,76,.4);
-  border-radius:var(--radius); padding:20px; margin-bottom:12px;
+  background:transparent;
+  border:none;
+  padding:0 0 12px; margin-bottom:12px;
 }
-.purchase-section p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.purchase-section p { font-size:15px; font-weight:700; background:linear-gradient(135deg,#8B6914,#C9A84C,#F5D57A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; line-height:1.4; margin-bottom:14px; }
 .buy-btn {
   width:100%; padding:18px; border-radius:16px; border:none;
   background:linear-gradient(135deg,#8B6914 0%,#C9A84C 35%,#F5D57A 55%,#C9A84C 75%,#8B6914 100%);
@@ -416,7 +416,7 @@ body {
   <div id="shopping-list-section" style="display:none"></div>
   <!-- PURCHASE -->
   <div id="purchase-section" class="purchase-section">
-    <p>А вот тебе меню на 28 дней с рецептами, согласно твоим данным 👇</p>
+    <p>И вот меню на 28 дней с рецептами под твой КБЖУ 👇</p>
     <button class="buy-btn" onclick="showPayment()">299 ₽</button>
   </div>
 
