@@ -989,13 +989,46 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
 }
 
 // --- Exclusion banner (shown above meal list when exclusions active) ---
+let exclusionBannerOpen = false;
+
+function toggleExclusionBanner() {
+  exclusionBannerOpen = !exclusionBannerOpen;
+  document.querySelectorAll('.exclusion-banner').forEach(el => {
+    const body = el.querySelector('.exclusion-body');
+    const arrow = el.querySelector('.exclusion-arrow');
+    if (body) body.style.display = exclusionBannerOpen ? 'block' : 'none';
+    if (arrow) arrow.textContent = exclusionBannerOpen ? '▲' : '▼';
+  });
+}
+
+function removeExclusion(id) {
+  state.excludedIngredientIds = state.excludedIngredientIds.filter(x => x !== id);
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  renderMeals();
+  const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
+  if (openDay) renderDayMeals(parseInt(openDay));
+}
+
 function buildExclusionBannerHtml() {
   const ids = state.excludedIngredientIds || [];
   if (!ids.length) return '';
-  const names = ids.map(id => ingredientsMap[id]?.name || id).join(', ');
-  return `<div style="background:rgba(251,146,60,.1);border:1px solid #fb923c;border-radius:14px;padding:7px 14px;font-size:12px;color:#fb923c;margin-bottom:12px;">
-    🚫 Исключено из меню: <b>${names}</b>
-    <span onclick="clearExclusions()" style="margin-left:8px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить]</span>
+  const tags = ids.map(id => {
+    const name = ingredientsMap[id]?.name || id;
+    return `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(251,146,60,.18);border:1px solid rgba(251,146,60,.4);border-radius:20px;padding:3px 10px;font-size:11px;color:#fb923c;margin:3px 3px;">
+      ${name}
+      <span onclick="removeExclusion('${id}')" style="cursor:pointer;color:#94a3b8;font-size:13px;line-height:1;">&times;</span>
+    </span>`;
+  }).join('');
+
+  return `<div class="exclusion-banner" style="background:rgba(251,146,60,.08);border:1px solid #fb923c;border-radius:14px;margin-bottom:12px;overflow:hidden;">
+    <div onclick="toggleExclusionBanner()" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;">
+      <span style="font-size:12px;font-weight:700;color:#fb923c;">🚫 Исключено из меню (${ids.length})</span>
+      <span class="exclusion-arrow" style="font-size:11px;color:#fb923c;">${exclusionBannerOpen ? '▲' : '▼'}</span>
+    </div>
+    <div class="exclusion-body" style="display:${exclusionBannerOpen ? 'block' : 'none'};padding:0 12px 12px;">
+      <div style="flex-wrap:wrap;display:flex;">${tags}</div>
+      <span onclick="clearExclusions()" style="display:inline-block;margin-top:8px;cursor:pointer;color:#94a3b8;font-size:11px;">[сбросить все]</span>
+    </div>
   </div>`;
 }
 
