@@ -1015,6 +1015,10 @@ async function loadNutritionData() {
     nutritionDataLoaded = true;
     computeRecipeScores();
     console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);
+    // Перерисовать карточки если результаты уже на экране
+    if (state.kcal > 0 && document.getElementById('results').style.display !== 'none') {
+      renderMeals();
+    }
   } catch(e) {
     console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);
   } finally {
@@ -1726,11 +1730,11 @@ function _applySwapDOM(cardId, recipe) {
     fat = Math.round(recipe.fat_per_serving || 0);
     carbs = Math.round(recipe.carbs_per_serving || 0);
   } else {
-    (recipe.ingredients || []).forEach(function(i) {
-      var d = ingredientsMap[i.id] || ingredientsByName[(i.id||'').toLowerCase()];
-      if (d) { var g = i.amount_g || i.amount || 100; cal += (d.calories||0)*g/100; prot += (d.protein||0)*g/100; fat += (d.fat||0)*g/100; carbs += (d.carbs||0)*g/100; }
-    });
-    cal = Math.round(cal); prot = Math.round(prot); fat = Math.round(fat); carbs = Math.round(carbs);
+    var nut = calculateRecipeNutrition(recipe);
+    if (nut.calories > 0) {
+      cal = Math.round(nut.calories); prot = Math.round(nut.protein);
+      fat = Math.round(nut.fat); carbs = Math.round(nut.carbs);
+    }
   }
   // Update macros chips
   var macrosEl = card.querySelector('.recipe-macros');
