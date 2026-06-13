@@ -1053,7 +1053,16 @@ function calculateRecipeNutrition(recipe) {
 
 // ---------- 3. scaleRecipe ----------------------------------
 function scaleRecipe(recipe, targetCalories) {
-  const base = calculateRecipeNutrition(recipe);
+  let base = calculateRecipeNutrition(recipe);
+  // Fallback: use pre-baked calories_per_serving if local calculation gives 0
+  if ((!base.calories || base.calories < 1) && recipe.calories_per_serving) {
+    base = {
+      calories: recipe.calories_per_serving,
+      protein:  recipe.protein_per_serving || 0,
+      fat:      recipe.fat_per_serving     || 0,
+      carbs:    recipe.carbs_per_serving   || 0,
+    };
+  }
   if (!base.calories || base.calories < 1) {
     return { ingredients: recipe.ingredients, nutrition: base };
   }
@@ -1655,8 +1664,20 @@ function renderShoppingList() {
   if (_apiPlan && _apiPlan[0]) {
     const day0 = _apiPlan[0];
     const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
-    const cards = slots.filter(s => day0[s])
-      .map(s => buildMealCardHTML_API(day0[s], s, 'preview-' + s));
+    // Build engine meals to fill slots missing from API (e.g. no lunch/dinner in Supabase yet)
+    if (!dayMenuCache[1] && nutritionDataLoaded) {
+      const _p = buildUserProfile(); const _t = new NutrientTracker();
+      dayMenuCache[1] = buildDayMenu(_p, 1, _t);
+    }
+    const cards = [];
+    for (const s of slots) {
+      if (day0[s]) {
+        cards.push(buildMealCardHTML_API(day0[s], s, 'preview-' + s));
+      } else if (dayMenuCache[1]) {
+        const em = dayMenuCache[1].find(m => m.mealType === s);
+        if (em) cards.push(buildMealCardHTML(em, dayMenuCache[1].indexOf(em), 'preview-eng'));
+      }
+    }
     document.getElementById('mealsContainer').innerHTML = cards.join('');
     return;
   }
@@ -1697,6 +1718,8 @@ function _parseCard(cardId) {
   if (e) return {day:+e[1], idx:+e[2]};
   var a = cardId.match(/^d(\d+)-(\w+)$/);
   if (a) { var s=['breakfast','lunch','dinner','snack']; return {day:+a[1],idx:s.indexOf(a[2])}; }
+  var pe = cardId.match(/^preview-eng-(\d+)$/);
+  if (pe) return {day:1, idx:+pe[1]};
   var p = cardId.match(/^preview-(\w+)$/);
   if (p) { var s2=['breakfast','lunch','dinner','snack']; return {day:1,idx:s2.indexOf(p[1])}; }
   return {day:1,idx:0};
@@ -1830,8 +1853,17 @@ function swapPrev(cardId, e) {
   var pos = _swapPos[cardId]||0;
   if (pos <= 0) return;
   _swapPos[cardId] = pos - 1;
-  var recId = (_swapHist[cardId]||[])[pos-1];
-  _applySwapDOM(cardId, recipesArray.find(function(r){return r.id===recId;}));
+  var newPos = pos - 1;
+  var recId = (_swapHist[cardId]||[])[newPos];
+  // При возврате к оригиналу (позиция 0) берём из dayMenuCache (там Supabase-версия с КБЖУ)
+  var recipe = null;
+  if (newPos === 0) {
+    var pr = _parseCard(cardId);
+    var cached = dayMenuCache[pr.day] && dayMenuCache[pr.day][pr.idx];
+    if (cached && cached.originalRecipe) recipe = cached.originalRecipe;
+  }
+  if (!recipe) recipe = recipesArray.find(function(r){return r.id===recId;});
+  _applySwapDOM(cardId, recipe);
 }
 
 function swapNext(cardId, e) {
@@ -1839,7 +1871,10 @@ function swapNext(cardId, e) {
   var mealType = _getMealType(cardId);
   if (!_swapHist[cardId]) {
     var pr = _parseCard(cardId);
-    var curId = (dayMenuCache[pr.day] && dayMenuCache[pr.day][pr.idx] && dayMenuCache[pr.day][pr.idx].recipe) ? dayMenuCache[pr.day][pr.idx].recipe.id : '';
+    var cached = dayMenuCache[pr.day] && dayMenuCache[pr.day][pr.idx];
+    var curId = cached && cached.recipe ? cached.recipe.id : '';
+    // Сохраняем оригинал с КБЖУ для возврата через swapPrev
+    if (cached && cached.recipe && !cached.originalRecipe) cached.originalRecipe = cached.recipe;
     _swapHist[cardId] = [curId];
     _swapPos[cardId] = 0;
   }
@@ -1982,14 +2017,35 @@ const dayMenuCache = {};
 function renderDayMeals(d) {
   const container = document.getElementById('dayMealsContainer');
 
-  // API plan takes priority over engine
+  // API plan takes priority over engine; fill null slots from local engine
   if (_apiPlan && state.kcal > 0) {
     const dayData = _apiPlan[d - 1];
     if (dayData) {
+      // Ensure engine cache exists for fallback slots
+      if (!dayMenuCache[d] && nutritionDataLoaded) {
+        const _p = buildUserProfile();
+        const _t = window._globalTracker || new NutrientTracker();
+        dayMenuCache[d] = buildDayMenu(_p, d, _t);
+      }
       const banner = buildExclusionBannerHtml();
       const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
-      const cards = slots.filter(s => dayData[s])
-        .map(s => buildMealCardHTML_API(dayData[s], s, 'd' + d + '-' + s));
+      const cards = [];
+      for (const s of slots) {
+        if (dayData[s]) {
+          // API slot: store in dayMenuCache for swap/macros logic
+          const slotIdx = slots.indexOf(s);
+          if (!dayMenuCache[d]) dayMenuCache[d] = [];
+          if (!dayMenuCache[d][slotIdx]) dayMenuCache[d][slotIdx] = {};
+          dayMenuCache[d][slotIdx].recipe = dayData[s];
+          dayMenuCache[d][slotIdx].originalRecipe = dayData[s];
+          dayMenuCache[d][slotIdx].mealType = s;
+          cards.push(buildMealCardHTML_API(dayData[s], s, 'd' + d + '-' + s));
+        } else if (dayMenuCache[d]) {
+          // No API recipe for this slot — use engine meal
+          const em = dayMenuCache[d].find(m => m.mealType === s);
+          if (em) cards.push(buildMealCardHTML(em, dayMenuCache[d].indexOf(em), 'dr-' + d));
+        }
+      }
       container.innerHTML =
         '<div class="section-label" style="margin-top:12px;">День ' + d + '</div>' +
         banner + cards.join('');
