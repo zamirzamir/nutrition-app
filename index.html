@@ -1351,6 +1351,27 @@ function buildMealCardHTML_API(recipe, mealType, cardId) {
       carbs = Math.round(nut.carbs);
     }
   }
+  // Если всё равно 0 — запросим у API после рендера
+  if (!cal) {
+    setTimeout(() => {
+      fetch('/api/recipe?id=' + encodeURIComponent(recipe.id))
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!data?.nutrition_per_serving) return;
+          const n = data.nutrition_per_serving;
+          recipe.calories_per_serving = n.calories;
+          recipe.protein_per_serving  = n.protein;
+          recipe.fat_per_serving      = n.fat;
+          recipe.carbs_per_serving    = n.carbs;
+          const el = document.getElementById(cardId);
+          const m = el ? el.closest('.meal-card')?.querySelector('.recipe-macros') : null;
+          if (m) m.innerHTML = `<div class="macro-chip">🔥 ${Math.round(n.calories)} ккал</div>
+            <div class="macro-chip">🥩 Б: ${Math.round(n.protein)}г</div>
+            <div class="macro-chip">🥑 Ж: ${Math.round(n.fat)}г</div>
+            <div class="macro-chip">🍚 У: ${Math.round(n.carbs)}г</div>`;
+        }).catch(() => {});
+    }, 100);
+  }
   return `
 <div class="meal-card">
   <div class="meal-img-wrap" onclick="loadAndToggleRecipe('${cardId}','${recipe.id}')">
@@ -1734,6 +1755,24 @@ function _applySwapDOM(cardId, recipe) {
     if (nut.calories > 0) {
       cal = Math.round(nut.calories); prot = Math.round(nut.protein);
       fat = Math.round(nut.fat); carbs = Math.round(nut.carbs);
+    } else {
+      // Запрашиваем у API если локальный расчёт не дал результата
+      fetch('/api/recipe?id=' + encodeURIComponent(recipe.id))
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if (!data || !data.nutrition_per_serving) return;
+          var n = data.nutrition_per_serving;
+          recipe.calories_per_serving = n.calories;
+          recipe.protein_per_serving  = n.protein;
+          recipe.fat_per_serving      = n.fat;
+          recipe.carbs_per_serving    = n.carbs;
+          var el = document.getElementById(cardId) ? document.getElementById(cardId).closest('.meal-card') : null;
+          var m = el ? el.querySelector('.recipe-macros') : null;
+          if (m) m.innerHTML = '<div class="macro-chip">🔥 ' + Math.round(n.calories) + ' ккал</div>' +
+            '<div class="macro-chip">🥩 Б: ' + Math.round(n.protein) + 'г</div>' +
+            '<div class="macro-chip">🥑 Ж: ' + Math.round(n.fat) + 'г</div>' +
+            '<div class="macro-chip">🍚 У: ' + Math.round(n.carbs) + 'г</div>';
+        }).catch(function(){});
     }
   }
   // Update macros chips
