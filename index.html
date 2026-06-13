@@ -164,6 +164,27 @@ body {
   padding:0 6px; white-space:nowrap;
 }
 
+/* MEAL MANAGER */
+.meal-manager-block {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  animation: fadeUp .4s ease both;
+}
+.meal-manager-btn {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  width:100%;aspect-ratio:1;border-radius:10px;
+  border:1.5px solid var(--accent);
+  background:rgba(201,168,76,.08);
+  color:var(--accent2);font-size:10px;font-weight:600;
+  cursor:pointer;padding:4px;text-align:center;line-height:1.2;
+  transition:background .15s, transform .1s;
+}
+.meal-manager-btn:active { transform:scale(.94); background:rgba(201,168,76,.18); }
+.meal-manager-btn:disabled { border-color:rgba(201,168,76,.2); color:rgba(201,168,76,.3); background:rgba(255,255,255,.03); cursor:default; transform:none; }
+
 /* RECIPE */
 .recipe-block {
   display:none; padding:16px 18px 18px;
@@ -522,6 +543,7 @@ const state = {
   activeDayBtn: null,
   ingredientSwaps: {},   // { fromId: toId }
   mealOverrides: {},     // { mealType: recipeObject }
+  mealSlots: ['breakfast', 'lunch', 'dinner', 'snack'], // active meal slots
 };
 
 // ========== GENDER ==========
@@ -1250,8 +1272,21 @@ function buildDayMenu(userProfile, dayIndex, tracker) {
   const usedIds  = new Set();
   const swaps = state.ingredientSwaps || {};
 
-  for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack']) {
-    const targetCal = Math.round(calories_target * MEAL_SPLIT[mealType]);
+  // Compute per-slot calorie split dynamically from active slots
+  const activeSlots = state.mealSlots && state.mealSlots.length ? state.mealSlots : ['breakfast','lunch','dinner','snack'];
+  const slotWeights = activeSlots.reduce((acc, s) => {
+    const base = s.includes('breakfast') ? 0.25 : s.includes('lunch') ? 0.35 : s.includes('dinner') ? 0.30 : 0.10;
+    acc[s] = (acc[s] || 0) + base;
+    return acc;
+  }, {});
+  const totalWeight = Object.values(slotWeights).reduce((a, b) => a + b, 0) || 1;
+
+  // Track how many times each base type has appeared for de-duplication of same-type
+  const slotTypeCount = {};
+
+  for (const mealType of activeSlots) {
+    const targetCal = Math.round(calories_target * (slotWeights[mealType] / totalWeight) / (activeSlots.filter(s=>s===mealType).length || 1));
+    const baseType = mealType; // may be 'breakfast','lunch','dinner','snack'
     if (!recipesArray.length) continue;
 
     let picked;
@@ -1259,7 +1294,7 @@ function buildDayMenu(userProfile, dayIndex, tracker) {
     if (overrideRecipe) {
       picked = { recipe: overrideRecipe, substituted: [], modifiedIngredients: overrideRecipe.ingredients };
     } else {
-      picked = pickMealForSlot(mealType, excluded_ingredient_ids, usedIds);
+      picked = pickMealForSlot(baseType, excluded_ingredient_ids, usedIds);
     }
     if (!picked) continue;
 
@@ -1450,6 +1485,97 @@ function _renderRecipeDetails(el, recipe) {
 // ============================================================
 
 const MEAL_TYPE_RU = { breakfast:'Завтрак', lunch:'Обед', dinner:'Ужин', snack:'Перекус' };
+const MEAL_BASE_TYPE = { breakfast:'breakfast', lunch:'lunch', dinner:'dinner', snack:'snack' };
+
+// ========== MEAL SLOTS MANAGEMENT ==========
+const MEAL_TYPES_ORDER = ['breakfast', 'lunch', 'dinner', 'snack'];
+const MEAL_TYPE_EMOJI = { breakfast:'🌅', lunch:'☀️', dinner:'🌙', snack:'🍎' };
+
+function getMealSlotLabel(type) {
+  return MEAL_TYPE_RU[type] || type;
+}
+
+function addMealSlot(type) {
+  const slots = state.mealSlots;
+  if (slots.length >= 6) return;
+  slots.push(type);
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  _swapHist = {}; _swapPos = {};
+  renderMealsOrDay();
+}
+
+function removeMealSlot(type) {
+  const slots = state.mealSlots;
+  if (slots.length <= 2) return;
+  const idx = slots.lastIndexOf(type);
+  if (idx === -1) return;
+  slots.splice(idx, 1);
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  _swapHist = {}; _swapPos = {};
+  renderMealsOrDay();
+}
+
+function renderMealsOrDay() {
+  if (state.purchased) {
+    // Re-render the currently open day if any
+    const openDay = document.querySelector('.day-btn.active');
+    if (openDay) renderDayMeals(parseInt(openDay.dataset.day));
+  } else {
+    renderMeals();
+  }
+}
+
+function buildMealManagerHTML() {
+  const slots = state.mealSlots || ['breakfast','lunch','dinner','snack'];
+  const count = slots.length;
+  const counts = {};
+  MEAL_TYPES_ORDER.forEach(t => { counts[t] = slots.filter(s => s === t).length; });
+
+  const removeBtn = (type, label, emoji) => {
+    const canRemove = counts[type] > 0 && count > 2;
+    return `<button class="meal-manager-btn" onclick="${canRemove ? `removeMealSlot('${type}')` : ''}" ${!canRemove ? 'disabled' : ''}>
+      <span style="font-size:15px;">${emoji}</span>
+      <span>${label}</span>
+      <span style="font-size:9px;opacity:.7;">убрать</span>
+    </button>`;
+  };
+  const addBtn = (type, label, emoji) => {
+    const canAdd = count < 6;
+    return `<button class="meal-manager-btn" onclick="${canAdd ? `addMealSlot('${type}')` : ''}" ${!canAdd ? 'disabled' : ''}>
+      <span style="font-size:15px;">${emoji}</span>
+      <span>${label}</span>
+      <span style="font-size:9px;opacity:.7;">добавить</span>
+    </button>`;
+  };
+
+  const countLabel = count <= 2 ? '(минимум)' : count >= 6 ? '(максимум)' : '';
+
+  return `<div class="meal-manager-block">
+    <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600;letter-spacing:.4px;">
+      ПРИЁМЫ ПИЩИ &nbsp;·&nbsp; ${count} / 6 ${countLabel ? `<span style="color:var(--accent);opacity:.7;">${countLabel}</span>` : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div>
+        <div style="text-align:center;font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;opacity:.8;">— УБРАТЬ —</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+          ${removeBtn('breakfast','Завтрак','🌅')}
+          ${removeBtn('lunch','Обед','☀️')}
+          ${removeBtn('dinner','Ужин','🌙')}
+          ${removeBtn('snack','Перекус','🍎')}
+        </div>
+      </div>
+      <div>
+        <div style="text-align:center;font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;opacity:.8;">+ ДОБАВИТЬ +</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+          ${addBtn('breakfast','Завтрак','🌅')}
+          ${addBtn('lunch','Обед','☀️')}
+          ${addBtn('dinner','Ужин','🌙')}
+          ${addBtn('snack','Перекус','🍎')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
 
 // --- Shared helper: build meal card HTML from engine meal object ---
 function buildMealCardHTML(m, index, idPrefix='recipe') {
@@ -1663,14 +1789,14 @@ function renderShoppingList() {
   // API plan has priority
   if (_apiPlan && _apiPlan[0]) {
     const day0 = _apiPlan[0];
-    const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+    const activeSlots = state.mealSlots || ['breakfast', 'lunch', 'dinner', 'snack'];
     // Build engine meals to fill slots missing from API (e.g. no lunch/dinner in Supabase yet)
     if (!dayMenuCache[1] && nutritionDataLoaded) {
       const _p = buildUserProfile(); const _t = new NutrientTracker();
       dayMenuCache[1] = buildDayMenu(_p, 1, _t);
     }
     const cards = [];
-    for (const s of slots) {
+    for (const s of activeSlots) {
       if (day0[s]) {
         cards.push(buildMealCardHTML_API(day0[s], s, 'preview-' + s));
       } else if (dayMenuCache[1]) {
@@ -1678,7 +1804,7 @@ function renderShoppingList() {
         if (em) cards.push(buildMealCardHTML(em, dayMenuCache[1].indexOf(em), 'preview-eng'));
       }
     }
-    document.getElementById('mealsContainer').innerHTML = cards.join('');
+    document.getElementById('mealsContainer').innerHTML = cards.join('') + buildMealManagerHTML();
     return;
   }
 
@@ -1696,7 +1822,7 @@ function renderShoppingList() {
   const tracker = new NutrientTracker();
   const engineMeals = buildDayMenu(profile, 1, tracker);
   document.getElementById('mealsContainer').innerHTML =
-    engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('');
+    engineMeals.map((m, i) => buildMealCardHTML(m, i, 'recipe')).join('') + buildMealManagerHTML();
 }
 
 function toggleRecipe(id) {
@@ -2007,7 +2133,8 @@ function renderDayMealsFromEngine(d, engineMeals) {
   const banner = buildExclusionBannerHtml();
   container.innerHTML =
     `<div class="section-label" style="margin-top:12px;">День ${d}</div>` + banner +
-    engineMeals.map((m, i) => buildMealCardHTML(m, i, `dr-${d}`)).join('');
+    engineMeals.map((m, i) => buildMealCardHTML(m, i, `dr-${d}`)).join('') +
+    buildMealManagerHTML();
   container.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -2028,12 +2155,12 @@ function renderDayMeals(d) {
         dayMenuCache[d] = buildDayMenu(_p, d, _t);
       }
       const banner = buildExclusionBannerHtml();
-      const slots = ['breakfast', 'lunch', 'dinner', 'snack'];
+      const activeSlots = state.mealSlots || ['breakfast', 'lunch', 'dinner', 'snack'];
       const cards = [];
-      for (const s of slots) {
+      for (const s of activeSlots) {
         if (dayData[s]) {
           // API slot: store in dayMenuCache for swap/macros logic
-          const slotIdx = slots.indexOf(s);
+          const slotIdx = ['breakfast','lunch','dinner','snack'].indexOf(s);
           if (!dayMenuCache[d]) dayMenuCache[d] = [];
           if (!dayMenuCache[d][slotIdx]) dayMenuCache[d][slotIdx] = {};
           dayMenuCache[d][slotIdx].recipe = dayData[s];
@@ -2048,7 +2175,7 @@ function renderDayMeals(d) {
       }
       container.innerHTML =
         '<div class="section-label" style="margin-top:12px;">День ' + d + '</div>' +
-        banner + cards.join('');
+        banner + cards.join('') + buildMealManagerHTML();
       container.scrollIntoView({behavior:'smooth', block:'start'});
       return;
     }
