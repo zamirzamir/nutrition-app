@@ -974,6 +974,7 @@ function substituteRecipe(recipe, excludedIds) {
 
 // ---------- 1. Data store -----------------------------------
 let ingredientsMap = {};   // { id: ingredientObject }
+let ingredientsByName = {}; // { "название нижний регистр": ingredientObject }
 let recipesArray   = [];   // [ recipeObject, ... ]
 let nutritionDataLoaded = false;
 let nutritionDataLoading = false;
@@ -990,7 +991,7 @@ async function loadNutritionData() {
     const ingArr = await ingRes.json();
     // Transform Supabase flat format → engine per_100g format
     ingArr.forEach(ing => {
-      ingredientsMap[ing.id] = {
+      const obj = {
         ...ing,
         per_100g: {
           calories: ing.calories || 0,
@@ -1000,6 +1001,8 @@ async function loadNutritionData() {
           fiber:    ing.fiber    || 0,
         }
       };
+      ingredientsMap[ing.id] = obj;
+      if (ing.name) ingredientsByName[(ing.name || '').toLowerCase()] = obj;
     });
     // Keep static recipes.json as engine fallback (320 recipes)
     try {
@@ -1034,7 +1037,7 @@ function calculateRecipeNutrition(recipe) {
   NUTRIENT_KEYS.forEach(k => totals[k] = 0);
 
   for (const ing of recipe.ingredients) {
-    const data = ingredientsMap[ing.id];
+    const data = ingredientsMap[ing.id] || ingredientsByName[(ing.id || '').toLowerCase()];
     if (!data) continue;
     const factor = ing.amount_g / 100;
     NUTRIENT_KEYS.forEach(k => {
