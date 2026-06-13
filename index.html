@@ -1333,10 +1333,20 @@ async function loadMealPlanFromAPI() {
 }
 
 function buildMealCardHTML_API(recipe, mealType, cardId) {
-  const cal   = Math.round(recipe.calories_per_serving || 0);
-  const prot  = Math.round(recipe.protein_per_serving  || 0);
-  const fat   = Math.round(recipe.fat_per_serving      || 0);
-  const carbs = Math.round(recipe.carbs_per_serving    || 0);
+  let cal   = Math.round(recipe.calories_per_serving || 0);
+  let prot  = Math.round(recipe.protein_per_serving  || 0);
+  let fat   = Math.round(recipe.fat_per_serving      || 0);
+  let carbs = Math.round(recipe.carbs_per_serving    || 0);
+  // Если нет готового КБЖУ — считаем из ингредиентов
+  if (!cal && recipe.ingredients && recipe.ingredients.length) {
+    const nut = calculateRecipeNutrition(recipe);
+    if (nut.calories > 0) {
+      cal   = Math.round(nut.calories);
+      prot  = Math.round(nut.protein);
+      fat   = Math.round(nut.fat);
+      carbs = Math.round(nut.carbs);
+    }
+  }
   return `
 <div class="meal-card">
   <div class="meal-img-wrap" onclick="loadAndToggleRecipe('${cardId}','${recipe.id}')">
@@ -1717,7 +1727,7 @@ function _applySwapDOM(cardId, recipe) {
     carbs = Math.round(recipe.carbs_per_serving || 0);
   } else {
     (recipe.ingredients || []).forEach(function(i) {
-      var d = ingredientsMap[i.id];
+      var d = ingredientsMap[i.id] || ingredientsByName[(i.id||'').toLowerCase()];
       if (d) { var g = i.amount_g || i.amount || 100; cal += (d.calories||0)*g/100; prot += (d.protein||0)*g/100; fat += (d.fat||0)*g/100; carbs += (d.carbs||0)*g/100; }
     });
     cal = Math.round(cal); prot = Math.round(prot); fat = Math.round(fat); carbs = Math.round(carbs);
