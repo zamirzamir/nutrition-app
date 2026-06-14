@@ -1026,6 +1026,31 @@ async function loadNutritionData() {
       ingredientsMap[ing.id] = obj;
       if (ing.name) ingredientsByName[(ing.name || '').toLowerCase()] = obj;
     });
+    // Load КБЖУ reference indexed by Russian ingredient name (recipes reference ingredients by name)
+    try {
+      const kbRes = await fetch('/ingredients_kbju.json');
+      if (kbRes.ok) {
+        const kbData = await kbRes.json();
+        const kbArr = Array.isArray(kbData) ? kbData : (kbData.ingredients || []);
+        kbArr.forEach(it => {
+          const obj = {
+            id: it.name,
+            name: it.name,
+            per_100g: {
+              calories: it.calories || 0,
+              protein:  it.protein  || 0,
+              fat:      it.fat      || 0,
+              carbs:    it.carbs    || 0,
+              fiber:    it.fiber    || 0,
+            }
+          };
+          const key = (it.name || '').toLowerCase().trim();
+          // Не перезатираем точные данные из ingredients.json, если они уже есть
+          if (key && !ingredientsByName[key]) ingredientsByName[key] = obj;
+        });
+        console.log(`✅ КБЖУ reference: ${kbArr.length} ingredients by name`);
+      }
+    } catch (e) { console.warn('⚠️ ingredients_kbju.json not loaded:', e.message); }
     // Keep static recipes.json as engine fallback (320 recipes)
     try {
       const recRes = await fetch('/recipes.json');
@@ -1863,8 +1888,12 @@ function _kcalForRecipe(recipe) {
   if (!recipe) return 0;
   var c = 0;
   (recipe.ingredients||[]).forEach(function(i) {
-    var d = ingredientsMap[i.id];
-    if (d) c += (d.calories||0) * (i.amount_g||100) / 100;
+    var d = ingredientsMap[i.id] || ingredientsByName[(i.id||'').toLowerCase().trim()];
+    if (d) {
+      var cal = d.calories;
+      if (cal == null && d.per_100g) cal = d.per_100g.calories;
+      c += (cal||0) * (i.amount_g||100) / 100;
+    }
   });
   return c;
 }
