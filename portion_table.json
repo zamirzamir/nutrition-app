@@ -1,0 +1,292 @@
+{
+ "description": "Мин/опт/макс вес порции (г) по весу тела и приёму пищи",
+ "base_formula": "K*weight^0.75*meal_coef, K=13.9",
+ "table": {
+  "40": {
+   "breakfast": {
+    "min": 113,
+    "opt": 188,
+    "max": 291
+   },
+   "lunch": {
+    "min": 153,
+    "opt": 254,
+    "max": 394
+   },
+   "dinner": {
+    "min": 133,
+    "opt": 221,
+    "max": 343
+   },
+   "snack": {
+    "min": 56,
+    "opt": 93,
+    "max": 144
+   }
+  },
+  "50": {
+   "breakfast": {
+    "min": 133,
+    "opt": 222,
+    "max": 344
+   },
+   "lunch": {
+    "min": 180,
+    "opt": 301,
+    "max": 466
+   },
+   "dinner": {
+    "min": 157,
+    "opt": 261,
+    "max": 405
+   },
+   "snack": {
+    "min": 66,
+    "opt": 110,
+    "max": 170
+   }
+  },
+  "60": {
+   "breakfast": {
+    "min": 153,
+    "opt": 255,
+    "max": 395
+   },
+   "lunch": {
+    "min": 207,
+    "opt": 345,
+    "max": 534
+   },
+   "dinner": {
+    "min": 180,
+    "opt": 300,
+    "max": 464
+   },
+   "snack": {
+    "min": 76,
+    "opt": 126,
+    "max": 195
+   }
+  },
+  "70": {
+   "breakfast": {
+    "min": 172,
+    "opt": 286,
+    "max": 443
+   },
+   "lunch": {
+    "min": 232,
+    "opt": 387,
+    "max": 600
+   },
+   "dinner": {
+    "min": 202,
+    "opt": 336,
+    "max": 521
+   },
+   "snack": {
+    "min": 85,
+    "opt": 141,
+    "max": 219
+   }
+  },
+  "80": {
+   "breakfast": {
+    "min": 190,
+    "opt": 316,
+    "max": 490
+   },
+   "lunch": {
+    "min": 257,
+    "opt": 428,
+    "max": 663
+   },
+   "dinner": {
+    "min": 223,
+    "opt": 372,
+    "max": 576
+   },
+   "snack": {
+    "min": 94,
+    "opt": 156,
+    "max": 242
+   }
+  },
+  "90": {
+   "breakfast": {
+    "min": 207,
+    "opt": 345,
+    "max": 535
+   },
+   "lunch": {
+    "min": 280,
+    "opt": 467,
+    "max": 724
+   },
+   "dinner": {
+    "min": 244,
+    "opt": 406,
+    "max": 630
+   },
+   "snack": {
+    "min": 102,
+    "opt": 171,
+    "max": 264
+   }
+  },
+  "100": {
+   "breakfast": {
+    "min": 224,
+    "opt": 374,
+    "max": 579
+   },
+   "lunch": {
+    "min": 303,
+    "opt": 505,
+    "max": 750
+   },
+   "dinner": {
+    "min": 264,
+    "opt": 440,
+    "max": 680
+   },
+   "snack": {
+    "min": 111,
+    "opt": 185,
+    "max": 286
+   }
+  },
+  "110": {
+   "breakfast": {
+    "min": 241,
+    "opt": 401,
+    "max": 600
+   },
+   "lunch": {
+    "min": 326,
+    "opt": 543,
+    "max": 750
+   },
+   "dinner": {
+    "min": 283,
+    "opt": 472,
+    "max": 680
+   },
+   "snack": {
+    "min": 119,
+    "opt": 198,
+    "max": 307
+   }
+  },
+  "120": {
+   "breakfast": {
+    "min": 257,
+    "opt": 428,
+    "max": 600
+   },
+   "lunch": {
+    "min": 348,
+    "opt": 580,
+    "max": 750
+   },
+   "dinner": {
+    "min": 302,
+    "opt": 504,
+    "max": 680
+   },
+   "snack": {
+    "min": 127,
+    "opt": 212,
+    "max": 328
+   }
+  },
+  "130": {
+   "breakfast": {
+    "min": 273,
+    "opt": 455,
+    "max": 600
+   },
+   "lunch": {
+    "min": 369,
+    "opt": 615,
+    "max": 750
+   },
+   "dinner": {
+    "min": 321,
+    "opt": 535,
+    "max": 680
+   },
+   "snack": {
+    "min": 135,
+    "opt": 225,
+    "max": 348
+   }
+  },
+  "140": {
+   "breakfast": {
+    "min": 289,
+    "opt": 481,
+    "max": 600
+   },
+   "lunch": {
+    "min": 390,
+    "opt": 651,
+    "max": 750
+   },
+   "dinner": {
+    "min": 339,
+    "opt": 566,
+    "max": 680
+   },
+   "snack": {
+    "min": 143,
+    "opt": 238,
+    "max": 368
+   }
+  },
+  "150": {
+   "breakfast": {
+    "min": 304,
+    "opt": 506,
+    "max": 600
+   },
+   "lunch": {
+    "min": 411,
+    "opt": 685,
+    "max": 750
+   },
+   "dinner": {
+    "min": 357,
+    "opt": 596,
+    "max": 680
+   },
+   "snack": {
+    "min": 150,
+    "opt": 250,
+    "max": 380
+   }
+  },
+  "160": {
+   "breakfast": {
+    "min": 319,
+    "opt": 532,
+    "max": 600
+   },
+   "lunch": {
+    "min": 431,
+    "opt": 719,
+    "max": 750
+   },
+   "dinner": {
+    "min": 375,
+    "opt": 625,
+    "max": 680
+   },
+   "snack": {
+    "min": 158,
+    "opt": 263,
+    "max": 380
+   }
+  }
+ }
+}

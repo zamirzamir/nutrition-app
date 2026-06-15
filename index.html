@@ -149,6 +149,19 @@ body {
 }
 .meal-img-overlay .meal-name { font-size:17px; font-weight:800; color:#fff; }
 .meal-img-overlay .meal-type { font-size:11px; color:rgba(255,255,255,.7); margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
+/* Чип режима тега (правый верхний угол карточки) */
+.tag-chip {
+  position:absolute; top:10px; right:10px; z-index:5;
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--accent,#a78bfa); color:#fff;
+  border-radius:16px; padding:5px 8px 5px 11px;
+  font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.tag-chip .tag-x {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%;
+  background:rgba(255,255,255,.25); cursor:pointer; font-size:13px; line-height:1;
+}
 .meal-nav-bar {
   position:absolute; top:10px; left:50%; transform:translateX(-50%);
   display:flex; align-items:center; gap:4px;
@@ -539,10 +552,13 @@ const state = {
   cw: 0, tw: 0,
   context: '',
   purchased: false,
-  excludedIngredientIds: [], // ingredient IDs the user can't eat
+  excludedIngredientIds: [], // (устар.) ingredient IDs — больше не используется фильтром
+  excludedCats: [],      // исключённые категории (рыба, молочное, ...)
+  excludedNames: [],     // исключённые слова-названия (говядина, лук, ...)
   activeDayBtn: null,
-  ingredientSwaps: {},   // { fromId: toId }
+  ingredientSwaps: {},   // { fromName: toName }
   mealOverrides: {},     // { mealType: recipeObject }
+  tagMode: {},           // { mealType: tagKey } — режим тега: слот крутит только блюда тега
   mealSlots: ['breakfast', 'lunch', 'dinner', 'snack'], // active meal slots
 };
 
@@ -570,7 +586,7 @@ function calculate() {
   if (!height || height<100 || height>250) { alert('Введи корректный рост (от 100 до 250 см)'); return; }
   if (!age || age<10 || age>100) { alert('Введи корректный возраст (от 10 до 100 лет)'); return; }
 
-  state.cw = cw; state.tw = tw;
+  state.cw = cw; state.tw = tw; state.height = height; state.age = age;
 
   const bmr = state.gender === 'male'
     ? 10*cw + 6.25*height - 5*age + 5
@@ -670,50 +686,51 @@ function calculate() {
 
 // ========== EXCLUSION & SUBSTITUTION SYSTEM ==========
 
-// --- Ingredient groups for text detection ---
-const EXCLUSION_PATTERNS = [
+// ====== НОВАЯ СИСТЕМА ИСКЛЮЧЕНИЙ (на категориях + русских названиях) ======
+// Исключения хранятся в state.excludedCats (Set категорий) и state.excludedNames (Set слов-названий).
 
-  { words: ['мясо','мяса','мясной','мясных','мясные','мясным','мясного','мясному','без мяса','не ем мяс','не ест мяс','не едим мяс','отказ от мяса','говядин','свинин','баранин','телятин','колбас','сосиск'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
-  { words: ['рыб','лосос','треск','тунец','скумбри','сельд','сардин','форел','палтус','тилапи','минтай','окун','анчоус','без рыбы','не ем рыб','не ест рыб','рыбу не ем'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
-  { words: ['морепродукт','креветк','кальмар','краб','мидий','гребешок','устриц','без морепродуктов','не ем морепродукт'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
-  { words: ['молочн','молоко','молока','сыр ','сыра','творог','кефир','йогурт','сметан','сливки','сливочн','лактоз','непереносимость лактоз','без молочк','без молока','без сыра','не ем молочн'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
-  { words: ['без топлёного масла','без ги','без ghee'], ids: ['ghee'] },
-  { words: ['яйц','яйцо','яйца','без яиц','не ем яйц','аллергия на яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
-  { words: ['мёд','без мёда','без меда','не ем мёд','не ем мед'], ids: ['honey'] },
-  { words: ['свинин','свиной','свиная','без свинины','не ем свинину','халяль','halal','кошерн','kosher'], ids: ['pork_loin','pork_minced'] },
-  { words: ['без курицы','без курятины','не ем курицу','не ем курятин'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken'] },
-  { words: ['без говядины','не ем говядин'], ids: ['beef_lean','beef_minced','liver_beef','broth_beef'] },
-  { words: ['красное мясо','красного мяса','без красного мяса','не ем красное мясо'], ids: ['beef_lean','beef_minced','liver_beef','lamb_leg','pork_loin','pork_minced'] },
-  { words: ['орех','миндал','грецк','кешью','фундук','фисташ','макадами','пекан','бразильск','без орехов','аллергия на орехи'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
-  { words: ['без семян','семечки не ем','не ем семечки'], ids: ['sunflower_seeds','pumpkin_seeds','hemp_seeds','sesame_seeds','flaxseeds','chia_seeds'] },
-  { words: ['глютен','клейковин','gluten','целиак','без глютена','без пшениц','непереносимость глютен','пшеница','ржан'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
-  { words: ['бобов','фасол','нут ','нута','чечевиц','горох','тофу','темпе','натто','соев','edamame','бобы','без бобовых'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
-  { words: ['без соли','мало соли','несолёное','не ем соль','ограничение соли'], ids: ['salt','miso_paste','soy_sauce','fish_sauce','worcestershire_sauce','anchovy','herring'] },
-  { words: ['без сахара','диабет','не ем сахар','исключи сахар','без сладкого'], ids: ['sugar','honey','sugar_maple','coconut_sugar'] },
-
+// Группы-триггеры: фраза → категории, которые надо исключить целиком.
+const EXCLUSION_GROUPS = [
+  { words: ['не ем мяс','без мяса','отказ от мяса','исключи мясо','убери мясо','не ем мясо','мясо не ем','не едим мяс'], cats: ['мясо','птица','колбасы'] },
+  { words: ['не ем птиц','без птицы','не ем курицу','без курицы','без курятины','не ем курятин','курицу не ем'], cats: ['птица'] },
+  { words: ['не ем говядин','без говядины','говядину не ем'], cats: [], names: ['говядина','говяж'] },
+  { words: ['не ем свинин','без свинины','свинину не ем','халяль','halal','кошер','kosher'], cats: [], names: ['свин'] },
+  { words: ['красное мясо','без красного мяса','не ем красное мясо'], cats: [], names: ['говядина','свин','баранин','телятин'] },
+  { words: ['не ем рыб','без рыбы','рыбу не ем','исключи рыбу','убери рыбу','отказ от рыбы'], cats: ['рыба'] },
+  { words: ['не ем морепродукт','без морепродуктов','морепродукты не ем','без морепродукт'], cats: ['морепродукты'] },
+  { words: ['не ем колбас','без колбасы','без сосисок','не ем сосиск','без колбас'], cats: ['колбасы'] },
+  { words: ['не ем молочн','без молочк','без молока','не ем молоко','без сыра','не ем сыр','лактоз','непереносимость лактоз','без лактозы'], cats: ['молочное','сыры'] },
+  { words: ['не ем яйц','без яиц','аллергия на яйц','яйца не ем','без яйца'], cats: ['яйца'] },
+  { words: ['не ем орех','без орехов','аллергия на орехи','орехи не ем','без орех'], cats: ['орехи'] },
+  { words: ['не ем глютен','без глютена','без пшениц','целиак','клейковин','непереносимость глютен','без хлеба','без мучного'], cats: ['злаки','хлеб_выпечка'] },
+  { words: ['не ем бобов','без бобовых','бобовые не ем','без фасоли','не ем фасол'], cats: ['бобовые'] },
+  { words: ['не ем сладк','без сладкого','без сахара','диабет','исключи сахар','не ем сахар'], cats: ['сладкое'] },
+  { words: ['не ем грибы','без грибов','грибы не ем'], cats: [], names: ['гриб','шампиньон','вешенк','лисичк','опят','маслят'] },
+  { words: ['не ем лук','без лука'], cats: [], names: ['лук'] },
+  { words: ['не ем чеснок','без чеснока'], cats: [], names: ['чеснок'] },
+  { words: ['не ем помидор','без помидор','без томат','не ем томат'], cats: [], names: ['помидор','томат'] },
+  { words: ['не ем мёд','не ем мед','без мёда','без меда'], cats: [], names: ['мед','мёд'] },
 ];
 
-// Диетические типы (ЗАМЕНЯЮТ exclusions целиком)
-const DIET_PATTERNS = [
-  { words: ['пескатариан','pescatarian','pescetarian','ем рыбу но не мясо','рыбу ем мясо нет'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
-  { words: ['вегетариан','vegetarian'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters'] },
-  { words: ['веган','vegan','plant-based','plant based','растительное питани','растительн рацион','отказ от животных','ничего животного'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth','salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil','shrimp','squid','crab','mussels','scallops','oysters','milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese','egg_chicken','egg_white','egg_yolk','honey','protein_whey'] },
+// Диеты — ПОЛНОСТЬЮ задают набор исключённых категорий.
+const DIET_GROUPS = [
+  { words: ['пескатариан','pescatarian','pescetarian','ем рыбу но не мясо'], cats: ['мясо','птица','колбасы'] },
+  { words: ['вегетариан','vegetarian'], cats: ['мясо','птица','колбасы','рыба','морепродукты'] },
+  { words: ['веган','vegan','plant-based','plant based','растительное питани','отказ от животных','ничего животного'], cats: ['мясо','птица','колбасы','рыба','морепродукты','молочное','сыры','яйца'] },
 ];
 
-// Позитивные упоминания (УБИРАЮТ из exclusions)
-const INCLUSION_PATTERNS = [
-  { words: ['ем мяс','хочу мяс','верни мяс','снова ем мяс','можно мяс','буду есть мяс','ем курицу','хочу курицу','верни курицу','ем говядину','хочу говядину','верни говядину'], ids: ['chicken_breast','chicken_thigh','liver_chicken','broth_chicken','beef_lean','beef_minced','liver_beef','broth_beef','lamb_leg','turkey_breast','pork_loin','pork_minced','bone_broth'] },
-  { words: ['ем рыб','хочу рыб','верни рыб','снова ем рыб','можно рыб','буду есть рыб'], ids: ['salmon','salmon_pink_canned','cod','tuna_fresh','tuna_canned','mackerel','herring','sardines_canned','trout','halibut','tilapia','pollock','sea_bass','anchovy','fish_sauce','cod_liver_oil'] },
-  { words: ['ем морепродукт','хочу морепродукт','верни морепродукт','ем креветк','хочу креветк'], ids: ['shrimp','squid','crab','mussels','scallops','oysters'] },
-  { words: ['ем молоч','ем молок','хочу молок','верни молок','снова ем молок','ем сметан','хочу сметан','верни сметан','ем творог','хочу творог','верни творог','ем кефир','хочу кефир','верни кефир','ем йогурт','хочу йогурт','верни йогурт','ем сыр','хочу сыр','верни сыр','ем сливк','хочу сливк'], ids: ['milk_whole','greek_yogurt','yogurt_natural','kefir','sour_cream','cream_heavy','butter','ghee','cheese_cheddar','mozzarella','parmesan','feta_cheese','cream_cheese','cottage_cheese'] },
-  { words: ['ем яйц','хочу яйц','верни яйц','снова ем яйц','можно яйц'], ids: ['egg_chicken','egg_white','egg_yolk'] },
-  { words: ['ем мёд','ем мед','хочу мёд','хочу мед','верни мёд','верни мед'], ids: ['honey'] },
-  { words: ['ем свинин','хочу свинин','верни свинин'], ids: ['pork_loin','pork_minced'] },
-  { words: ['ем орех','хочу орех','верни орех','ем миндал','ем кешью','ем фундук'], ids: ['almonds','walnuts','cashews','pine_nuts','pistachios','hazelnuts','peanut_butter','macadamia','pecan','brazil_nuts','tahini'] },
-  { words: ['ем глютен','ем пшениц','хочу пшениц','верни пшениц','ем хлеб','хочу хлеб','ем пасту','хочу пасту','ем макарон','хочу макарон'], ids: ['wheat_flour','pasta_wheat','bread_rye','bread_whole_wheat','bulgur','couscous','spelt','pita_bread','oats','wheat_germ','wheat_bran','rye_flour'] },
-  { words: ['ем бобов','ем фасол','ем нут','хочу нут','ем чечевиц','хочу чечевиц','ем тофу','хочу тофу','верни бобов'], ids: ['chickpeas','lentils_green','lentils_red','lentils_black','kidney_beans','white_beans','black_beans','pinto_beans','fava_beans','mung_beans','adzuki_beans','natto','tempeh','tofu','edamame','hummus','green_peas','soy_milk','soy_sauce'] },
-  { words: ['ем соль','можно соль','верни соль','снова с солью'], ids: ['salt','miso_paste','worcestershire_sauce'] },
-  { words: ['ем сахар','можно сахар','верни сахар','снова сахар'], ids: ['sugar','sugar_maple','coconut_sugar'] },
+// Позитивные упоминания — УБИРАЮТ категории/названия из исключений.
+const INCLUSION_GROUPS = [
+  { words: ['ем мяс','хочу мяс','верни мяс','снова ем мяс','можно мяс','буду есть мяс'], cats: ['мясо','птица','колбасы'] },
+  { words: ['ем курицу','хочу курицу','верни курицу','ем птиц'], cats: ['птица'] },
+  { words: ['ем рыб','хочу рыб','верни рыб','снова ем рыб','можно рыб','буду есть рыб'], cats: ['рыба'] },
+  { words: ['ем морепродукт','хочу морепродукт','верни морепродукт','ем креветк','хочу креветк'], cats: ['морепродукты'] },
+  { words: ['ем молоч','ем молок','хочу молок','верни молок','снова ем молок','ем сметан','ем творог','ем кефир','ем йогурт','ем сыр','хочу сыр'], cats: ['молочное','сыры'] },
+  { words: ['ем яйц','хочу яйц','верни яйц','снова ем яйц','можно яйц'], cats: ['яйца'] },
+  { words: ['ем орех','хочу орех','верни орех','ем миндал','ем кешью','ем фундук'], cats: ['орехи'] },
+  { words: ['ем глютен','ем пшениц','хочу пшениц','ем хлеб','хочу хлеб','ем пасту','ем макарон'], cats: ['злаки','хлеб_выпечка'] },
+  { words: ['ем бобов','ем фасол','ем нут','хочу нут','ем чечевиц','ем тофу'], cats: ['бобовые'] },
+  { words: ['ем сахар','можно сахар','верни сахар','ем сладк','можно сладк'], cats: ['сладкое'] },
 ];
 
 // Reset phrases — убираем все ограничения
@@ -730,97 +747,90 @@ const RESET_EXCLUSION_WORDS = [
   'больше нет ограничений', 'снял ограничения', 'убрал ограничения',
 ];
 
-// --- Substitution map: ingredient_id → array of substitute ids ---
-const INGREDIENT_SUBSTITUTES = {
-  // Meat → plant proteins
-  chicken_breast:    ['tofu_firm','tempeh','chickpeas_cooked','lentils_red_cooked'],
-  chicken_thigh:     ['tofu_firm','tempeh','chickpeas_cooked'],
-  beef_lean:         ['lentils_red_cooked','tofu_firm','tempeh','black_beans_cooked'],
-  beef_ribeye:       ['lentils_red_cooked','tofu_firm','tempeh'],
-  pork_lean:         ['tofu_firm','tempeh','chickpeas_cooked'],
-  // Fish & seafood → plant/other proteins
-  salmon:            ['tofu_firm','chickpeas_cooked','lentils_red_cooked'],
-  tuna_canned:       ['chickpeas_cooked','tofu_firm','edamame'],
-  cod:               ['tofu_firm','chickpeas_cooked'],
-  shrimp:            ['edamame','tofu_firm'],
-  // Dairy
-  milk_whole:        ['oats_rolled'],   // oat "milk" substitute
-  milk_skim:         ['oats_rolled'],
-  greek_yogurt:      ['tofu_silken'],
-  cottage_cheese_5:  ['tofu_silken'],
-  cheese_cheddar:    ['tofu_firm'],
-  cheese_feta:       ['tofu_firm'],
-  butter:            ['coconut_oil','olive_oil'],
-  ghee:              ['coconut_oil','olive_oil'],
-  kefir:             ['tofu_silken'],
-  // Eggs
-  egg_whole:         ['tofu_silken','chickpeas_cooked'],
-  egg_white:         ['tofu_silken'],
-  // Nuts → seeds
-  almonds:           ['pumpkin_seeds','sunflower_seeds','hemp_seeds'],
-  walnuts:           ['pumpkin_seeds','hemp_seeds'],
-  cashews:           ['pumpkin_seeds','sunflower_seeds'],
-  // Honey → dates
-  honey:             ['dates_medjool'],
-  // Gluten → gluten-free grains
-  bread_white:       ['rice_cakes','buckwheat_cooked'],
-  bread_rye:         ['rice_cakes','buckwheat_cooked'],
-  bread_ww:          ['rice_cakes','buckwheat_cooked'],
-  pasta_cooked:      ['buckwheat_cooked','white_rice_cooked'],
-  // Mushrooms → zucchini/eggplant
-  mushrooms_white:   ['zucchini','eggplant'],
-  // Tofu → legumes
-  tofu_firm:         ['chickpeas_cooked','lentils_red_cooked','tempeh'],
-  tofu_silken:       ['cottage_cheese_5','greek_yogurt'],
-};
+// --- Замена ингредиента на похожий: по категории подбираем замену той же категории ---
+// (используется, когда блюдо содержит исключённый ингредиент, но категория не запрещена целиком)
+function findCategorySubstitute(ingName, excludedCats, excludedNames) {
+  const cat = ingredientCategoryByName[(ingName||'').toLowerCase().trim()] || 'прочее';
+  if (excludedCats.has(cat)) return null; // вся категория под запретом — замены нет
+  // ищем другой ингредиент той же категории, не входящий в исключения
+  for (const key in ingredientCategoryByName) {
+    if (ingredientCategoryByName[key] !== cat) continue;
+    if (key === (ingName||'').toLowerCase().trim()) continue;
+    if (excludedNames.has(key)) continue;
+    if ([...excludedNames].some(n => key.includes(n))) continue;
+    return ingredientsByName[key]?.name || key;
+  }
+  return null;
+}
 
-// --- Parse free text → set of excluded ingredient IDs ---
+// --- Парсинг свободного текста → обновление исключений (категории + названия) ---
+// Возвращает: null — полный сброс; false — ничего не распознано; true — исключения изменены.
 function parseExclusions(text) {
   const t = text.toLowerCase();
-  const excluded = new Set(state.excludedIngredientIds || []);
 
   // 1. Полный сброс
   if (RESET_EXCLUSION_WORDS.some(w => t.includes(w))) {
     return null;
   }
 
+  const cats  = new Set(state.excludedCats  || []);
+  const names = new Set(state.excludedNames || []);
   let changed = false;
 
-  // 2. Диетический тип → ЗАМЕНЯЕТ все текущие exclusions
+  // 2. Диета → ПОЛНОСТЬЮ задаёт набор исключённых категорий
   let dietMatched = false;
-  for (const pattern of DIET_PATTERNS) {
-    if (pattern.words.some(w => t.includes(w))) {
-      excluded.clear();
-      pattern.ids.forEach(id => excluded.add(id));
-      changed = true;
-      dietMatched = true;
-      break;
+  for (const g of DIET_GROUPS) {
+    if (g.words.some(w => t.includes(w))) {
+      cats.clear(); names.clear();
+      g.cats.forEach(c => cats.add(c));
+      changed = true; dietMatched = true; break;
     }
   }
 
   if (!dietMatched) {
-    // 3. Конкретное ограничение → ДОБАВЛЯЕМ ids к exclusions (сначала)
-    for (const pattern of EXCLUSION_PATTERNS) {
-      if (pattern.words.some(w => t.includes(w))) {
-        pattern.ids.forEach(id => excluded.add(id));
+    // 3. Конкретные исключения → добавляем категории/названия
+    for (const g of EXCLUSION_GROUPS) {
+      if (g.words.some(w => t.includes(w))) {
+        (g.cats || []).forEach(c => cats.add(c));
+        (g.names || []).forEach(n => names.add(n));
         changed = true;
       }
     }
-    // 4. Позитивное упоминание → УБИРАЕМ ids (после exclusion, поэтому побеждает)
-    for (const pattern of INCLUSION_PATTERNS) {
-      if (pattern.words.some(w => {
+    // 4. Позитивные упоминания → убираем категории (после исключений, поэтому побеждают)
+    for (const g of INCLUSION_GROUPS) {
+      if (g.words.some(w => {
         const idx = t.indexOf(w);
         if (idx === -1) return false;
         const before = t.substring(Math.max(0, idx - 5), idx);
-        return !before.includes('не');
+        return !before.includes('не'); // «не ем мясо» не считается позитивным
       })) {
-        pattern.ids.forEach(id => excluded.delete(id));
+        (g.cats || []).forEach(c => cats.delete(c));
         changed = true;
       }
     }
   }
 
-  return changed ? [...excluded] : false;
+  if (!changed) return false;
+  // Сохраняем в state
+  state.excludedCats  = [...cats];
+  state.excludedNames = [...names];
+  return true;
+}
+
+// Проверка: содержит ли рецепт исключённый ингредиент (по категории или названию)
+function recipeHasExcluded(recipe, excludedCats, excludedNames) {
+  if (!recipe || !recipe.ingredients) return false;
+  for (const ing of recipe.ingredients) {
+    const nm = (ing.id || ing.name || '').toLowerCase().trim();
+    if (excludedCats && excludedCats.size) {
+      const cat = ingredientCategoryByName[nm] || 'прочее';
+      if (excludedCats.has(cat)) return true;
+    }
+    if (excludedNames && excludedNames.size) {
+      for (const n of excludedNames) { if (n && nm.includes(n)) return true; }
+    }
+  }
+  return false;
 }
 
 function parseMenuReset(text) {
@@ -841,41 +851,258 @@ function parseMenuReset(text) {
     openPopup('🔄', 'Готово! Всё меню пересчитано заново с учётом твоих настроек.');
   }
 
+  // Общий словарь слов приёмов пищи
+  const MEAL_WORDS = {
+    breakfast: ['завтрак','завтраку','завтрака','завтраком','утром','на утро','с утра'],
+    lunch:     ['обед','обеду','обеда','обедом','днём','днем','в обед'],
+    dinner:    ['ужин','ужину','ужина','ужином','вечером','на вечер'],
+    snack:     ['перекус','перекуса','перекусу','перекусом','снек','полдник'],
+  };
+  function detectMeal(t) {
+    for (const [mt, words] of Object.entries(MEAL_WORDS)) {
+      const found = words.find(w => t.includes(w));
+      if (found) return { mealType: mt, mealWord: found };
+    }
+    return null;
+  }
+
   function parseIngredientRequest(text) {
   const t = text.toLowerCase().trim();
-  const verbs = ['хочу','хочется','дай','поставь','добавь','сделай','положи','хочу чтобы'];
+  // Глаголы-намерения «хочу/поставь/добавь...» + «съесть/скушать/покушать»
+  const verbs = ['хочу съесть','хочу скушать','хочу покушать','хочу чтобы','хочу','хочется','хотелось бы',
+                 'дай','дайте','поставь','поставьте','добавь','добавьте','сделай','сделайте','положи',
+                 'съесть','скушать','покушать','съем','скушаю','можно','давай','пусть будет'];
+  // «замени/поменяй/другое ... » обрабатывает parseFoodSubstitution — сюда не пускаем
+  const subVerbs = ['замени','заменить','поменяй','поменять','смени','сменить','измени','изменить','другое','другой','другую','что-нибудь другое','что-то другое'];
+  if (subVerbs.some(v => t.includes(v))) return false;
+  const meal = detectMeal(t);
+  if (!meal) return false; // без приёма пищи — это не запрос блюда в слот
   const hasVerb = verbs.some(v => t.includes(v));
-  if (!hasVerb) return false;
-  const MEAL_WORDS = {
-    breakfast: ['завтрак','завтраку','завтрака'],
-    lunch:     ['обед','обеду','обеда','обедом'],
-    dinner:    ['ужин','ужину','ужина','ужином'],
-    snack:     ['перекус','перекуса','перекусу'],
-  };
-  let mealType = null, mealWord = null;
-  for (const [mt, words] of Object.entries(MEAL_WORDS)) {
-    const found = words.find(w => t.includes(w));
-    if (found) { mealType = mt; mealWord = found; break; }
-  }
-  if (!mealType) return false;
-  let cleaned = t;
-  verbs.forEach(v => { cleaned = cleaned.replace(new RegExp(v + '\\s*', 'g'), ''); });
-  cleaned = cleaned.replace(/\bна\b/g,'').replace(/\bс\b/g,'').replace(mealWord,'').trim();
-  const ingName = cleaned.replace(/[.,!?]/g,'').trim();
+
+  let cleaned = ' ' + t + ' ';
+  verbs.forEach(v => { cleaned = cleaned.split(v).join(' '); });
+  // убрать слова приёма пищи
+  MEAL_WORDS[meal.mealType].forEach(w => { cleaned = cleaned.split(w).join(' '); });
+  // убрать местоимения и предлоги как отдельные слова
+  const stop = ['я','мне','бы','на','в','во','с','со','и','а','хочу','чтобы','то','же','покушать','поесть','съесть'];
+  cleaned = cleaned.replace(/[.,!?]/g,' ');
+  let words = cleaned.split(/\s+/).filter(w => w && !stop.includes(w));
+  const ingName = words.join(' ').trim();
   if (!ingName || ingName.length < 2) return false;
-  return { type: 'ingredient_request', mealType, ingredientName: ingName };
+  // Без глагола принимаем только короткие фразы вида «борщ на ужин» (1-3 слова)
+  if (!hasVerb && words.length > 3) return false;
+  return { type: 'ingredient_request', mealType: meal.mealType, ingredientName: ingName };
+}
+
+// ===== ТЕГИ-ГРУППЫ для «режима тега» (хочу суп / салат / сыр / бутерброд...) =====
+// key — тег в r.tags.groups; label — для чипа; phrases — что говорит клиент (+синонимы).
+const TAG_GROUPS = {
+  'суп':        {label:'Суп',        phrases:['суп','супчик','первое','борщ','щи','солянк','уха']},
+  'салат':      {label:'Салат',      phrases:['салат','салатик','винегрет','цезарь','оливье']},
+  'каша':       {label:'Каша',       phrases:['каша','кашка','овсянк']},
+  'бутерброд':  {label:'Бутерброд',  phrases:['бутерброд','бутер','бутербродик','сэндвич','сендвич','тост','гренк']},
+  'выпечка':    {label:'Выпечка',    phrases:['выпечк','пирог','булочк','кекс','маффин','круассан','ватрушк']},
+  'блины':      {label:'Блины/оладьи',phrases:['блин','оладь','панкейк','сырник','драник']},
+  'яичница':    {label:'Из яиц',     phrases:['яичниц','омлет','скрэмбл','глазунь','шакшук']},
+  'гарнир':     {label:'Гарнир',     phrases:['гарнир','пюре','плов']},
+  'второе':     {label:'Горячее',    phrases:['второе','горячее','котлет','стейк','тефтел','гуляш','жарко']},
+  'напиток':    {label:'Напиток',    phrases:['напиток','смузи','коктейл','компот','морс','латте','какао']},
+  'закуска':    {label:'Закуска',    phrases:['закуск','канапе','рулетик']},
+  'мясо':       {label:'Мясо',       phrases:['мясо','мясное','говядин','свинин','баранин','фарш']},
+  'курица':     {label:'Курица',     phrases:['курица','курицу','куриц','курин','цыпл']},
+  'индейка':    {label:'Индейка',    phrases:['индейк','индюш']},
+  'рыба':       {label:'Рыба',       phrases:['рыба','рыбу','рыбное','лосос','форел','тунец','треск','семг','горбуш','минтай']},
+  'морепродукты':{label:'Морепродукты',phrases:['морепродукт','креветк','кальмар','мидии','краб']},
+  'колбаса':    {label:'Колбасы',    phrases:['колбас','сосиск','ветчин','бекон','салями']},
+  'сыр':        {label:'Сыр',        phrases:['сыр','сырный','сыром','моцарелл','пармезан','фета']},
+  'творог':     {label:'Творог',     phrases:['творог','творож','творожок']},
+  'яйцо':       {label:'Яйца',       phrases:['яйцо','яйца','яичн']},
+  'молочное':   {label:'Молочное',   phrases:['молочн','молоко','кефир','сметан','сливки']},
+  'грибы':      {label:'Грибы',      phrases:['грибы','грибн','шампиньон','вешенк','лисичк','опят']},
+  'овощи':      {label:'Овощи',      phrases:['овощи','овощное','овощн']},
+  'картофель':  {label:'Картофель',  phrases:['картоф','картош','картошк']},
+  'бобовые':    {label:'Бобовые',    phrases:['бобов','фасол','чечевиц','тофу']},
+  'крупы':      {label:'Крупы',      phrases:['крупа','гречк','булгур','перловк','пшено','киноа']},
+  'макароны':   {label:'Паста',      phrases:['макарон','паста','спагетти','лапша','вермишель','фетучини']},
+  'сладкое':    {label:'Сладкое',    phrases:['сладк','десерт','пирожн']},
+  'шоколад':    {label:'Шоколад',    phrases:['шоколад','шоколадк','батончик','плитк']},
+  'йогурт':     {label:'Йогурт',     phrases:['йогурт','творожок','скир']},
+  'орехи':      {label:'Орехи',      phrases:['орех','миндал','фундук','кешью','фисташ','грецк']},
+  'фрукты':     {label:'Фрукты',     phrases:['фрукт','яблок','банан','груш','апельсин']},
+  'ягоды':      {label:'Ягоды',      phrases:['ягод','клубник','малин','черник','голубик']},
+};
+
+// HTML чипа режима тега для карточки приёма (или '' если режим не активен)
+function tagChipHtml(mealType) {
+  const tag = state.tagMode && state.tagMode[mealType];
+  if (!tag) return '';
+  const label = (TAG_GROUPS[tag] && TAG_GROUPS[tag].label) || tag;
+  return `<div class="tag-chip" onclick="event.stopPropagation()">${label}<span class="tag-x" onclick="exitTagModeUI('${mealType}',event)">✕</span></div>`;
+}
+// Обработчик клика по крестику чипа — снимает режим тега
+function exitTagModeUI(mealType, e) {
+  if (e) e.stopPropagation();
+  exitTagMode(mealType);
+}
+
+// Определяет тег-группу из фразы клиента («хочу суп» → 'суп'). Возвращает ключ или null.
+function detectTagGroup(text) {
+  const t = (text || '').toLowerCase();
+  // ищем самое длинное совпадение фразы (специфичные раньше общих)
+  let best = null, bestLen = 0;
+  for (const key in TAG_GROUPS) {
+    for (const p of TAG_GROUPS[key].phrases) {
+      if (t.includes(p) && p.length > bestLen) { best = key; bestLen = p.length; }
+    }
+  }
+  return best;
+}
+
+// Слово в запросе → тег-группа рецепта (для «хочу бутерброд», «хочу смузи» и т.п.)
+const REQUEST_TAG_WORDS = [
+  { stems: ['бутерброд','бутер','сэндвич','сендвич','сэндвичь'], tag: 'is_sandwich' },
+];
+
+// Упорядочивает бутерброды по паттерну «2 простых + 1 сложный» (каждый 3-й — сложный).
+// Простые: ржаные раньше белых. Сложные и простые — каждый по своему score.
+function orderSandwiches(list) {
+  const simplePrio = r => (r.tags.bread === 'rye' ? 0 : 1); // ржаные первыми
+  const simple = list.filter(r => r.tags && r.tags.is_simple_sandwich)
+                     .sort((a, b) => (simplePrio(a) - simplePrio(b)) || ((b.score||0) - (a.score||0)));
+  const complex = list.filter(r => !(r.tags && r.tags.is_simple_sandwich))
+                      .sort((a, b) => (b.score||0) - (a.score||0));
+  const out = [];
+  let si = 0, ci = 0;
+  // паттерн: простой, простой, сложный, простой, простой, сложный, ...
+  while (si < simple.length || ci < complex.length) {
+    if (si < simple.length) out.push(simple[si++]);
+    if (si < simple.length) out.push(simple[si++]);
+    if (ci < complex.length) out.push(complex[ci++]);
+    if (si >= simple.length && ci >= complex.length) break;
+    // если простые кончились — досыпаем оставшиеся сложные
+    if (si >= simple.length) { while (ci < complex.length) out.push(complex[ci++]); }
+  }
+  return out;
+}
+function requestToTag(q) {
+  const t = (q || '').toLowerCase();
+  for (const r of REQUEST_TAG_WORDS) if (r.stems.some(s => t.includes(s))) return r.tag;
+  return null;
+}
+
+// ===== РЕЖИМ ТЕГА: слот крутит только блюда выбранного тега =====
+// Пул блюд приёма с данным тегом, в порядке карусели, без исключённых.
+function tagPool(mealType, tagKey) {
+  const exCats  = new Set(state.excludedCats  || []);
+  const exNames = new Set(state.excludedNames || []);
+  let pool = recipesArray.filter(r => {
+    const mt = Array.isArray(r.meal_type) ? r.meal_type.join(',') : (r.meal_type || '');
+    if (!mt.includes(mealType)) return false;
+    if (!(r.tags && r.tags.groups && r.tags.groups.indexOf(tagKey) !== -1)) return false;
+    return !recipeHasExcluded(r, exCats, exNames);
+  });
+  // порядок: карусель приёма (разнообразие), затем score
+  pool.sort((a, b) => {
+    const ac = (a.carousel && a.carousel[mealType]) || 999999;
+    const bc = (b.carousel && b.carousel[mealType]) || 999999;
+    if (ac !== bc) return ac - bc;
+    return (b.score||0) - (a.score||0);
+  });
+  // спец-случай бутербродов: паттерн 2 простых + 1 сложный
+  if (tagKey === 'бутерброд') return orderSandwiches(pool);
+  return pool;
+}
+
+// Включает режим тега для слота и ставит первое блюдо тега
+function enterTagMode(mealType, tagKey) {
+  const pool = tagPool(mealType, tagKey);
+  if (!pool.length) return null;
+  state.tagMode = state.tagMode || {};
+  state.tagMode[mealType] = tagKey;
+  state.mealOverrides[mealType] = pool[0];
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { recipeName: pool[0].name, tagLabel: (TAG_GROUPS[tagKey] && TAG_GROUPS[tagKey].label) || tagKey, count: pool.length };
+}
+
+// Снимает режим тега со слота — меню возвращается к обычному
+function exitTagMode(mealType) {
+  if (state.tagMode) delete state.tagMode[mealType];
+  if (state.mealOverrides) delete state.mealOverrides[mealType];
+  _swapHist = {}; _swapPos = {};
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
 }
 
 function applyIngredientRequest(mealType, ingName) {
   if (!recipesArray.length) return null;
   const q = ingName.toLowerCase().trim();
-  const matchIds = Object.keys(ingredientsMap).filter(id => {
-    const n = (ingredientsMap[id].name || '').toLowerCase();
-    return n.includes(q) || q.includes(n.split(' ')[0]);
-  });
-  if (!matchIds.length) return null;
-  const pool = filterRecipes(mealType);
-  const recipe = pool.find(r => r.ingredients && r.ingredients.some(i => matchIds.includes(i.id)));
+  const exCats  = new Set(state.excludedCats  || []);
+  const exNames = new Set(state.excludedNames || []);
+  const pool = filterRecipes(mealType).filter(r => !recipeHasExcluded(r, exCats, exNames));
+
+  // Стратегия 0-tag: запрос — ТЕГ-ГРУППА («хочу суп / салат / сыр / бутерброд...») → РЕЖИМ ТЕГА
+  const tagKey = detectTagGroup(q);
+  if (tagKey) {
+    const res = enterTagMode(mealType, tagKey);
+    if (res) return { recipeName: res.recipeName, ingDisplayName: res.tagLabel, tagMode: true, tagLabel: res.tagLabel };
+  }
+
+  // Стратегия 0: запрос — ТЕГ-ГРУППА («хочу бутерброд») → рецепт с этим тегом
+  const reqTag = requestToTag(q);
+  if (reqTag) {
+    // Ранжирование бутербродов: паттерн «2 простых + 1 сложный» (каждый 3-й — сложный),
+    // чтобы было разнообразие и клиент видел, что сложных тоже немало.
+    const tagged = pool.filter(r => r.tags && r.tags[reqTag]);
+    if (tagged.length) {
+      const ordered = orderSandwiches(tagged);
+      const recipe = ordered[0];
+      state.mealOverrides[mealType] = recipe;
+      Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+      if (state.kcal > 0) {
+        renderMeals();
+        const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+        renderDayMeals(parseInt(d));
+      }
+      return { recipeName: recipe.name, ingDisplayName: 'бутерброд' };
+    }
+  }
+
+  // Стратегия 1: запрос совпадает с НАЗВАНИЕМ блюда («хочу борщ на обед»)
+  let recipe = pool.find(r => r.name.toLowerCase().includes(q));
+  if (!recipe) {
+    const qWords = q.split(' ').filter(w => w.length > 3);
+    recipe = pool.find(r => qWords.some(w => r.name.toLowerCase().includes(w)));
+  }
+  // Стратегия 2: запрос — КАТЕГОРИЯ продукта («хочу курицу/рыбу/мясо на обед»)
+  let ingDisplay = ingName;
+  if (!recipe) {
+    const reqCat = requestToCategory(q); // курицу→птица, рыбу→рыба и т.п.
+    if (reqCat) {
+      recipe = pool.find(r => (r.ingredients || []).some(i => (ingredientCategoryByName[(i.id||'').toLowerCase().trim()] === reqCat)));
+      if (recipe) {
+        const hit = recipe.ingredients.find(i => ingredientCategoryByName[(i.id||'').toLowerCase().trim()] === reqCat);
+        if (hit) ingDisplay = hit.id;
+      }
+    }
+  }
+  // Стратегия 3: точное/частичное совпадение ингредиента по названию
+  if (!recipe) {
+    const canon = resolveIngredientName(q);
+    if (canon) {
+      const ck = canon.toLowerCase();
+      recipe = pool.find(r => (r.ingredients||[]).some(i => (i.id||'').toLowerCase() === ck));
+      if (recipe) ingDisplay = canon;
+    }
+  }
   if (!recipe) return null;
   state.mealOverrides[mealType] = recipe;
   Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
@@ -884,33 +1111,39 @@ function applyIngredientRequest(mealType, ingName) {
     const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
     renderDayMeals(parseInt(d));
   }
-  return { recipeName: recipe.name, ingDisplayName: ingredientsMap[matchIds[0]]?.name || ingName };
+  return { recipeName: recipe.name, ingDisplayName: ingDisplay };
 }
 
 function parseFoodSubstitution(text) {
   const t = text.toLowerCase().trim();
-  const verbs = ['замени ', 'поменяй ', 'смени '];
+  const verbs = ['замени ','заменить ','поменяй ','поменять ','смени ','сменить ','измени ','изменить ','другой ','другое ','другую '];
   const hasVerb = verbs.some(v => t.includes(v));
   if (!hasVerb) return false;
+
   const naIdx = t.indexOf(' на ');
-  if (naIdx === -1) return false;
-  let fromPart = '';
-  for (const verb of verbs) {
-    const idx = t.indexOf(verb);
-    if (idx !== -1) { fromPart = t.substring(idx + verb.length, naIdx).trim(); break; }
+
+  // --- Случай «замени обед на X» / «поменяй ужин на плов» / «поменяй курицу на индейку» ---
+  if (naIdx !== -1) {
+    let fromPart = '';
+    for (const verb of verbs) {
+      const idx = t.indexOf(verb);
+      if (idx !== -1) { fromPart = t.substring(idx + verb.length, naIdx).trim(); break; }
+    }
+    const toPart = t.substring(naIdx + 4).trim();
+    const mealFrom = detectMeal(fromPart);
+    const mealTo = detectMeal(toPart);
+    // «другое на завтрак» / «поменяй на обед» — from пустой, а в to стоит приём → reroll
+    if ((!fromPart || mealTo) && mealTo) return { type: 'meal_reroll', mealType: mealTo.mealType };
+    if (!toPart) { if (mealFrom) return { type: 'meal_reroll', mealType: mealFrom.mealType }; return false; }
+    if (!fromPart) return false;
+    if (mealFrom) return { type: 'meal', mealType: mealFrom.mealType, dishName: toPart };
+    return { type: 'ingredient', fromName: fromPart, toName: toPart };
   }
-  const toPart = t.substring(naIdx + 4).trim();
-  if (!fromPart || !toPart) return false;
-  const MEAL_WORDS = {
-    breakfast: ['завтрак','завтраку','завтрака'],
-    lunch: ['обед','обеду','обеда','обедом'],
-    dinner: ['ужин','ужину','ужина','ужином'],
-    snack: ['перекус','перекуса','перекусу'],
-  };
-  for (const [mealType, words] of Object.entries(MEAL_WORDS)) {
-    if (words.some(w => fromPart.includes(w))) return { type: 'meal', mealType, dishName: toPart };
-  }
-  return { type: 'ingredient', fromName: fromPart, toName: toPart };
+
+  // --- Случай «замени обед» / «смени завтрак» (без «на X») → перевыбрать блюдо в слоте ---
+  const meal = detectMeal(t);
+  if (meal) return { type: 'meal_reroll', mealType: meal.mealType };
+  return false;
 }
 
 function applyMealReplacement(mealType, dishName) {
@@ -934,34 +1167,128 @@ function applyMealReplacement(mealType, dishName) {
   return recipe.name;
 }
 
-function applyIngredientSwap(fromName, toName) {
-  const fn = fromName.toLowerCase().trim();
-  const tn = toName.toLowerCase().trim();
-  const fromId = Object.keys(ingredientsMap).find(id => {
-    const n = (ingredientsMap[id].name || '').toLowerCase();
-    return n.includes(fn) || fn.includes(n.split(' ')[0]);
-  });
-  const toId = Object.keys(ingredientsMap).find(id => {
-    const n = (ingredientsMap[id].name || '').toLowerCase();
-    return n.includes(tn) || tn.includes(n.split(' ')[0]);
-  });
-  if (!fromId || !toId) return null;
-  state.ingredientSwaps = state.ingredientSwaps || {};
-  state.ingredientSwaps[fromId] = toId;
+// «Замени обед» (без указания блюда) → поставить другое популярное блюдо в слот
+function applyMealReroll(mealType) {
+  if (!recipesArray.length) return null;
+  const exCats  = new Set(state.excludedCats  || []);
+  const exNames = new Set(state.excludedNames || []);
+  // текущее блюдо в этом слоте (если есть)
+  let currentId = null;
+  const cached = dayMenuCache[1];
+  if (cached) {
+    const m = cached.find(x => x.mealType === mealType);
+    if (m && m.recipe) currentId = m.recipe.id;
+  }
+  if (state.mealOverrides && state.mealOverrides[mealType]) currentId = state.mealOverrides[mealType].id;
+  // пул по приоритету (filterRecipes уже отсортирован скорингом), без текущего и исключённых
+  const pool = filterRecipes(mealType).filter(r =>
+    r.id !== currentId && !recipeHasExcluded(r, exCats, exNames));
+  if (!pool.length) return null;
+  // берём следующее по приоритету (топ), слегка рандомизируя топ-10 для разнообразия
+  const top = pool.slice(0, 10);
+  const recipe = top[Math.floor(Math.random() * top.length)] || pool[0];
+  state.mealOverrides[mealType] = recipe;
   Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
   if (state.kcal > 0) {
     renderMeals();
     const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
     renderDayMeals(parseInt(d));
   }
-  return { fromName: ingredientsMap[fromId].name, toName: ingredientsMap[toId].name };
+  return recipe.name;
 }
 
-// --- Try to substitute excluded ingredients in a recipe ---
-// Returns { substituted: [{original, replacement}], modifiedIngredients }
-// or null if a core ingredient can't be substituted
-function substituteRecipe(recipe, excludedIds) {
-  if (!excludedIds || !excludedIds.length) {
+// Корень слова (курицу/курица/куриное → "кур") для нечёткого поиска
+function _ru_stem(w) {
+  w = (w || '').toLowerCase().trim();
+  return w.length > 5 ? w.slice(0, w.length - 2) : w;
+}
+// Эталонные названия для обобщённых запросов (что подставлять при «...на индейку»)
+const CANONICAL_PRODUCT = {
+  'куриц':'Куриное филе','курин':'Куриное филе','кур':'Куриное филе','курицу':'Куриное филе','курица':'Куриное филе',
+  'индейк':'Филе индейки','индюш':'Филе индейки','индейку':'Филе индейки','индейка':'Филе индейки',
+  'говядин':'Говядина','говядину':'Говядина','свинин':'Свинина','свинину':'Свинина','баранин':'Баранина',
+  'рыб':'Треска','рыбу':'Треска','лосос':'Лосось','семг':'Семга','форел':'Форель','тунец':'Тунец','минтай':'Минтай','треск':'Треска',
+  'креветк':'Креветки','креветки':'Креветки',
+  'рис':'Рис','греч':'Гречка','гречк':'Гречка','гречку':'Гречка','овсян':'Овсяные хлопья',
+  'молок':'Молоко','молоко':'Молоко','кефир':'Кефир','творог':'Творог','сметан':'Сметана','йогурт':'Йогурт',
+  'сахар':'Сахар','мед':'Мед','мёд':'Мед','соль':'Соль',
+  'яблок':'Яблоки','банан':'Банан','лимон':'Лимон',
+};
+// Найти каноническое название ингредиента по запросу пользователя
+function resolveIngredientName(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) return null;
+  // 0) точное совпадение названия в базе
+  if (ingredientsByName[q]) return ingredientsByName[q].name;
+  // 1) эталон для обобщённого запроса (курицу→Куриное филе, индейку→Филе индейки)
+  if (CANONICAL_PRODUCT[q]) return CANONICAL_PRODUCT[q];
+  const stem = _ru_stem(q);
+  if (CANONICAL_PRODUCT[stem]) return CANONICAL_PRODUCT[stem];
+  for (const k in CANONICAL_PRODUCT) { if (q.includes(k) || (stem && stem.includes(k))) return CANONICAL_PRODUCT[k]; }
+  // 2) частичное совпадение по подстроке (точные продукты)
+  let best = null;
+  for (const key in ingredientsByName) {
+    if (key === q) return ingredientsByName[key].name;
+    if (key.includes(q) || q.includes(key.split(' ')[0])) {
+      if (!best || key.length < best.length) best = key;
+    }
+  }
+  if (best) return ingredientsByName[best].name;
+  // 3) по корню слова (последний резерв)
+  if (stem && stem.length >= 4) {
+    for (const key in ingredientsByName) {
+      if (key.includes(stem)) { if (!best || key.length < best.length) best = key; }
+    }
+  }
+  return best ? ingredientsByName[best].name : null;
+}
+
+// Категории, для которых замена «по категории» осмысленна (мясо/птица/рыба и т.п.).
+// Для злаков/овощей/фруктов заменяем по конкретному названию, а не всю категорию.
+const SWAP_CAT_OK = new Set(['мясо','птица','рыба','морепродукты','колбасы']);
+// Определяет, на что в рецепте «нацелен» запрос замены: корень слова + (опц.) категория.
+function buildSwapMatcher(fromName) {
+  const q = (fromName || '').toLowerCase().trim();
+  const stem = _ru_stem(q);
+  let cat = requestToCategory(q); // курицу→птица, рыбу→рыба
+  if (cat && !SWAP_CAT_OK.has(cat)) cat = null; // для злаков/овощей — только по корню
+  return { q, stem: (stem && stem.length >= 4) ? stem : q, cat };
+}
+// Совпадает ли ингредиент рецепта с матчером замены.
+// Если у запроса есть категория (курицу→птица) — матчим СТРОГО по категории,
+// чтобы «курицу» не цепляла «Куриное яйцо» (оно в категории «яйца»).
+function ingMatchesSwap(ingId, matcher) {
+  const nm = (ingId || '').toLowerCase().trim();
+  if (!nm) return false;
+  if (matcher.cat) return ingredientCategoryByName[nm] === matcher.cat;
+  // иначе — по корню/подстроке (для конкретных продуктов: молоко, сахар...)
+  if (matcher.stem && nm.includes(matcher.stem)) return true;
+  return false;
+}
+
+function applyIngredientSwap(fromName, toName) {
+  const toCanon = resolveIngredientName(toName);
+  if (!toCanon) return null;
+  const matcher = buildSwapMatcher(fromName);
+  state.ingredientSwaps = state.ingredientSwaps || {};
+  // Храним как правило: ключ — исходный корень/слово, значение — {to, stem, cat}
+  state.ingredientSwaps[matcher.q] = { to: toCanon, stem: matcher.stem, cat: matcher.cat };
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) {
+    renderMeals();
+    const d = Object.keys(dayStates).find(d => dayStates[d].open) || '1';
+    renderDayMeals(parseInt(d));
+  }
+  return { fromName: fromName, toName: toCanon };
+}
+
+// --- Попытка заменить исключённые ингредиенты в рецепте ---
+// excludedCats/excludedNames — Set категорий и слов-названий.
+// Возвращает { substituted, modifiedIngredients } или null, если замена невозможна.
+function substituteRecipe(recipe, excludedCats, excludedNames) {
+  excludedCats  = excludedCats  || new Set();
+  excludedNames = excludedNames || new Set();
+  if (!excludedCats.size && !excludedNames.size) {
     return { substituted: [], modifiedIngredients: recipe.ingredients };
   }
 
@@ -969,24 +1296,22 @@ function substituteRecipe(recipe, excludedIds) {
   const modifiedIngredients = [];
 
   for (const ing of recipe.ingredients) {
-    if (!excludedIds.includes(ing.id)) {
-      modifiedIngredients.push(ing);
-      continue;
-    }
+    const nm = (ing.id || ing.name || '').toLowerCase().trim();
+    const cat = ingredientCategoryByName[nm] || 'прочее';
+    const byCat  = excludedCats.has(cat);
+    const byName = [...excludedNames].some(n => n && nm.includes(n));
 
-    // Find a substitute that's not also excluded
-    const subs = INGREDIENT_SUBSTITUTES[ing.id] || [];
-    const validSub = subs.find(s => !excludedIds.includes(s) && ingredientsMap[s]);
+    if (!byCat && !byName) { modifiedIngredients.push(ing); continue; }
 
-    if (validSub) {
-      substituted.push({ original: ing.id, replacement: validSub });
-      modifiedIngredients.push({ ...ing, id: validSub, substitutedFrom: ing.id });
+    // Если запрещена вся категория — заменить нечем (в той же категории всё под запретом)
+    const sub = byCat ? null : findCategorySubstitute(ing.id, excludedCats, excludedNames);
+    if (sub) {
+      substituted.push({ original: ing.id, replacement: sub });
+      modifiedIngredients.push({ ...ing, id: sub, substitutedFrom: ing.id });
     } else {
-      // Can't substitute — recipe is unusable for this ingredient
-      return null;
+      return null; // рецепт непригоден
     }
   }
-
   return { substituted, modifiedIngredients };
 }
 
@@ -997,7 +1322,41 @@ function substituteRecipe(recipe, excludedIds) {
 // ---------- 1. Data store -----------------------------------
 let ingredientsMap = {};   // { id: ingredientObject }
 let ingredientsByName = {}; // { "название нижний регистр": ingredientObject }
+let ingredientCategoryByName = {}; // { "название нижний регистр": "категория" }
 let recipesArray   = [];   // [ recipeObject, ... ]
+
+// Категория ингредиента рецепта (рецепты ссылаются по русскому названию в ing.id)
+function catOfIngredient(ing) {
+  if (!ing) return 'прочее';
+  const key = (ing.id || ing.name || '').toLowerCase().trim();
+  return ingredientCategoryByName[key] || 'прочее';
+}
+
+// Сопоставление слова-запроса с категорией продукта («курицу»→птица, «рыбу»→рыба)
+const REQUEST_CATEGORY_WORDS = [
+  { stems: ['куриц','курин','куриц','кур','цыпл','индейк','индюш','птиц'], cat: 'птица' },
+  { stems: ['рыб','лосос','семг','форел','треск','тунец','минтай','скумбри','сельд','горбуш'], cat: 'рыба' },
+  { stems: ['мяс','говядин','свинин','баранин','телятин','фарш','стейк'], cat: 'мясо' },
+  { stems: ['креветк','морепродукт','кальмар','мидии','краб'], cat: 'морепродукты' },
+  { stems: ['колбас','сосиск','бекон','ветчин'], cat: 'колбасы' },
+  { stems: ['творог','молочн','кефир','йогурт','сметан'], cat: 'молочное' },
+  { stems: ['сыр','сыром'], cat: 'сыры' },
+  { stems: ['яйц','яиц'], cat: 'яйца' },
+  { stems: ['овощ','салат'], cat: 'овощи' },
+  { stems: ['гриб','шампиньон'], cat: 'овощи' },
+  { stems: ['фрукт'], cat: 'фрукты' },
+  { stems: ['ягод'], cat: 'ягоды' },
+  { stems: ['орех'], cat: 'орехи' },
+  { stems: ['бобов','фасол','нут','чечевиц','тофу'], cat: 'бобовые' },
+  { stems: ['греч','рис','крупа','каша','овсян','булгур','перлов','пшен','макарон','паст','спагетти'], cat: 'злаки' },
+];
+function requestToCategory(q) {
+  const t = (q || '').toLowerCase();
+  for (const r of REQUEST_CATEGORY_WORDS) {
+    if (r.stems.some(s => t.includes(s))) return r.cat;
+  }
+  return null;
+}
 let nutritionDataLoaded = false;
 let nutritionDataLoading = false;
 let recipeScores = {};
@@ -1007,26 +1366,34 @@ async function loadNutritionData() {
   if (nutritionDataLoaded || nutritionDataLoading) return;
   nutritionDataLoading = true;
   try {
-    // Load ingredients from Supabase API
-    const ingRes = await fetch('/api/ingredients');
-    if (!ingRes.ok) throw new Error('API not available');
-    const ingArr = await ingRes.json();
-    // Transform Supabase flat format → engine per_100g format
-    ingArr.forEach(ing => {
-      const obj = {
-        ...ing,
-        per_100g: {
-          calories: ing.calories || 0,
-          protein:  ing.protein  || 0,
-          fat:      ing.fat      || 0,
-          carbs:    ing.carbs    || 0,
-          fiber:    ing.fiber    || 0,
-        }
-      };
-      ingredientsMap[ing.id] = obj;
-      if (ing.name) ingredientsByName[(ing.name || '').toLowerCase()] = obj;
-    });
-    // Load КБЖУ reference indexed by Russian ingredient name (recipes reference ingredients by name)
+    // 1) Ingredients from Supabase API — НЕОБЯЗАТЕЛЬНО (локально/при сбое не должно ломать меню)
+    try {
+      const ingRes = await fetch('/api/ingredients');
+      if (ingRes.ok) {
+        const ingArr = await ingRes.json();
+        ingArr.forEach(ing => {
+          const obj = {
+            ...ing,
+            per_100g: {
+              calories: ing.calories || 0,
+              protein:  ing.protein  || 0,
+              fat:      ing.fat      || 0,
+              carbs:    ing.carbs    || 0,
+              fiber:    ing.fiber    || 0,
+            }
+          };
+          ingredientsMap[ing.id] = obj;
+          if (ing.name) ingredientsByName[(ing.name || '').toLowerCase()] = obj;
+        });
+        console.log(`✅ Ingredients from API: ${ingArr.length}`);
+      } else {
+        console.warn('⚠️ /api/ingredients недоступен — используем локальный КБЖУ-справочник');
+      }
+    } catch (e) {
+      console.warn('⚠️ /api/ingredients не загружен:', e.message);
+    }
+
+    // 2) КБЖУ-справочник по русским названиям ингредиентов — ОСНОВНОЙ источник КБЖУ
     try {
       const kbRes = await fetch('/ingredients_kbju.json');
       if (kbRes.ok) {
@@ -1036,6 +1403,7 @@ async function loadNutritionData() {
           const obj = {
             id: it.name,
             name: it.name,
+            category: it.category || 'прочее',
             per_100g: {
               calories: it.calories || 0,
               protein:  it.protein  || 0,
@@ -1045,29 +1413,33 @@ async function loadNutritionData() {
             }
           };
           const key = (it.name || '').toLowerCase().trim();
-          // Не перезатираем точные данные из ingredients.json, если они уже есть
+          // Категорию запоминаем всегда (по русскому названию ингредиента рецепта)
+          if (key) ingredientCategoryByName[key] = it.category || 'прочее';
+          // Не перезатираем точные данные из API/ingredients.json, если они уже есть
           if (key && !ingredientsByName[key]) ingredientsByName[key] = obj;
         });
-        console.log(`✅ КБЖУ reference: ${kbArr.length} ingredients by name`);
+        console.log(`✅ КБЖУ reference: ${kbArr.length} ingredients by name (с категориями)`);
       }
     } catch (e) { console.warn('⚠️ ingredients_kbju.json not loaded:', e.message); }
-    // Keep static recipes.json as engine fallback (320 recipes)
+
+    // 3) Рецепты — грузим всегда
     try {
       const recRes = await fetch('/recipes.json');
       if (recRes.ok) {
         const recData = await recRes.json();
         recipesArray = Array.isArray(recData) ? recData : (recData.recipes || []);
+        console.log(`✅ Recipes: ${recipesArray.length}`);
       }
-    } catch {}
+    } catch (e) { console.warn('⚠️ recipes.json not loaded:', e.message); }
+
     nutritionDataLoaded = true;
     computeRecipeScores();
-    console.log(`✅ Nutrition data: ${ingArr.length} ingredients from API`);
     // Перерисовать карточки если результаты уже на экране
     if (state.kcal > 0 && document.getElementById('results').style.display !== 'none') {
       renderMeals();
     }
   } catch(e) {
-    console.warn('⚠️ Nutrition data not loaded (JSON files missing):', e.message);
+    console.warn('⚠️ Nutrition data load error:', e.message);
   } finally {
     nutritionDataLoading = false;
   }
@@ -1099,9 +1471,32 @@ function calculateRecipeNutrition(recipe) {
 }
 
 // ---------- 3. scaleRecipe ----------------------------------
-function scaleRecipe(recipe, targetCalories) {
+// ===== МОДЕЛЬ КОРИДОРА ВЕСА ПОРЦИИ (от пола/веса/роста + приём пищи) =====
+const PORTION_MEAL_COEF = { breakfast: 0.85, lunch: 1.15, dinner: 1.00, snack: 0.42 };
+const PORTION_HARD_MAX  = { breakfast: 600, lunch: 780, dinner: 700, snack: 400 };
+const PORTION_HARD_MIN  = { breakfast: 100, lunch: 130, dinner: 110, snack: 45 };
+// Базовый «оптимальный» вес порции основного приёма (сырой вес), г.
+function basePortionGrams() {
+  const sex = state.gender === 'male' ? 14.5 : 12.5;
+  const w = state.cw || 70;          // текущий вес клиента, кг
+  const h = state.height || 170;     // рост, см
+  return sex * Math.pow(w, 0.75) * Math.pow(h / 170, 0.5);
+}
+// Коридор [min, opt, max] веса порции для приёма пищи (сырой вес)
+function portionCorridor(mealType) {
+  const baseType = mealType in PORTION_MEAL_COEF ? mealType : 'lunch';
+  const opt0 = basePortionGrams() * (PORTION_MEAL_COEF[baseType] || 1);
+  const mn = Math.max(PORTION_HARD_MIN[baseType] || 100, Math.round(opt0 * 0.60));
+  const mx = Math.min(PORTION_HARD_MAX[baseType] || 700, Math.round(opt0 * 1.55));
+  const opt = Math.max(mn, Math.min(Math.round(opt0), mx));
+  return { min: mn, opt, max: mx };
+}
+
+// Масштабирует рецепт под целевые калории. Если указан mealType — зажимает
+// итоговый вес порции в коридор [min,max] (по сырому весу), что может слегка
+// сдвинуть фактические калории (день добивается перебалансировкой).
+function scaleRecipe(recipe, targetCalories, mealType) {
   let base = calculateRecipeNutrition(recipe);
-  // Fallback: use pre-baked calories_per_serving if local calculation gives 0
   if ((!base.calories || base.calories < 1) && recipe.calories_per_serving) {
     base = {
       calories: recipe.calories_per_serving,
@@ -1113,7 +1508,19 @@ function scaleRecipe(recipe, targetCalories) {
   if (!base.calories || base.calories < 1) {
     return { ingredients: recipe.ingredients, nutrition: base };
   }
-  const factor = targetCalories / base.calories;
+  let factor = targetCalories / base.calories;
+
+  // Зажим веса порции в коридор (по сырому суммарному весу ингредиентов)
+  if (mealType) {
+    const rawWeight = (recipe.ingredients || []).reduce((s, i) => s + (i.amount_g || 0), 0);
+    if (rawWeight > 0) {
+      const cor = portionCorridor(mealType);
+      const targetWeight = rawWeight * factor;
+      const clampedWeight = Math.max(cor.min, Math.min(targetWeight, cor.max));
+      factor = clampedWeight / rawWeight;
+    }
+  }
+
   const scaledIngredients = recipe.ingredients.map(ing => ({
     ...ing,
     amount_g: Math.round(ing.amount_g * factor)
@@ -1221,8 +1628,20 @@ const MEAL_SPLIT = {
 };
 
 // ---------- 6b. computeRecipeScores -----------------------
-const PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','pork_minced','shrimp','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','cottage_cheese','kefir','butter','cream_cheese','broccoli','spinach','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','zucchini','eggplant','cauliflower','cabbage_white','potato','mushroom_champignon','beet','pollock','herring','mackerel','pumpkin','corn','green_beans','apple','banana','orange','avocado','lemon','kiwi','pear','oats','rice_white','buckwheat','pasta_wheat','quinoa','bulgur','millet','couscous','wheat_flour','lentils_red','chickpeas','black_beans','kidney_beans','tofu','green_peas','lentils_green','lentils_black','white_beans','almonds','walnuts','cashews','hazelnuts','sunflower_oil','olive_oil','oat_milk','almond_milk','coconut_milk','soy_milk','soy_sauce','tomato_paste','apple_cider_vinegar','mustard','broth_chicken','broth_beef','bone_broth','black_pepper','parsley_fresh','dill_fresh','cilantro_fresh','salt','turmeric','cinnamon','cumin','paprika','sugar','green_tea','water']);
+// Популярные/повседневные продукты (русские названия, нижний регистр) — для скоринга «обычности» рецепта.
+const PRIORITY_IDS = new Set(['куриное филе','куриная грудка','куриное бедро','куриный фарш','говядина','мясной фарш','свинина','креветки','куриное яйцо','яйца','молоко','йогурт','творог','сметана','кефир','сливочное масло','творожный сыр','твердый сыр','сыр','помидор','огурец','репчатый лук','зеленый лук','чеснок','морковь','картошка','картофель','капуста','белокочанная капуста','болгарский перец','кабачки','баклажан','шампиньоны','свекла','тыква','брокколи','яблоки','банан','апельсин','лимон','авокадо','рис','гречка','овсяные хлопья','макароны','спагетти','пшеничная мука хлебопекарная','мука','фасоль','нут','чечевица','грецкий орех','миндаль','растительное масло','оливковое масло','подсолнечное масло рафинированное','соевый соус','томатная паста','майонез','сметана','соль','сахар','черный перец молотый','укроп','петрушка','зелень','вода']);
   function computeRecipeScores() {
+  // Рейтинг запечён в recipes.json (поля r.score и r.rank[meal]).
+  // Если по какой-то причине его нет — посчитаем простой fallback по частоте.
+  const hasBaked = recipesArray.length && typeof recipesArray[0].score === 'number';
+  if (hasBaked) {
+    recipesArray.forEach(r => { recipeScores[r.id] = r.score || 0; });
+    const sorted = [...recipesArray].sort((a, b) => (b.score||0) - (a.score||0));
+    topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
+    console.log('✅ Recipe scores from baked data (top-1000 ready)');
+    return;
+  }
+  // Fallback (старый расчёт по частоте)
   const ingFreq = {};
   recipesArray.forEach(r => {
     (r.ingredients || []).forEach(ing => { ingFreq[ing.id] = (ingFreq[ing.id] || 0) + 1; });
@@ -1231,52 +1650,105 @@ const PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','po
     const ings = r.ingredients || [];
     if (!ings.length) { recipeScores[r.id] = 0; return; }
     const avgFreq = ings.reduce((s, i) => s + (ingFreq[i.id] || 0), 0) / ings.length;
-    const simBonus = Math.max(0, 15 - ings.length) * 8;
-    const imgBonus = r.image_url ? 40 : 0;
-    const SUPER_PRIORITY_IDS = new Set(['chicken_breast','chicken_thigh','beef_minced','egg_chicken','milk_whole','yogurt_natural','greek_yogurt','butter','cottage_cheese','tomato','cucumber','bell_pepper_red','bell_pepper_green','carrot','onion','garlic','cabbage_white','potato','mushroom_champignon','apple','banana','oats','rice_white','buckwheat','almonds','walnuts','sunflower_oil','salt','tomato_paste','water','sugar','black_pepper']);
-    const priorityBonus = ings.filter(i => PRIORITY_IDS.has(i.id)).length * 300;
-    const superBonus = ings.filter(i => SUPER_PRIORITY_IDS.has(i.id)).length * 600;
-      recipeScores[r.id] = avgFreq + simBonus + imgBonus + priorityBonus + superBonus;
+    recipeScores[r.id] = avgFreq + (r.image_url ? 40 : 0);
   });
   const sorted = [...recipesArray].sort((a, b) => (recipeScores[b.id]||0) - (recipeScores[a.id]||0));
   topRecipeIds = new Set(sorted.slice(0, 1000).map(r => r.id));
-  console.log('✅ Recipe scores computed, top-1000 ready');
+  console.log('✅ Recipe scores computed (fallback)');
 }
 
 // ---------- 7. filterRecipes --------------------------------
-// No diet-tag filtering — only by meal_type.
-// Recipes with excluded ingredients are handled via substituteRecipe().
+// Сортировка по запечённому рейтингу для конкретного приёма (r.rank[mealType]),
+// затем по общему score. Фильтрация по исключениям — отдельно, в pickMealForSlot.
 function filterRecipes(mealType) {
   const pool = recipesArray.filter(r => {
     const mt = Array.isArray(r.meal_type) ? r.meal_type.join(',') : (r.meal_type || '');
     return mt.includes(mealType);
   });
   return pool.sort((a, b) => {
-    const aTop = topRecipeIds.has(a.id) ? 1 : 0, bTop = topRecipeIds.has(b.id) ? 1 : 0;
-    if (aTop !== bTop) return bTop - aTop;
-    return (recipeScores[b.id]||0) - (recipeScores[a.id]||0);
+    // 1) КАРУСЕЛЬ РАЗНООБРАЗИЯ — порядок, где типы блюд чередуются (нет 240 блинов подряд).
+    //    Топ-блюда уже учтены при построении карусели, она запечена в r.carousel[meal].
+    const ac = (a.carousel && a.carousel[mealType]) || 999999;
+    const bc = (b.carousel && b.carousel[mealType]) || 999999;
+    if (ac !== bc) return ac - bc;
+    // 2) Фолбэк (если карусель не запечена): топ → рейтинг → score
+    const at = (a.top_rank && a.top_rank[mealType]) || 999;
+    const bt = (b.top_rank && b.top_rank[mealType]) || 999;
+    if (at !== bt) return at - bt;
+    const ar = (a.rank && a.rank[mealType]) || 999999;
+    const br = (b.rank && b.rank[mealType]) || 999999;
+    if (ar !== br) return ar - br;
+    return (b.score||0) - (a.score||0);
   });
 }
 
-// Get best meal for a slot: prefer no substitution, allow substitution, skip if impossible
-function pickMealForSlot(mealType, excludedIds, usedRecipeIds = new Set()) {
-  let pool = filterRecipes(mealType);
-  // Shuffle for variety
-  pool = [...pool.slice(0, 30)].sort(() => Math.random() - 0.5);
+// ---------- 7b. Динамические КОРТЕЖИ по 30 (карусель в рантайме) ----------
+// Строит n_tuples кортежей по size блюд из карусели приёма, исключая запрещённые
+// (по категориям/названиям) и чередуя типы блюд внутри кортежа. Добивает до size,
+// когда есть из чего; без повторов между кортежами. Устойчиво к любым исключениям.
+function buildCarouselTuples(mealType, exclusion, size = 30, nTuples = 5) {
+  const exCats  = exclusion && exclusion.cats  ? exclusion.cats  : new Set();
+  const exNames = exclusion && exclusion.names ? exclusion.names : new Set();
 
-  // 1st pass: find recipe with no excluded ingredients
-  for (const r of pool) {
-    if (usedRecipeIds.has(r.id)) continue;
-    const hasExcluded = r.ingredients.some(i => excludedIds.includes(i.id));
-    if (!hasExcluded) return { recipe: r, substituted: [], modifiedIngredients: r.ingredients };
+  // 1) пул приёма в порядке карусели, без исключённых
+  let pool = recipesArray.filter(r => {
+    const c = r.carousel && r.carousel[mealType];
+    if (!c) return false;
+    return !recipeHasExcluded(r, exCats, exNames);
+  });
+  pool.sort((a, b) => a.carousel[mealType] - b.carousel[mealType]);
+
+  // 2) нарезаем на кортежи с чередованием типов внутри каждого
+  const tuples = [];
+  const used = new Set();
+  for (let t = 0; t < nTuples; t++) {
+    const tup = [];
+    let lastType = null;
+    while (tup.length < size) {
+      let chosen = null;
+      for (const r of pool) {
+        if (used.has(r.id)) continue;
+        if (r.tags && r.tags.dish_type === lastType) continue;
+        chosen = r; break;
+      }
+      if (!chosen) { // не нашли с другим типом — берём любой оставшийся
+        for (const r of pool) { if (!used.has(r.id)) { chosen = r; break; } }
+      }
+      if (!chosen) break; // блюда кончились
+      tup.push(chosen); used.add(chosen.id);
+      lastType = chosen.tags && chosen.tags.dish_type;
+    }
+    if (tup.length) tuples.push(tup); else break;
   }
-  // 2nd pass: try substitution
+  return tuples;
+}
+
+// Get best meal for a slot: prefer no substitution, allow substitution, skip if impossible
+// exclusion передаётся как {cats:Set, names:Set}
+function pickMealForSlot(mealType, exclusion, usedRecipeIds = new Set()) {
+  const excludedCats  = exclusion && exclusion.cats  ? exclusion.cats  : new Set();
+  const excludedNames = exclusion && exclusion.names ? exclusion.names : new Set();
+  let pool = filterRecipes(mealType);
+  // Берём топ-40 (по скорингу) и перемешиваем для разнообразия
+  pool = [...pool.slice(0, 40)].sort(() => Math.random() - 0.5);
+
+  // 1-й проход: рецепт без исключённых ингредиентов
   for (const r of pool) {
     if (usedRecipeIds.has(r.id)) continue;
-    const result = substituteRecipe(r, excludedIds);
+    if (!recipeHasExcluded(r, excludedCats, excludedNames))
+      return { recipe: r, substituted: [], modifiedIngredients: r.ingredients };
+  }
+  // 2-й проход: пробуем замену
+  for (const r of pool) {
+    if (usedRecipeIds.has(r.id)) continue;
+    const result = substituteRecipe(r, excludedCats, excludedNames);
     if (result) return { recipe: r, ...result };
   }
-  // Fallback: any recipe from pool
+  // Fallback: любой рецепт без исключений из всего пула (а не только топ-40)
+  const fullPool = filterRecipes(mealType);
+  const clean = fullPool.find(r => !usedRecipeIds.has(r.id) && !recipeHasExcluded(r, excludedCats, excludedNames));
+  if (clean) return { recipe: clean, substituted: [], modifiedIngredients: clean.ingredients };
+  // Совсем крайний случай — любой
   const fallback = pool.find(r => !usedRecipeIds.has(r.id)) || pool[0];
   if (fallback) return { recipe: fallback, substituted: [], modifiedIngredients: fallback.ingredients };
   return null;
@@ -1290,8 +1762,13 @@ function pickRandom(arr, n) {
 function buildDayMenu(userProfile, dayIndex, tracker) {
   const {
     calories_target,
-    excluded_ingredient_ids = []
   } = userProfile;
+
+  // Текущие исключения (категории + названия)
+  const exclusion = {
+    cats:  new Set(state.excludedCats  || []),
+    names: new Set(state.excludedNames || []),
+  };
 
   const dayMeals = [];
   const usedIds  = new Set();
@@ -1319,20 +1796,26 @@ function buildDayMenu(userProfile, dayIndex, tracker) {
     if (overrideRecipe) {
       picked = { recipe: overrideRecipe, substituted: [], modifiedIngredients: overrideRecipe.ingredients };
     } else {
-      picked = pickMealForSlot(baseType, excluded_ingredient_ids, usedIds);
+      picked = pickMealForSlot(baseType, exclusion, usedIds);
     }
     if (!picked) continue;
 
     usedIds.add(picked.recipe.id);
 
+    const swapRules = Object.values(swaps);
     const swappedIngredients = picked.modifiedIngredients.map(ing => {
-      const swapTo = swaps[ing.id];
-      if (swapTo && ingredientsMap[swapTo]) return { ...ing, id: swapTo, substitutedFrom: ing.substitutedFrom || ing.id };
+      // Применяем правила замены: ing заменяется, если совпал по корню/категории
+      for (const rule of swapRules) {
+        if (!rule || !rule.to) continue;
+        if (ingMatchesSwap(ing.id, rule)) {
+          return { ...ing, id: rule.to, substitutedFrom: ing.substitutedFrom || ing.id };
+        }
+      }
       return ing;
     });
 
     const { ingredients: scaledIngredients, nutrition } =
-      scaleRecipe({ ...picked.recipe, ingredients: swappedIngredients }, targetCal);
+      scaleRecipe({ ...picked.recipe, ingredients: swappedIngredients }, targetCal, mealType);
 
     dayMeals.push({
       mealType,
@@ -1345,7 +1828,95 @@ function buildDayMenu(userProfile, dayIndex, tracker) {
       image_url:    picked.recipe.image_url
     });
   }
+
+  // ===== Перебалансировка дня под цель ±1.5% (корректируем веса в коридоре) =====
+  rebalanceDay(dayMeals, calories_target);
+
   return dayMeals;
+}
+
+// Калорийность рецепта на 100 г (сырой вес) — для подбора по плотности
+function recipeKcalPer100(recipe) {
+  const n = calculateRecipeNutrition(recipe);
+  const raw = (recipe.ingredients || []).reduce((s, i) => s + (i.amount_g || 0), 0);
+  return raw > 0 ? (n.calories / raw) * 100 : 0;
+}
+
+// Подгоняет суммарные калории дня к цели (±1.5%): сначала весами в коридоре,
+// затем — заменой самого «неподходящего» блюда на более плотное/лёгкое.
+function rebalanceDay(dayMeals, targetKcal) {
+  if (!dayMeals || !dayMeals.length || !targetKcal) return;
+  const TOL = 0.015;
+
+  const reweight = () => {
+    for (let iter = 0; iter < 6; iter++) {
+      const sum = dayMeals.reduce((s, m) => s + (m.nutrition?.calories || 0), 0);
+      if (sum <= 0) return Infinity;
+      const dev = (sum - targetKcal) / targetKcal;
+      if (Math.abs(dev) <= TOL) return Math.abs(dev);
+      const need = targetKcal / sum;
+      dayMeals.forEach(m => {
+        const raw = (m.scaledIngredients || []).reduce((s, i) => s + (i.amount_g || 0), 0);
+        if (raw <= 0) return;
+        const cor = portionCorridor(m.mealType);
+        const targetW = Math.max(cor.min, Math.min(raw * need, cor.max));
+        const f = targetW / raw;
+        m.scaledIngredients = m.scaledIngredients.map(i => ({ ...i, amount_g: Math.round(i.amount_g * f) }));
+        m.nutrition = calculateRecipeNutrition({ ...m.recipe, ingredients: m.scaledIngredients });
+      });
+    }
+    const sum = dayMeals.reduce((s, m) => s + (m.nutrition?.calories || 0), 0);
+    return Math.abs((sum - targetKcal) / targetKcal);
+  };
+
+  let dev = reweight();
+  if (dev <= TOL) return;
+
+  // Не уложились весами → заменяем блюда. До 3 попыток.
+  const used = new Set(dayMeals.map(m => m.recipe?.id).filter(Boolean));
+  for (let attempt = 0; attempt < 3 && dev > TOL; attempt++) {
+    const sum = dayMeals.reduce((s, m) => s + (m.nutrition?.calories || 0), 0);
+    const overshoot = sum > targetKcal; // перебор → нужно блюдо ПЛОТНЕЕ/легче по слоту
+    // Берём приём, чей вес упёрся в границу коридора (источник промаха)
+    let worst = null, worstScore = -1;
+    dayMeals.forEach(m => {
+      const raw = (m.scaledIngredients || []).reduce((s, i) => s + (i.amount_g || 0), 0);
+      const cor = portionCorridor(m.mealType);
+      const atEdge = raw <= cor.min + 2 || raw >= cor.max - 2;
+      const slotCal = m.nutrition?.calories || 0;
+      if (atEdge && slotCal > worstScore) { worstScore = slotCal; worst = m; }
+    });
+    if (!worst) break;
+
+    // Целевая калорийность этого приёма = его текущая − избыток (грубо)
+    const cor = portionCorridor(worst.mealType);
+    const slotTargetCal = (worst.nutrition?.calories || 0) - (sum - targetKcal);
+    const exclusion = { cats: new Set(state.excludedCats || []), names: new Set(state.excludedNames || []) };
+    // ищем блюдо, у которого нужный вес попадёт в коридор
+    const pool = filterRecipes(worst.mealType)
+      .filter(r => !used.has(r.id) && !recipeHasExcluded(r, exclusion.cats, exclusion.names));
+    let best = null, bestPen = Infinity;
+    for (const r of pool.slice(0, 200)) {
+      const dens = recipeKcalPer100(r) / 100; // ккал/г
+      if (dens <= 0) continue;
+      const needG = slotTargetCal / dens;
+      const clamped = Math.max(cor.min, Math.min(needG, cor.max));
+      const pen = Math.abs(clamped * dens - slotTargetCal);
+      if (pen < bestPen) { bestPen = pen; best = r; }
+    }
+    if (!best) break;
+    used.add(best.id);
+    // ставим новое блюдо в этот приём
+    const sc = scaleRecipe(best, slotTargetCal, worst.mealType);
+    worst.recipe = best;
+    worst.modifiedIngredients = best.ingredients;
+    worst.scaledIngredients = sc.ingredients;
+    worst.nutrition = sc.nutrition;
+    worst.instructions = best.instructions;
+    worst.image_url = best.image_url;
+    worst.substituted = [];
+    dev = reweight();
+  }
 }
 
 // ---------- 9. generate28DayPlan ----------------------------
@@ -1373,7 +1944,8 @@ function buildUserProfile() {
     protein_g:              state.protein  || 0,
     fat_g:                  state.fat      || 0,
     carbs_g:                state.carbs    || 0,
-    excluded_ingredient_ids: state.excludedIngredientIds || [],
+    excludedCats:           state.excludedCats  || [],
+    excludedNames:          state.excludedNames || [],
   };
 }
 
@@ -1450,6 +2022,7 @@ function buildMealCardHTML_API(recipe, mealType, cardId) {
       <div class="meal-type">${MEAL_TYPE_RU[mealType] || mealType}</div>
       <div class="meal-name">${recipe.name}</div>
     </div>
+    ${tagChipHtml(mealType)}
     <div class="meal-nav-bar">
       <button class="meal-nav-btn" onclick="swapPrev('${cardId}',event)">‹</button>
       <span class="meal-tap-hint">👆 рецепт</span>
@@ -1643,6 +2216,7 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
         <div class="meal-type">${MEAL_TYPE_RU[m.mealType] || m.mealType}</div>
         <div class="meal-name">${m.recipe?.name || ''}</div>
       </div>
+      ${tagChipHtml(m.mealType)}
       <div class="meal-nav-bar">
         <button class="meal-nav-btn" onclick="swapPrev('${idPrefix}-${index}',event)">‹</button>
         <span class="meal-tap-hint">👆 рецепт</span>
@@ -1668,12 +2242,18 @@ function buildMealCardHTML(m, index, idPrefix='recipe') {
 // --- Exclusion banner (shown above meal list when exclusions active) ---
 let exclBannerOpen = false; // starts collapsed (preview mode)
 const EXCL_PREVIEW = 4; // tags visible when collapsed
+const CAT_LABELS = { 'мясо':'Мясо','птица':'Птица','рыба':'Рыба','морепродукты':'Морепродукты','колбасы':'Колбасы','молочное':'Молочное','сыры':'Сыры','яйца':'Яйца','овощи':'Овощи','фрукты':'Фрукты','ягоды':'Ягоды','орехи':'Орехи','бобовые':'Бобовые','злаки':'Злаки/мучное','хлеб_выпечка':'Хлеб/выпечка','масла_жиры':'Масла/жиры','сладкое':'Сладкое','соусы':'Соусы','напитки':'Напитки','специи':'Специи' };
 function buildExclusionBannerHtml() {
-  const ids = state.excludedIngredientIds || [];
+  // Собираем теги из категорий и названий
+  const cats  = state.excludedCats  || [];
+  const names = state.excludedNames || [];
+  const ids = [...cats.map(c => 'cat:' + c), ...names.map(n => 'name:' + n)];
   if (!ids.length) { exclBannerOpen = false; return ''; }
   const makeTag = id => {
-    const nm = ingredientsMap[id]?.name || id;
-    return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${nm} ×</span>`;
+    const isCat = id.startsWith('cat:');
+    const val = id.slice(isCat ? 4 : 5);
+    const label = isCat ? (CAT_LABELS[val] || val) : val;
+    return `<span onclick="confirmRemoveExclusion('${id}',event)" style="cursor:pointer;display:inline-block;background:rgba(251,146,60,.2);border-radius:6px;padding:1px 7px;margin:2px 3px;">${label} ×</span>`;
   };
   const previewTags = ids.slice(0, EXCL_PREVIEW).map(makeTag).join('');
   const restTags = ids.slice(EXCL_PREVIEW).map(makeTag).join('');
@@ -1713,6 +2293,8 @@ function toggleExclBanner() {
 }
 
 function clearExclusions() {
+  state.excludedCats = [];
+  state.excludedNames = [];
   state.excludedIngredientIds = [];
   state.ingredientSwaps = {};
   state.mealOverrides = {};
@@ -1723,7 +2305,9 @@ function clearExclusions() {
 }
 function confirmRemoveExclusion(id, evt) {
   evt.stopPropagation();
-  const name = ingredientsMap[id]?.name || id;
+  const isCat = id.startsWith('cat:');
+  const val = id.slice(isCat ? 4 : 5);
+  const name = isCat ? (CAT_LABELS[val] || val) : val;
   const ov = document.createElement('div');
   ov.id = 'excl-confirm';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
@@ -1734,7 +2318,12 @@ function confirmRemoveExclusion(id, evt) {
 
 function doRemoveExclusion(id) {
   document.getElementById('excl-confirm')?.remove();
-  state.excludedIngredientIds = (state.excludedIngredientIds || []).filter(x => x !== id);
+  const isCat = id.startsWith('cat:');
+  const val = id.slice(isCat ? 4 : 5);
+  if (isCat) state.excludedCats  = (state.excludedCats  || []).filter(x => x !== val);
+  else       state.excludedNames = (state.excludedNames || []).filter(x => x !== val);
+  Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
+  if (state.kcal > 0) renderMeals();
   const openDay = Object.keys(dayStates).find(d => dayStates[d].open);
   if (openDay && state.kcal > 0) renderDayMeals(parseInt(openDay));
 }
@@ -2041,6 +2630,17 @@ function swapNext(cardId, e) {
     return;
   }
   var used = {}; hist.forEach(function(id){ used[id]=1; });
+  // РЕЖИМ ТЕГА: листаем только блюда выбранного тега, по порядку (ранжированно)
+  var activeTag = state.tagMode && state.tagMode[mealType];
+  if (activeTag) {
+    var tpool = tagPool(mealType, activeTag);
+    var nextT = tpool.find(function(r){ return !used[r.id]; });
+    if (!nextT) { openPopup('🔄','Показаны все варианты «' + ((TAG_GROUPS[activeTag]&&TAG_GROUPS[activeTag].label)||activeTag) + '»'); return; }
+    hist.push(nextT.id);
+    _swapPos[cardId] = hist.length - 1;
+    _applySwapDOM(cardId, nextT);
+    return;
+  }
   var refKcal = _kcalForRecipe(recipesArray.find(function(r){return r.id===hist[0];}));
   var candidates = filterRecipes(mealType).filter(function(r){ return !used[r.id]; });
   var nextRec = candidates.find(function(r){
@@ -2361,6 +2961,8 @@ async function sendFoodPref() {
   const exclusionResult = parseExclusions(val);
 
   if (exclusionResult === null) {
+    state.excludedCats = [];
+    state.excludedNames = [];
     state.excludedIngredientIds = [];
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
     if (state.kcal > 0) renderMeals();
@@ -2370,7 +2972,7 @@ async function sendFoodPref() {
   }
 
   if (exclusionResult !== false) {
-    state.excludedIngredientIds = exclusionResult;
+    // state.excludedCats/excludedNames уже обновлены внутри parseExclusions
     Object.keys(dayMenuCache).forEach(k => delete dayMenuCache[k]);
     _apiPlan = null;
     if (state.kcal > 0) {
@@ -2387,13 +2989,23 @@ async function sendFoodPref() {
   const ingReq = parseIngredientRequest(val);
   if (ingReq !== false) {
     const res = applyIngredientRequest(ingReq.mealType, ingReq.ingredientName);
-    if (res) { openPopup('🍽️', `Понял! Ставлю ${res.ingDisplayName} на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType} — «${res.recipeName}». Меню обновлено.`); return; }
+    if (res) {
+      if (res.tagMode) {
+        openPopup('🍽️', `Включил режим «${res.tagLabel}» на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType}. Листай стрелками — будут только блюда этой группы. Нажми ✕ на плашке, чтобы вернуть обычное меню.`);
+      } else {
+        openPopup('🍽️', `Понял! Ставлю ${res.ingDisplayName} на ${MEAL_TYPE_RU[ingReq.mealType]||ingReq.mealType} — «${res.recipeName}». Меню обновлено.`);
+      }
+      return;
+    }
   }
   const subResult = parseFoodSubstitution(val);
   if (subResult !== false) {
     if (subResult.type === 'meal') {
       const rName = applyMealReplacement(subResult.mealType, subResult.dishName);
       if (rName) { openPopup('🍽️', `Заменил ${MEAL_TYPE_RU[subResult.mealType]||subResult.mealType} на «${rName}». Меню обновлено.`); return; }
+    } else if (subResult.type === 'meal_reroll') {
+      const rName = applyMealReroll(subResult.mealType);
+      if (rName) { openPopup('🔄', `Поменял ${MEAL_TYPE_RU[subResult.mealType]||subResult.mealType} на «${rName}». Меню обновлено.`); return; }
     } else if (subResult.type === 'ingredient') {
       const res = applyIngredientSwap(subResult.fromName, subResult.toName);
       if (res) { openPopup('🔄', `Заменил ${res.fromName} на ${res.toName} во всех блюдах. Меню пересчитано.`); return; }
