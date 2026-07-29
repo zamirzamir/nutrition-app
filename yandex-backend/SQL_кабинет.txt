@@ -1,0 +1,25 @@
+-- ТАБЛИЦЫ ЛИЧНОГО КАБИНЕТА для YDB (версия 2: профиль одной JSON-строкой)
+-- Если ты уже создал старую user_profiles — сначала удали её (DROP), потом создай заново.
+
+-- 0. (если нужно) удалить старую версию таблицы профиля:
+-- DROP TABLE user_profiles;
+
+-- 1. Профиль клиента — ВСЁ в JSON-поле data (только Utf8, надёжно).
+--    data = JSON: {gender, height, age, current_weight, desired_weight, activity, goal, exclusions}
+--    locked = "1" после первого сохранения (фикс-поля больше не меняются).
+CREATE TABLE user_profiles (
+    phone Utf8,
+    data Utf8,
+    locked Utf8,
+    created_at Timestamp,
+    updated_at Timestamp,
+    PRIMARY KEY (phone)
+);
+
+-- 2. Прогресс по дням (уже создан, если делал ранее — пропусти).
+CREATE TABLE user_progress (
+    phone Utf8,
+    data Utf8,
+    updated_at Timestamp,
+    PRIMARY KEY (phone)
+);

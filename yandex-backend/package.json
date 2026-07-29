@@ -1,0 +1,10 @@
+{
+  "name": "nutrition-auth-backend",
+  "version": "1.0.0",
+  "description": "Авторизация и оплата для приложения питания (Yandex Cloud Function)",
+  "main": "index.js",
+  "dependencies": {
+    "ydb-sdk": "^5.9.0",
+    "@yandex-cloud/nodejs-sdk": "^2.7.6"
+  }
+}

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вариант 3 — «Изумрудное стекло» · Формула здорового тела</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#06100D; --emerald:#0E2A22; --emerald2:#123528;
+    --glass:rgba(20,44,36,.55); --glass2:rgba(26,54,44,.65);
+    --line:rgba(95,191,122,.22); --gline:rgba(201,168,76,.35);
+    --gold:#C9A84C; --gold2:#E8C96A; --green:#5FBF7A; --mint:#9FD3A8;
+    --text:#EDF5EE; --muted:#8FA898;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a1512;font-family:'Inter',sans-serif;color:var(--text);padding:36px 16px 60px}
+  .head{text-align:center;max-width:900px;margin:0 auto 34px}
+  .head .k{font-size:11px;letter-spacing:.25em;color:var(--green);text-transform:uppercase;font-weight:700}
+  .head h1{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,40px);margin:10px 0 8px}
+  .head p{color:var(--muted);font-size:14.5px}
+  .row{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{width:330px}
+  .col .cap{text-align:center;color:var(--muted);font-size:12.5px;margin-top:12px}
+  .phone{
+    border-radius:40px;border:1px solid rgba(95,191,122,.3);overflow:hidden;position:relative;padding-bottom:64px;
+    background:
+      radial-gradient(90% 50% at 50% 0%, rgba(95,191,122,.14), transparent 60%),
+      linear-gradient(170deg,#0E2A22 0%,#06100D 55%,#081712 100%);
+    box-shadow:0 34px 80px rgba(0,0,0,.65), inset 0 0 60px rgba(95,191,122,.05);
+  }
+  /* размытое фото Ромы как подложка шапки */
+  .backdrop{position:absolute;top:-20px;left:-20px;right:-20px;height:280px;z-index:0;overflow:hidden}
+  .backdrop img{width:110%;height:110%;object-fit:cover;object-position:top;filter:blur(26px) brightness(.5) saturate(1.2);opacity:.7}
+  .tabbar{
+    position:absolute;bottom:10px;left:12px;right:12px;height:56px;z-index:5;
+    background:rgba(14,42,34,.72);backdrop-filter:blur(18px);border:1px solid var(--line);
+    border-radius:20px;display:flex;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:8.5px;font-weight:600}
+  .tab .i{font-size:16px}
+  .tab.on{color:var(--gold2)}
+  .glass{
+    background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);
+    border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,.3);
+  }
+  /* ===== экран 1 ===== */
+  .top{position:relative;z-index:2;padding:22px 14px 0}
+  .ava-row{display:flex;align-items:center;gap:10px}
+  .ava{width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
+  .ava img{width:100%;height:100%;object-fit:cover}
+  .hello{font-size:11px;color:var(--mint)}
+  .h-name{font-family:'Playfair Display',serif;font-size:16px}
+  .ring-card{margin-top:12px;padding:14px;display:flex;gap:14px;align-items:center}
+  .ring{position:relative;width:74px;height:74px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .n{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold2)}
+  .ring .l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .ring-t .a{font-family:'Playfair Display',serif;font-size:17px;line-height:1.25}
+  .ring-t .a em{color:var(--gold2);font-style:italic}
+  .ring-t .b{font-size:10.5px;color:var(--mint);margin-top:4px}
+  .kbju{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  .kb{padding:8px 6px;text-align:center}
+  .kb .v{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700}
+  .kb .t{font-size:8.5px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+  .kb .d{height:3px;border-radius:3px;margin-top:6px;background:rgba(95,191,122,.14);overflow:hidden}
+  .kb .d i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+  .kb.ok .d i{background:var(--green)}
+  .days{display:flex;gap:7px;overflow:hidden;margin-top:12px}
+  .dchip{min-width:44px;padding:8px 0;border-radius:14px;text-align:center;background:rgba(20,44,36,.4);border:1px solid var(--line)}
+  .dchip .dw{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .dchip .dn{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-top:1px}
+  .dchip.past{opacity:.4}.dchip.past .dn{text-decoration:line-through}
+  .dchip.cur{background:linear-gradient(160deg,#C9A84C,#E8C96A);border-color:transparent;color:#1a1405}
+  .dchip.cur .dw{color:#5c4a15}
+  .sec{position:relative;z-index:2;padding:12px 14px 0}
+  .sec h2{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:baseline}
+  .sec h2 a{font-size:10.5px;color:var(--gold2);font-weight:600;text-decoration:none;font-family:'Inter',sans-serif}
+  .meal{display:flex;gap:10px;padding:8px;margin-bottom:8px;align-items:center}
+  .meal img{width:54px;height:54px;border-radius:12px;object-fit:cover}
+  .meal .mt{font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--green);font-weight:700}
+  .meal .mn{font-size:12.5px;font-weight:600;margin-top:1px}
+  .meal .mk{font-size:10px;color:var(--muted);margin-top:2px}
+  .meal .go{margin-left:auto;width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,.16);display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:13px;flex-shrink:0}
+  .meal.eaten{opacity:.55}.meal.eaten .go{background:var(--green);color:#08130c}
+  /* ===== экран 2 ===== */
+  .w-hero{position:relative;height:170px;overflow:hidden;z-index:1}
+  .w-hero img{width:100%;height:100%;object-fit:cover;filter:brightness(.65) saturate(1.1)}
+  .w-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,16,13,.2),rgba(6,16,13,.95))}
+  .w-hero .in{position:absolute;left:14px;right:14px;bottom:10px;z-index:2}
+  .w-hero .k{font-size:9px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;font-weight:700}
+  .w-hero h2{font-family:'Playfair Display',serif;font-size:20px;margin-top:3px}
+  .w-hero .m{font-size:10.5px;color:var(--mint);margin-top:2px}
+  .adapt{margin:12px 14px 0;font-size:10.5px;color:var(--mint);background:rgba(95,191,122,.1);border:1px solid rgba(95,191,122,.3);border-radius:12px;padding:8px 10px;line-height:1.45;position:relative;z-index:2}
+  .place{display:flex;gap:7px;margin:12px 14px 0;position:relative;z-index:2}
+  .plc{flex:1;padding:9px;border-radius:12px;border:1px solid var(--line);background:rgba(20,44,36,.4);color:var(--muted);font-size:11.5px;font-weight:600;text-align:center}
+  .plc.on{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#1a1405;border-color:transparent}
+  .exl{margin:10px 14px 0;position:relative;z-index:2}
+  .ex{display:flex;gap:10px;padding:8px;margin-bottom:8px;align-items:center}
+  .ex img{width:50px;height:50px;border-radius:11px;object-fit:cover}
+  .ex .en{font-size:12.5px;font-weight:600}
+  .ex .em{font-size:10px;color:var(--gold2);margin-top:2px}
+  .ex .ec{font-size:9.5px;color:var(--muted);margin-top:1px}
+  .ex .chk{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);flex-shrink:0}
+  .ex.done .chk{background:var(--green);border-color:transparent;position:relative}
+  .ex.done .chk::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#08130c;font-size:12px;font-weight:800}
+  .donebar{margin:10px 14px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#1a1405;text-align:center;padding:11px;border-radius:14px;font-size:12.5px;font-weight:700;position:relative;z-index:2}
+  /* ===== экран 3 ===== */
+  .r-img{position:relative;z-index:1}
+  .r-img img{width:100%;height:200px;object-fit:cover}
+  .r-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,#06100D 97%)}
+  .r-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(6,16,13,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:13px;z-index:2}
+  .r-nav{position:absolute;top:12px;left:12px;display:flex;gap:6px;z-index:2}
+  .r-nav span{width:30px;height:30px;border-radius:50%;background:rgba(6,16,13,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold2)}
+  .r-body{padding:0 14px;position:relative;z-index:2;margin-top:-30px}
+  .r-title-card{padding:12px 14px}
+  .r-title-card h2{font-family:'Playfair Display',serif;font-size:19px}
+  .chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .chip{background:rgba(6,16,13,.5);border:1px solid var(--gline);border-radius:100px;font-size:10px;color:var(--gold2);padding:5px 10px;font-weight:600}
+  .steps{margin-top:10px;padding:4px 14px 10px}
+  .step{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid rgba(95,191,122,.1)}
+  .step .n{width:20px;height:20px;border-radius:50%;background:rgba(95,191,122,.16);color:var(--mint);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step p{font-size:11px;line-height:1.5}
+  .r-btns{display:flex;gap:8px;margin:10px 0 4px;padding:0 0}
+  .rb{flex:1;padding:11px;border-radius:14px;text-align:center;font-size:12px;font-weight:700}
+  .rb.gold{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#1a1405}
+  .rb.ghost{border:1px solid var(--line);color:var(--mint)}
+</style>
+</head>
+<body>
+<div class="head">
+  <div class="k">Вариант 3</div>
+  <h1>«Изумрудное стекло»</h1>
+  <p>Самый современный: глубокий изумруд, «стеклянные» карточки с размытием, плавающий таб-бар, размытое фото Романа как атмосферная подложка. Зелёный здесь — цвет здоровья, золото — акцент достижений.</p>
+</div>
+<div class="row">
+
+  <!-- экран 1 -->
+  <div class="col">
+    <div class="phone">
+      <div class="backdrop"><img src="https://roman-nutrition-app.website.yandexcloud.net/design/bg_hero.webp" alt=""></div>
+      <div class="top">
+        <div class="ava-row">
+          <div class="ava"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103034_9392fe02-e619-4053-bc25-a0ac3c8b2472_min.webp" alt=""></div>
+          <div><div class="hello">Формула здорового тела</div><div class="h-name">Привет, Замир 👋</div></div>
+        </div>
+        <div class="glass ring-card">
+          <div class="ring">
+            <svg width="74" height="74">
+              <circle cx="37" cy="37" r="31" fill="none" stroke="rgba(95,191,122,.15)" stroke-width="6"/>
+              <circle cx="37" cy="37" r="31" fill="none" stroke="url(#g3)" stroke-width="6" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="144"/>
+              <defs><linearGradient id="g3"><stop offset="0" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8C96A"/></linearGradient></defs>
+            </svg>
+            <div class="in"><div class="n">26%</div><div class="l">пути</div></div>
+          </div>
+          <div class="ring-t">
+            <div class="a">Сегодня — <em>день 23 из 90</em></div>
+            <div class="b">Ты идёшь с опережением. Так держать 🔥</div>
+          </div>
+        </div>
+        <div class="glass kbju">
+          <div class="kb ok"><div class="v">1751</div><div class="t">ккал</div><div class="d"><i style="width:100%"></i></div></div>
+          <div class="kb"><div class="v">86/108</div><div class="t">белки</div><div class="d"><i style="width:80%"></i></div></div>
+          <div class="kb"><div class="v">41/60</div><div class="t">жиры</div><div class="d"><i style="width:68%"></i></div></div>
+          <div class="kb"><div class="v">120/195</div><div class="t">углев</div><div class="d"><i style="width:62%"></i></div></div>
+        </div>
+        <div class="days">
+          <div class="dchip past"><div class="dw">пн</div><div class="dn">21</div></div>
+          <div class="dchip past"><div class="dw">вт</div><div class="dn">22</div></div>
+          <div class="dchip cur"><div class="dw">ср</div><div class="dn">23</div></div>
+          <div class="dchip"><div class="dw">чт</div><div class="dn">24</div></div>
+          <div class="dchip"><div class="dw">пт</div><div class="dn">25</div></div>
+          <div class="dchip"><div class="dw">сб</div><div class="dn">26</div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <h2>Меню на сегодня <a href="#">заменить →</a></h2>
+        <div class="glass meal eaten">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103038_87fd1643-83ca-4de8-b5bc-e3a12bf201c0_min.webp" alt="">
+          <div><div class="mt">Завтрак · съеден</div><div class="mn">Шакшука с лавашом</div><div class="mk">412 ккал · Б28 Ж18 У34</div></div>
+          <div class="go">✓</div>
+        </div>
+        <div class="glass meal">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103041_1e1110e3-defd-4304-a101-3498e5d3eebe_min.webp" alt="">
+          <div><div class="mt">Обед</div><div class="mn">Боул с индейкой и нутом</div><div class="mk">486 ккал · Б36 Ж14 У52</div></div>
+          <div class="go">›</div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><span class="i">🍽</span>Питание</div>
+        <div class="tab"><span class="i">🏋️</span>Тренировки</div>
+        <div class="tab"><span class="i">🛒</span>Покупки</div>
+        <div class="tab"><span class="i">📈</span>Прогресс</div>
+        <div class="tab"><span class="i">👤</span>Профиль</div>
+      </div>
+    </div>
+    <div class="cap">Главный экран со «стеклом»</div>
+  </div>
+
+  <!-- экран 2 -->
+  <div class="col">
+    <div class="phone">
+      <div class="w-hero">
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125909_163daeee-4121-4b2f-a692-834466f8648b_min.webp" alt="">
+        <div class="in">
+          <div class="k">Тренировки · неделя 4</div>
+          <h2>Всё тело · день B</h2>
+          <div class="m">6 упражнений · ~35 минут · дома</div>
+        </div>
+      </div>
+      <div class="adapt">🌱 Первый месяц тело адаптируется — с весом не торопимся. Со второго месяца тренировки станут насыщеннее.</div>
+      <div class="place"><div class="plc on">🏠 Дома</div><div class="plc">🏋️ В зале</div></div>
+      <div class="exl">
+        <div class="glass ex done">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125732_c55a0e43-390d-4e21-9b88-914701f38c3b_min.webp" alt="">
+          <div><div class="en">Приседания</div><div class="em">2 × 12–15 · отдых 90 сек</div><div class="ec">Таз назад и вниз, колени по носкам</div></div>
+          <div class="chk"></div>
+        </div>
+        <div class="glass ex done">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125838_440d48fd-e19e-4e3f-b170-226f66dfa58a_min.webp" alt="">
+          <div><div class="en">Планка</div><div class="em">2 × 20–30 сек · отдых 40 сек</div><div class="ec">Локти под плечами, таз не провисает</div></div>
+          <div class="chk"></div>
+        </div>
+        <div class="glass ex">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_160531_7b6965e1-82ad-4af2-8b94-dfc927c18ec0_min.webp" alt="">
+          <div><div class="en">Птица-собака</div><div class="em">2 × 15 · отдых 60 сек</div><div class="ec">Рука вперёд + нога назад, замри</div></div>
+          <div class="chk"></div>
+        </div>
+      </div>
+      <div class="donebar">✓ Сделано (2 из 6)</div>
+      <div class="tabbar">
+        <div class="tab"><span class="i">🍽</span>Питание</div>
+        <div class="tab on"><span class="i">🏋️</span>Тренировки</div>
+        <div class="tab"><span class="i">🛒</span>Покупки</div>
+        <div class="tab"><span class="i">📈</span>Прогресс</div>
+        <div class="tab"><span class="i">👤</span>Профиль</div>
+      </div>
+    </div>
+    <div class="cap">Тренировка дня</div>
+  </div>
+
+  <!-- экран 3 -->
+  <div class="col">
+    <div class="phone">
+      <div class="r-img">
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103041_1e1110e3-defd-4304-a101-3498e5d3eebe_min.webp" alt="">
+        <div class="r-nav"><span>‹</span><span>›</span></div>
+        <span class="r-x">✕</span>
+      </div>
+      <div class="r-body">
+        <div class="glass r-title-card">
+          <h2>Боул с индейкой и нутом</h2>
+          <div class="chips">
+            <span class="chip">486 ккал</span><span class="chip">Б 36</span><span class="chip">Ж 14</span><span class="chip">У 52</span><span class="chip">⏱ 25 мин</span>
+          </div>
+        </div>
+        <div class="glass steps" style="margin-top:10px">
+          <div class="step"><div class="n">1</div><p>Промой рис и отвари в подсоленной воде 15 минут.</p></div>
+          <div class="step"><div class="n">2</div><p>Индейку кубиком, обжарь на капле масла 6–7 минут.</p></div>
+          <div class="step"><div class="n">3</div><p>Собери боул: рис, индейка, нут, овощи, зелень.</p></div>
+          <div class="step"><div class="n">4</div><p>Заправь лимонным соком, посыпь кунжутом.</p></div>
+        </div>
+        <div class="r-btns">
+          <div class="rb ghost">↻ Заменить</div>
+          <div class="rb gold">✓ Съел</div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><span class="i">🍽</span>Питание</div>
+        <div class="tab"><span class="i">🏋️</span>Тренировки</div>
+        <div class="tab"><span class="i">🛒</span>Покупки</div>
+        <div class="tab"><span class="i">📈</span>Прогресс</div>
+        <div class="tab"><span class="i">👤</span>Профиль</div>
+      </div>
+    </div>
+    <div class="cap">Рецепт с листанием фото</div>
+  </div>
+
+</div>
+</body>
+</html>

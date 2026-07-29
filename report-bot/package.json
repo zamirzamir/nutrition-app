@@ -1,0 +1,10 @@
+{
+  "name": "roman-report-bot",
+  "version": "1.0.0",
+  "description": "Ежедневный Telegram-отчёт по подпискам (Yandex Cloud Function, таймер)",
+  "main": "index.js",
+  "dependencies": {
+    "ydb-sdk": "^5.9.0",
+    "@yandex-cloud/nodejs-sdk": "^2.7.6"
+  }
+}

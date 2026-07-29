@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Иконка приложения — 5 вариантов</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111318;font-family:'Inter',sans-serif;color:#eee;padding:40px 16px 70px}
+  .head{text-align:center;margin-bottom:36px}
+  .head h1{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,36px)}
+  .head p{color:#98a;font-size:14px;margin-top:8px;color:#8E93A1}
+  .row{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+  .card{width:300px;background:#151A23;border:1px solid rgba(216,192,138,.2);border-radius:20px;padding:24px;text-align:center}
+  .big{width:160px;height:160px;border-radius:36px;overflow:hidden;margin:0 auto 18px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .big svg{width:100%;height:100%;display:block}
+  .sizes{display:flex;gap:14px;justify-content:center;align-items:flex-end;margin-bottom:16px}
+  .s64{width:64px;height:64px;border-radius:14px;overflow:hidden}
+  .s29{width:29px;height:29px;border-radius:7px;overflow:hidden}
+  .s64 svg,.s29 svg{width:100%;height:100%;display:block}
+  .onlight{background:#e9e4d6;padding:8px;border-radius:12px;display:flex;gap:10px;justify-content:center}
+  .name{font-size:15px;font-weight:800;margin-top:14px}
+  .desc{font-size:12px;color:#8E93A1;margin-top:6px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>Иконка на рабочий стол — 5 вариантов</h1>
+  <p>Палитра С2 «Полночь и шампанское». Каждая показана в 160 / 64 / 29 px и на светлой подложке.</p>
+</div>
+<div class="row" id="row"></div>
+
+<script>
+const BG = `<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#10141D"/><stop offset="1" stop-color="#070A10"/>
+  </linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#C8B080"/><stop offset="1" stop-color="#EFDDB0"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="0.5" cy="0.15" r="0.9">
+    <stop offset="0" stop-color="#EFDDB0" stop-opacity="0.14"/><stop offset="1" stop-color="#EFDDB0" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="100" height="100" fill="url(#bg)"/>
+<rect width="100" height="100" fill="url(#glow)"/>`;
+
+const ICONS = [
+// 1. Монограмма Ф
+[`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${BG}
+  <text x="50" y="68" font-family="Playfair Display,serif" font-style="italic" font-weight="700" font-size="58"
+        text-anchor="middle" fill="url(#gold)">Ф</text>
+  <rect x="30" y="78" width="40" height="2.6" rx="1.3" fill="url(#gold)" opacity="0.85"/>
+</svg>`,'В1 · Монограмма «Ф»','Курсивная серифная «Ф» (Формула) с золотой чертой. Люкс-минимализм, как у модных домов.'],
+// 2. РГ в кольце
+[`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${BG}
+  <circle cx="50" cy="50" r="33" fill="none" stroke="url(#gold)" stroke-width="2.6"/>
+  <text x="50" y="60" font-family="Inter,sans-serif" font-weight="800" font-size="27"
+        text-anchor="middle" fill="url(#gold)" letter-spacing="1">РГ</text>
+</svg>`,'В2 · «РГ» в кольце','Инициалы Романа в тонком кольце — перекликается с логотипом лендинга. Персональный бренд.'],
+// 3. Вилка + гантель
+[`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${BG}
+  <g stroke="url(#gold)" stroke-width="4.6" stroke-linecap="round" fill="none">
+    <path d="M32 26 L32 74"/>
+    <path d="M25 26 L25 40 Q25 46 32 46 Q39 46 39 40 L39 26"/>
+    <path d="M58 38 L84 64"/>
+    <path d="M55 47 L49 41 M75 67 L81 73" stroke-width="7"/>
+    <path d="M61 53 L55 47 M81 73 L87 79" stroke-width="0" />
+    <rect x="50.5" y="36.5" width="9" height="16" rx="4.5" transform="rotate(-45 55 44.5)" fill="url(#gold)" stroke="none"/>
+    <rect x="76.5" y="62.5" width="9" height="16" rx="4.5" transform="rotate(-45 81 70.5)" fill="url(#gold)" stroke="none"/>
+  </g>
+</svg>`,'В3 · Вилка и гантель','Два столпа продукта: питание + тренировки. Считывается даже без слов.'],
+// 4. Кольцо 90 дней
+[`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${BG}
+  <circle cx="50" cy="50" r="32" fill="none" stroke="#2A3040" stroke-width="7"/>
+  <path d="M50 18 A32 32 0 1 1 24 63" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="24" cy="63" r="5.5" fill="#EFDDB0"/>
+  <text x="50" y="59" font-family="Inter,sans-serif" font-weight="900" font-size="24" text-anchor="middle" fill="#F1EFEA">90</text>
+</svg>`,'В4 · Кольцо «90»','Кольцо прогресса с золотой дугой и цифрой 90 — суть продукта: путь на 90 дней.'],
+// 5. Тарелка-галочка
+[`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${BG}
+  <circle cx="50" cy="50" r="31" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <circle cx="50" cy="50" r="22" fill="none" stroke="url(#gold)" stroke-width="1.4" opacity="0.55"/>
+  <path d="M39 51 L47 59 L63 42" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`,'В5 · Тарелка-галочка','Тарелка (двойной обод) с галочкой «день выполнен». Дисциплина и результат.'],
+];
+
+document.getElementById('row').innerHTML = ICONS.map(([svg,name,desc])=>`
+  <div class="card">
+    <div class="big">${svg}</div>
+    <div class="sizes">
+      <div class="s64">${svg}</div>
+      <div class="s29">${svg}</div>
+    </div>
+    <div class="onlight">
+      <div class="s64">${svg}</div>
+      <div class="s29">${svg}</div>
+    </div>
+    <div class="name">${name}</div>
+    <div class="desc">${desc}</div>
+  </div>`).join('');
+</script>
+</body>
+</html>

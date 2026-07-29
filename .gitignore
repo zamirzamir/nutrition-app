@@ -1,0 +1,24 @@
+.DS_Store
+*_backup*.json
+*.bak
+recipes_backup_*.json
+блюда_фото/
+backups/
+
+# архивы и бэкапы — не место в git-истории (раздули старый репо до 20 ГБ)
+*.zip
+*.tar
+*.tar.gz
+backups 2/
+_архив_проекта/
+_АРХИВ/
+_АРХИВ 2/
+.git_OLD_20GB_удалить_после_пуша/
+
+# системное
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env

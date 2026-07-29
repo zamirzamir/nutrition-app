@@ -1,0 +1,18 @@
+-- ПОДАРОК КЛИЕНТУ: продлить доступ до 95 дней от даты оплаты (09.07.2026)
+-- Где выполнять: консоль Яндекс Клауда → YDB → твоя база → вкладка «Запросы».
+-- Выполнять по одному запросу.
+
+-- ШАГ 1. Посмотреть, кто есть в базе (найди email клиента; свои тестовые не трогай):
+SELECT email, paid_at, expires_at FROM subscriptions ORDER BY paid_at DESC LIMIT 20;
+
+-- ШАГ 2. Продлить клиенту: подставь его email из шага 1 вместо CLIENT@EMAIL
+UPDATE subscriptions
+SET expires_at = paid_at + Interval("P95D"),
+    updated_at = CurrentUtcTimestamp()
+WHERE email = 'CLIENT@EMAIL';
+
+-- ШАГ 3. Проверить результат:
+SELECT email, paid_at, expires_at FROM subscriptions WHERE email = 'CLIENT@EMAIL';
+
+-- Примечание: клиент увидит новую дату сразу (проверка /check при входе).
+-- Если захочешь продлить и себе (meforpeace@icloud.com) — тот же UPDATE со своим email.

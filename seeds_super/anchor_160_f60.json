@@ -1,0 +1,1 @@
+{"anchor": {"kcal": 2520, "p": 111, "f": 59, "c": 386, "meal": 5, "group": "f60", "pct": 0.0, "cum": 100.0}, "slots": ["breakfast", "lunch", "snack", "dinner", "snack"], "days": [["fr_115820", "fr_216794", "fr_186737", "fr_1495", "vg_064"]], "metrics": {"n_days": 1, "avg_micro": 15.83, "avg_refined_share": 0.118, "avg_complex_share": 0.0, "unique_dishes": 5}}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вариант 4 — «Графит·Спорт» · Формула здорового тела</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0C0C; --card:#151717; --card2:#1C1F1E;
+    --gold:#C9A84C; --gold2:#E8C96A; --green:#5FBF7A;
+    --text:#F4F3EF; --muted:#8E938E; --line:rgba(244,243,239,.09);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#101111;font-family:'Inter',sans-serif;color:var(--text);padding:36px 16px 60px}
+  .head{text-align:center;max-width:900px;margin:0 auto 34px}
+  .head .k{font-size:11px;letter-spacing:.25em;color:var(--gold2);text-transform:uppercase;font-weight:800}
+  .head h1{font-size:clamp(26px,4vw,40px);margin:10px 0 8px;font-weight:900;letter-spacing:-.02em}
+  .head p{color:var(--muted);font-size:14.5px}
+  .row{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{width:330px}
+  .col .cap{text-align:center;color:var(--muted);font-size:12.5px;margin-top:12px}
+  .phone{
+    background:var(--bg);border-radius:40px;border:1px solid rgba(244,243,239,.14);overflow:hidden;
+    box-shadow:0 34px 80px rgba(0,0,0,.7);position:relative;padding-bottom:64px;
+  }
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:60px;background:rgba(11,12,12,.95);border-top:1px solid var(--line);display:flex}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:8.5px;font-weight:700}
+  .tab .i{font-size:16px}
+  .tab.on{color:var(--gold2)}
+  /* ===== экран 1 ===== */
+  .hero{position:relative;height:196px;overflow:hidden}
+  .hero img{width:100%;height:100%;object-fit:cover;object-position:top;filter:grayscale(.35) contrast(1.06)}
+  .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,12,12,.1) 25%,var(--bg) 97%)}
+  .hero .in{position:absolute;left:16px;right:16px;bottom:6px;z-index:2}
+  .hello{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+  .bignum{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+  .bignum .d{font-size:44px;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--text)}
+  .bignum .of{font-size:14px;color:var(--muted);font-weight:600}
+  .bignum .pct{margin-left:auto;font-size:13px;font-weight:800;color:var(--gold2);background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);padding:5px 10px;border-radius:100px}
+  .pbar{height:8px;border-radius:8px;background:rgba(244,243,239,.1);overflow:hidden;margin-top:10px}
+  .pbar i{display:block;height:100%;width:26%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:8px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 14px 0}
+  .st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px}
+  .st .v{font-size:16px;font-weight:900;letter-spacing:-.02em}
+  .st .v small{font-size:9px;color:var(--muted);font-weight:600}
+  .st .t{font-size:8.5px;color:var(--muted);margin-top:2px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .st .bar{height:4px;border-radius:4px;background:rgba(244,243,239,.08);margin-top:7px;overflow:hidden}
+  .st .bar i{display:block;height:100%;background:var(--gold2)}
+  .st.ok .bar i{background:var(--green)}
+  .days{display:flex;gap:7px;overflow:hidden;padding:12px 14px 2px}
+  .dchip{min-width:44px;padding:8px 0;border-radius:12px;text-align:center;background:var(--card);border:1px solid var(--line)}
+  .dchip .dw{font-size:8px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;font-weight:700}
+  .dchip .dn{font-size:15px;font-weight:900;margin-top:1px}
+  .dchip.past{opacity:.4}.dchip.past .dn{text-decoration:line-through}
+  .dchip.cur{background:var(--gold2);border-color:transparent;color:#151002}
+  .dchip.cur .dw{color:#6b5410}
+  .sec{padding:12px 14px 0}
+  .sec h2{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--text);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+  .sec h2 a{font-size:10px;color:var(--gold2);font-weight:700;text-decoration:none;letter-spacing:.05em}
+  .meal{display:flex;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;margin-bottom:8px;align-items:center;position:relative;overflow:hidden}
+  .meal::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold2)}
+  .meal.eaten::before{background:var(--green)}
+  .meal img{width:54px;height:54px;border-radius:10px;object-fit:cover}
+  .meal .mt{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);font-weight:800}
+  .meal .mn{font-size:12.5px;font-weight:700;margin-top:1px}
+  .meal .mk{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600}
+  .meal .go{margin-left:auto;font-size:15px;color:var(--gold2)}
+  .meal.eaten{opacity:.55}
+  .wbtn{
+    margin:2px 0 6px;background:linear-gradient(135deg,#C9A84C,#E8C96A);border-radius:14px;padding:13px 14px;
+    display:flex;align-items:center;gap:10px;color:#151002;
+  }
+  .wbtn .t1{font-size:13px;font-weight:900;letter-spacing:.02em}
+  .wbtn .t2{font-size:10px;font-weight:600;opacity:.75;margin-top:1px}
+  .wbtn .arr{margin-left:auto;font-size:18px;font-weight:900}
+  /* ===== экран 2 ===== */
+  .s-head{padding:20px 16px 12px}
+  .s-head .k{font-size:9px;letter-spacing:.22em;color:var(--gold2);text-transform:uppercase;font-weight:800}
+  .s-head h2{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-top:4px}
+  .s-head .m{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+  .wstats{display:flex;gap:8px;padding:0 16px;margin-top:8px}
+  .ws{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px;text-align:center}
+  .ws .v{font-size:15px;font-weight:900}
+  .ws .t{font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+  .adapt{margin:12px 16px 0;font-size:10.5px;color:#9fd3a8;background:rgba(95,191,122,.08);border-left:3px solid var(--green);border-radius:8px;padding:9px 11px;line-height:1.45;font-weight:500}
+  .exl{margin:12px 16px 0}
+  .ex{display:flex;gap:10px;padding:9px;margin-bottom:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px}
+  .ex img{width:52px;height:52px;border-radius:10px;object-fit:cover;filter:saturate(.9)}
+  .ex .en{font-size:12.5px;font-weight:700}
+  .ex .em{font-size:10px;color:var(--gold2);margin-top:2px;font-weight:700}
+  .ex .ec{font-size:9.5px;color:var(--muted);margin-top:1px}
+  .ex .w{margin-left:auto;text-align:right;flex-shrink:0}
+  .ex .w .kg{font-size:14px;font-weight:900;color:var(--text)}
+  .ex .w .lbl{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .donebar{margin:12px 16px;background:var(--green);color:#08130c;text-align:center;padding:12px;border-radius:12px;font-size:13px;font-weight:900;letter-spacing:.04em}
+  /* ===== экран 3: прогресс ===== */
+  .p-head{padding:20px 16px 6px}
+  .p-head h2{font-size:24px;font-weight:900;letter-spacing:-.02em}
+  .p-head .m{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600}
+  .chart{margin:12px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .chart .t{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+  .chart svg{width:100%}
+  .badges{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 16px 0}
+  .bd{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px;display:flex;gap:9px;align-items:center}
+  .bd .i{width:34px;height:34px;border-radius:10px;background:rgba(201,168,76,.12);display:flex;align-items:center;justify-content:center;font-size:16px}
+  .bd .v{font-size:13px;font-weight:900}
+  .bd .t{font-size:9px;color:var(--muted);font-weight:600;margin-top:1px}
+  .streak{margin:10px 16px 0;background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(232,201,106,.06));border:1px solid rgba(201,168,76,.35);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:10px}
+  .streak .f{font-size:24px}
+  .streak .v{font-size:14px;font-weight:900}
+  .streak .t{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px}
+</style>
+</head>
+<body>
+<div class="head">
+  <div class="k">Вариант 4</div>
+  <h1>«ГРАФИТ · СПОРТ»</h1>
+  <p>Спортивный характер: почти чёрный графит, жирная рубленая типографика без засечек, крупные цифры как в спорт-трекерах, золото — только для акцентов. Плюс отдельный экран «Прогресс» со стриком и графиком веса.</p>
+</div>
+<div class="row">
+
+  <!-- экран 1 -->
+  <div class="col">
+    <div class="phone">
+      <div class="hero">
+        <img src="https://roman-nutrition-app.website.yandexcloud.net/design/bg_hero.webp" alt="Роман">
+        <div class="in">
+          <div class="hello">Формула здорового тела</div>
+          <div class="bignum"><span class="d">23</span><span class="of">/ 90 дней</span><span class="pct">26%</span></div>
+          <div class="pbar"><i></i></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="st ok"><div class="v">1751<small> ккал</small></div><div class="t">Калории</div><div class="bar"><i style="width:100%"></i></div></div>
+        <div class="st"><div class="v">86<small>/108</small></div><div class="t">Белки</div><div class="bar"><i style="width:80%"></i></div></div>
+        <div class="st"><div class="v">41<small>/60</small></div><div class="t">Жиры</div><div class="bar"><i style="width:68%"></i></div></div>
+        <div class="st"><div class="v">120<small>/195</small></div><div class="t">Углев</div><div class="bar"><i style="width:62%"></i></div></div>
+      </div>
+      <div class="days">
+        <div class="dchip past"><div class="dw">пн</div><div class="dn">21</div></div>
+        <div class="dchip past"><div class="dw">вт</div><div class="dn">22</div></div>
+        <div class="dchip cur"><div class="dw">ср</div><div class="dn">23</div></div>
+        <div class="dchip"><div class="dw">чт</div><div class="dn">24</div></div>
+        <div class="dchip"><div class="dw">пт</div><div class="dn">25</div></div>
+        <div class="dchip"><div class="dw">сб</div><div class="dn">26</div></div>
+      </div>
+      <div class="sec">
+        <h2>Меню на сегодня <a href="#">ЗАМЕНИТЬ →</a></h2>
+        <div class="meal eaten">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103038_87fd1643-83ca-4de8-b5bc-e3a12bf201c0_min.webp" alt="">
+          <div><div class="mt">Завтрак · съеден</div><div class="mn">Шакшука с лавашом</div><div class="mk">412 ккал · Б28 Ж18 У34</div></div>
+          <div class="go">✓</div>
+        </div>
+        <div class="meal">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103041_1e1110e3-defd-4304-a101-3498e5d3eebe_min.webp" alt="">
+          <div><div class="mt">Обед</div><div class="mn">Боул с индейкой и нутом</div><div class="mk">486 ккал · Б36 Ж14 У52</div></div>
+          <div class="go">›</div>
+        </div>
+        <div class="wbtn">
+          <div><div class="t1">ТРЕНИРОВКА ДНЯ: ВСЁ ТЕЛО · B</div><div class="t2">6 упражнений · 2×12–15 · ~35 мин · дома</div></div>
+          <span class="arr">→</span>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><span class="i">🍽</span>ПИТАНИЕ</div>
+        <div class="tab"><span class="i">🏋️</span>ТРЕНИНГ</div>
+        <div class="tab"><span class="i">🛒</span>ПОКУПКИ</div>
+        <div class="tab"><span class="i">📈</span>ПРОГРЕСС</div>
+        <div class="tab"><span class="i">👤</span>ПРОФИЛЬ</div>
+      </div>
+    </div>
+    <div class="cap">Главный экран</div>
+  </div>
+
+  <!-- экран 2 -->
+  <div class="col">
+    <div class="phone">
+      <div class="s-head">
+        <div class="k">Неделя 5 · прогрессия активна</div>
+        <h2>ВЕРХ ТЕЛА</h2>
+        <div class="m">5 упражнений · ~40 минут · 🏋️ в зале</div>
+      </div>
+      <div class="wstats">
+        <div class="ws"><div class="v">3×8–12</div><div class="t">Подходы</div></div>
+        <div class="ws"><div class="v">+2.5 кг</div><div class="t">Эта неделя</div></div>
+        <div class="ws"><div class="v">90 сек</div><div class="t">Отдых</div></div>
+      </div>
+      <div class="adapt" style="color:#E8C96A;background:rgba(201,168,76,.08);border-left-color:#C9A84C">🏆 Первый месяц позади — переходим на второй уровень. С этой недели растёт рабочий вес.</div>
+      <div class="exl">
+        <div class="ex">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125909_163daeee-4121-4b2f-a692-834466f8648b_min.webp" alt="">
+          <div><div class="en">Жим гантелей лёжа</div><div class="em">3 × 8–12 · отдых 120 сек</div><div class="ec">Гантели по дуге, внизу растяжение</div></div>
+          <div class="w"><div class="kg">18 кг</div><div class="lbl">рабочий</div></div>
+        </div>
+        <div class="ex">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125838_440d48fd-e19e-4e3f-b170-226f66dfa58a_min.webp" alt="">
+          <div><div class="en">Тяга верхнего блока</div><div class="em">3 × 8–12 · отдых 90 сек</div><div class="ec">К верху груди, без раскачки</div></div>
+          <div class="w"><div class="kg">45 кг</div><div class="lbl">рабочий</div></div>
+        </div>
+        <div class="ex">
+          <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125732_c55a0e43-390d-4e21-9b88-914701f38c3b_min.webp" alt="">
+          <div><div class="en">Жим стоя</div><div class="em">3 × 8–10 · отдых 120 сек</div><div class="ec">Пресс напряжён, строго вверх</div></div>
+          <div class="w"><div class="kg">25 кг</div><div class="lbl">рабочий</div></div>
+        </div>
+      </div>
+      <div class="donebar">СДЕЛАНО ✓</div>
+      <div class="tabbar">
+        <div class="tab"><span class="i">🍽</span>ПИТАНИЕ</div>
+        <div class="tab on"><span class="i">🏋️</span>ТРЕНИНГ</div>
+        <div class="tab"><span class="i">🛒</span>ПОКУПКИ</div>
+        <div class="tab"><span class="i">📈</span>ПРОГРЕСС</div>
+        <div class="tab"><span class="i">👤</span>ПРОФИЛЬ</div>
+      </div>
+    </div>
+    <div class="cap">Тренировка с рабочими весами</div>
+  </div>
+
+  <!-- экран 3: прогресс -->
+  <div class="col">
+    <div class="phone">
+      <div class="p-head">
+        <h2>ПРОГРЕСС</h2>
+        <div class="m">62.4 кг · осталось 2.4 кг до цели</div>
+      </div>
+      <div class="chart">
+        <div class="t">Вес · 4 недели</div>
+        <svg viewBox="0 0 280 90">
+          <polyline fill="none" stroke="rgba(244,243,239,.1)" stroke-width="1" points="0,20 280,20"/>
+          <polyline fill="none" stroke="rgba(244,243,239,.1)" stroke-width="1" points="0,50 280,50"/>
+          <polyline fill="none" stroke="rgba(244,243,239,.1)" stroke-width="1" points="0,80 280,80"/>
+          <polyline fill="none" stroke="url(#gr4)" stroke-width="3" stroke-linecap="round"
+            points="10,18 50,24 90,30 130,36 170,40 210,52 260,62"/>
+          <circle cx="260" cy="62" r="5" fill="#E8C96A"/>
+          <defs><linearGradient id="gr4"><stop offset="0" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8C96A"/></linearGradient></defs>
+        </svg>
+      </div>
+      <div class="streak">
+        <span class="f">🔥</span>
+        <div><div class="v">23 дня подряд</div><div class="t">Лучший стрик за всё время. Не прерывай серию!</div></div>
+      </div>
+      <div class="badges">
+        <div class="bd"><span class="i">⚖️</span><div><div class="v">−2.6 кг</div><div class="t">с начала пути</div></div></div>
+        <div class="bd"><span class="i">🏋️</span><div><div class="v">14</div><div class="t">тренировок</div></div></div>
+        <div class="bd"><span class="i">🍽</span><div><div class="v">92%</div><div class="t">попадание в КБЖУ</div></div></div>
+        <div class="bd"><span class="i">💪</span><div><div class="v">+12%</div><div class="t">рост рабочих весов</div></div></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><span class="i">🍽</span>ПИТАНИЕ</div>
+        <div class="tab"><span class="i">🏋️</span>ТРЕНИНГ</div>
+        <div class="tab"><span class="i">🛒</span>ПОКУПКИ</div>
+        <div class="tab on"><span class="i">📈</span>ПРОГРЕСС</div>
+        <div class="tab"><span class="i">👤</span>ПРОФИЛЬ</div>
+      </div>
+    </div>
+    <div class="cap">Экран «Прогресс» со стриком</div>
+  </div>
+
+</div>
+</body>
+</html>

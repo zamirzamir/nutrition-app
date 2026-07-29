@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 стилей — Формула здорового тела</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111312;font-family:'Inter',sans-serif;color:#eee;padding:36px 14px 70px}
+  .head{text-align:center;max-width:920px;margin:0 auto 30px}
+  .head h1{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,36px)}
+  .head p{color:#999;font-size:14px;margin-top:8px}
+  .row{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{width:300px}
+  .cap{margin-top:12px;text-align:center}
+  .cap b{font-size:14px;display:block}
+  .cap span{font-size:12px;color:#999;line-height:1.45;display:block;margin-top:4px}
+
+  /* ===== шаблон на токенах: цвет + ФОРМА + шрифт ===== */
+  .phone{
+    background:var(--bg);border-radius:34px;border:1px solid var(--frame);
+    overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.55);position:relative;
+    padding-bottom:58px;color:var(--text);font-family:var(--font-body,'Inter'),sans-serif;
+  }
+  .hero{position:relative;height:118px;overflow:hidden}
+  .hero img{width:100%;height:100%;object-fit:cover;object-position:top;filter:var(--heroflt,none)}
+  .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 15%,var(--bg) 97%)}
+  .hero .in{position:absolute;left:14px;right:14px;bottom:6px;z-index:2}
+  .hero .hi{font-size:10px;color:var(--muted)}
+  .hero .t{font-family:var(--font-head),serif;font-size:var(--head-size,16px);font-weight:var(--head-weight,600);margin-top:1px;letter-spacing:var(--head-ls,0);text-transform:var(--head-case,none)}
+  .hero .t em{color:var(--accent2);font-style:var(--em-style,italic)}
+  .pbar{height:5px;border-radius:5px;background:var(--pbg);overflow:hidden;margin-top:7px}
+  .pbar i{display:block;height:100%;width:26%;background:var(--btn-bg);border-radius:5px}
+  .pad{padding:10px 12px 0}
+  .kbju{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+  .kb{background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px 4px;text-align:center;box-shadow:var(--card-shadow,none)}
+  .kb .v{font-family:var(--font-head),serif;font-size:12.5px;font-weight:700;color:var(--accent2)}
+  .kb .t{font-size:7.5px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.05em}
+  .days{display:flex;gap:6px;overflow:hidden;margin-bottom:10px}
+  .dchip{min-width:40px;padding:7px 0;border-radius:var(--chip-r);text-align:center;background:var(--surface);border:var(--card-border);flex-shrink:0;box-shadow:var(--card-shadow,none)}
+  .dchip .dw{font-size:7px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+  .dchip .dn{font-family:var(--font-head),serif;font-size:13px;font-weight:700;margin-top:1px}
+  .dchip.past{opacity:.4}.dchip.past .dn{text-decoration:line-through}
+  .dchip.cur{background:var(--btn-bg);border-color:transparent;color:var(--onaccent)}
+  .dchip.cur .dw{color:var(--onaccent);opacity:.65}
+  .meal{display:flex;gap:8px;background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px;margin-bottom:8px;align-items:center;box-shadow:var(--card-shadow,none)}
+  .meal img{width:44px;height:44px;border-radius:calc(var(--card-r) - 4px);object-fit:cover}
+  .meal .mt{font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .meal .mn{font-size:10.5px;font-weight:600;margin-top:1px}
+  .meal .mk{font-size:8.5px;color:var(--muted);margin-top:1px}
+  .meal .go{margin-left:auto;width:22px;height:22px;border-radius:50%;background:var(--chipbg);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:11px;flex-shrink:0}
+  .btn{display:block;text-align:center;background:var(--btn-bg);color:var(--onaccent);
+    font-size:11px;font-weight:var(--btn-weight,700);padding:10px;border-radius:var(--btn-r);margin-bottom:8px;
+    box-shadow:var(--btn-shadow);letter-spacing:var(--btn-ls,0);text-transform:var(--btn-case,none);border:var(--btn-border,none)}
+  .ghost{display:block;text-align:center;border:1.5px solid var(--ghost-border);color:var(--accent2);font-size:11px;font-weight:600;
+    padding:9px;border-radius:var(--btn-r);letter-spacing:var(--btn-ls,0);text-transform:var(--btn-case,none)}
+  .tabbar{position:absolute;bottom:var(--bar-bottom,0);left:var(--bar-side,0);right:var(--bar-side,0);height:52px;
+    background:var(--barbg);backdrop-filter:blur(10px);border-top:var(--bar-border-top);border:var(--bar-border,none);
+    border-radius:var(--bar-r,0);display:flex;padding:3px 4px;box-shadow:var(--bar-shadow,none)}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--muted);font-size:7px;font-weight:600;border-radius:var(--chip-r);margin:3px 1px}
+  .tab .i{font-size:14px}
+  .tab.on{color:var(--tab-on,var(--accent2));background:var(--chipbg)}
+
+  /* ============== 5 СТИЛЕЙ ============== */
+  /* С1 · Тёмное золото — текущий (точка отсчёта): серифы, мягкие углы, градиент */
+  .s1{--bg:#070D0C;--surface:#131C19;--frame:rgba(201,168,76,.3);--card-border:1px solid rgba(201,168,76,.18);
+      --accent:#C9A84C;--accent2:#E8C96A;--onaccent:#1a1405;--text:#F2ECDD;--muted:#A7A089;
+      --pbg:rgba(242,236,221,.14);--chipbg:rgba(201,168,76,.13);--barbg:rgba(10,16,14,.95);
+      --font-head:'Playfair Display';--card-r:13px;--chip-r:11px;--btn-r:11px;
+      --btn-bg:linear-gradient(135deg,#C9A84C,#E8C96A);--btn-shadow:0 4px 16px rgba(201,168,76,.3);
+      --ghost-border:rgba(201,168,76,.35);--bar-border-top:1px solid rgba(201,168,76,.18)}
+  /* С2 · Полночь и шампанское — строгий: острые углы, плоские кнопки-капс, тонкие линии */
+  .s2{--bg:#0A0E14;--surface:#131A25;--frame:rgba(216,192,138,.28);--card-border:1px solid rgba(216,192,138,.16);
+      --accent:#C8B080;--accent2:#EFDDB0;--onaccent:#10131a;--text:#F1EFEA;--muted:#8E93A1;
+      --pbg:rgba(241,239,234,.12);--chipbg:rgba(216,192,138,.1);--barbg:rgba(10,14,20,.96);
+      --font-head:'Inter';--head-weight:800;--head-ls:.02em;--em-style:normal;
+      --card-r:6px;--chip-r:6px;--btn-r:4px;
+      --btn-bg:#EFDDB0;--btn-shadow:none;--btn-case:uppercase;--btn-ls:.14em;--btn-weight:800;
+      --ghost-border:rgba(216,192,138,.4);--bar-border-top:1px solid rgba(216,192,138,.16)}
+  /* С3 · Слоновая кость — светлый люкс: кремовый фон, пилюли, тёмно-зелёные кнопки */
+  .s3{--bg:#F5EFE3;--surface:#FDFAF3;--frame:#c9c0aa;--card-border:1px solid rgba(24,36,32,.1);
+      --accent:#A8842C;--accent2:#8a6b1e;--onaccent:#E8C96A;--text:#182420;--muted:#8A8471;
+      --pbg:rgba(24,36,32,.12);--chipbg:rgba(168,132,44,.12);--barbg:rgba(253,250,243,.96);
+      --font-head:'Playfair Display';--card-r:16px;--chip-r:100px;--btn-r:100px;
+      --btn-bg:#182420;--btn-shadow:0 6px 18px rgba(24,36,32,.25);
+      --card-shadow:0 6px 16px rgba(90,75,30,.08);
+      --ghost-border:rgba(168,132,44,.45);--bar-border-top:1px solid rgba(24,36,32,.1);--tab-on:#A8842C;
+      --heroflt:none}
+  /* С4 · Эспрессо и медь — тёплый и мягкий: очень круглые углы, плавающий бар-пилюля */
+  .s4{--bg:#140E0A;--surface:#221812;--frame:rgba(227,154,100,.32);--card-border:1px solid rgba(227,154,100,.18);
+      --accent:#C77B4A;--accent2:#E39A64;--onaccent:#1c0d03;--text:#F4EBE0;--muted:#A89684;
+      --pbg:rgba(244,235,224,.13);--chipbg:rgba(199,123,74,.14);--barbg:rgba(34,24,18,.92);
+      --font-head:'Manrope';--head-weight:800;--em-style:normal;
+      --card-r:20px;--chip-r:18px;--btn-r:18px;
+      --btn-bg:linear-gradient(135deg,#C77B4A,#E39A64);--btn-shadow:0 6px 20px rgba(199,123,74,.35);
+      --ghost-border:rgba(227,154,100,.4);
+      --bar-bottom:8px;--bar-side:10px;--bar-r:22px;--bar-border:1px solid rgba(227,154,100,.25);--bar-border-top:none;--bar-shadow:0 10px 26px rgba(0,0,0,.45)}
+  /* С5 · Уголь и лайм — спорт: рубленый жирный шрифт, левая золотая… нет — лаймовая полоса, резкие углы */
+  .s5{--bg:#0C0D0C;--surface:#161817;--frame:rgba(155,225,93,.3);--card-border:1px solid rgba(155,225,93,.14);
+      --accent:#7FC93F;--accent2:#9BE15D;--onaccent:#0d1503;--text:#F2F4F0;--muted:#8F958C;
+      --pbg:rgba(242,244,240,.12);--chipbg:rgba(155,225,93,.12);--barbg:rgba(12,13,12,.96);
+      --font-head:'Inter';--head-weight:900;--head-ls:-.01em;--head-case:uppercase;--head-size:14.5px;--em-style:normal;
+      --card-r:10px;--chip-r:9px;--btn-r:9px;
+      --btn-bg:#9BE15D;--btn-shadow:0 0 22px rgba(155,225,93,.35);--btn-case:uppercase;--btn-ls:.1em;--btn-weight:900;
+      --ghost-border:rgba(155,225,93,.4);--bar-border-top:1px solid rgba(155,225,93,.16);
+      --heroflt:grayscale(.35) contrast(1.05)}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>Пять стилей — цвет и форма</h1>
+  <p>Один экран, пять характеров: меняются палитра, скругления, шрифты и стиль кнопок. Всё на токенах — выбранный стиль включается заменой одного блока переменных.</p>
+</div>
+<div class="row" id="row"></div>
+
+<script>
+const VARIANTS = [
+  ['s1','С1 · Тёмное золото (текущий)','Точка отсчёта: серифы, мягкие углы, золотой градиент. Вечерний люкс.'],
+  ['s2','С2 · Полночь и шампанское','Строгий: чёрно-синий, острые углы, плоские кнопки капсом. Швейцарские часы, минимум украшений.'],
+  ['s3','С3 · Слоновая кость (светлый)','Полный уход от тёмного: кремовый фон, кнопки-пилюли тёмно-зелёные. Дневной, «дорогое меню».'],
+  ['s4','С4 · Эспрессо и медь','Тёплый и мягкий: шоколад + медь, очень круглые углы, плавающий бар-пилюля. Уют и аппетит.'],
+  ['s5','С5 · Уголь и лайм','Спортивный: рубленый жирный шрифт капсом, неоновый лайм, резкие углы. Энергия, молодая аудитория.'],
+];
+const SHAK='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103038_87fd1643-83ca-4de8-b5bc-e3a12bf201c0_min.webp';
+const HERO='https://roman-nutrition-app.website.yandexcloud.net/design/bg_hero.webp';
+function phone(cls){
+  return `<div class="phone ${cls}">
+    <div class="hero"><img src="${HERO}" alt="">
+      <div class="in"><div class="hi">С возвращением 👋</div>
+        <div class="t">Сегодня — <em>день 23 из 90</em></div>
+        <div class="pbar"><i></i></div></div></div>
+    <div class="pad">
+      <div class="kbju">
+        <div class="kb"><div class="v">1751</div><div class="t">ккал</div></div>
+        <div class="kb"><div class="v">108</div><div class="t">белки</div></div>
+        <div class="kb"><div class="v">60</div><div class="t">жиры</div></div>
+        <div class="kb"><div class="v">195</div><div class="t">углев</div></div>
+      </div>
+      <div class="days">
+        <div class="dchip past"><div class="dw">день</div><div class="dn">21</div></div>
+        <div class="dchip past"><div class="dw">день</div><div class="dn">22</div></div>
+        <div class="dchip cur"><div class="dw">день</div><div class="dn">23</div></div>
+        <div class="dchip"><div class="dw">день</div><div class="dn">24</div></div>
+        <div class="dchip"><div class="dw">день</div><div class="dn">25</div></div>
+        <div class="dchip"><div class="dw">день</div><div class="dn">26</div></div>
+      </div>
+      <div class="meal"><img src="${SHAK}" alt="">
+        <div><div class="mt">Завтрак</div><div class="mn">Шакшука с лавашом</div><div class="mk">412 ккал · Б28 Ж18 У34</div></div>
+        <div class="go">›</div></div>
+      <div class="btn">Открыть меню дня →</div>
+      <div class="ghost">↻ Заменить блюдо</div>
+    </div>
+    <div class="tabbar">
+      <div class="tab"><span class="i">🍽</span>Питание</div>
+      <div class="tab"><span class="i">🏋️</span>Тренинг</div>
+      <div class="tab on"><span class="i">✨</span>Сегодня</div>
+      <div class="tab"><span class="i">🛒</span>Покупки</div>
+      <div class="tab"><span class="i">👤</span>Профиль</div>
+    </div>
+  </div>`;
+}
+document.getElementById('row').innerHTML = VARIANTS.map(([cls,name,desc]) =>
+  `<div class="col">${phone(cls)}<div class="cap"><b>${name}</b><span>${desc}</span></div></div>`
+).join('');
+</script>
+</body>
+</html>

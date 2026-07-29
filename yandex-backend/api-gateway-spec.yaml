@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: nutrition-auth-api
+  version: 1.0.0
+x-yc-apigateway:
+  # 25.07 (Замир): сайт переехал на боевой домен → CORS должен пускать ИМЕННО его,
+  # иначе вход/профиль/прогресс блокируются браузером (кнопка «Проверяем» зависает).
+  # credentials:true требует ТОЧНЫЙ origin (не '*'), поэтому один боевой домен.
+  cors:
+    origin: 'https://roman-nutrition-app.website.yandexcloud.net'
+    methods: 'GET, POST, OPTIONS'
+    allowedHeaders: 'Content-Type, Authorization'
+    credentials: true
+    maxAge: 3600
+paths:
+  /prodamus-webhook:
+    post:
+      summary: Приём оплаты от Продамуса
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /login-request:
+    post:
+      summary: Запрос кода входа по телефону
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /login-verify:
+    post:
+      summary: Проверка кода, выдача куки
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /check:
+    get:
+      summary: Гейт части 2 — проверка куки и оплаты
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /recipes-url:
+    get:
+      summary: P0 — подписанная ссылка на приватный recipes.json (только оплатившим)
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /telegram-webhook:
+    post:
+      summary: Webhook Telegram-бота
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /profile-get:
+    get:
+      summary: Получить профиль клиента
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /profile-save:
+    post:
+      summary: Сохранить профиль клиента
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /progress-get:
+    get:
+      summary: Получить прогресс дней
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /progress-save:
+    post:
+      summary: Сохранить прогресс дней
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /admin-reset:
+    post:
+      summary: Админ-сброс профиля клиента
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /admin-extend-subs:
+    post:
+      summary: Разовое продление существующих подписок до 90 дней (dry-run/apply, admin_key)
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /feedback:
+    post:
+      summary: Приём обратной связи «Нашли ошибку?» (без авторизации)
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /feedback-list:
+    post:
+      summary: Выгрузка отзывов (admin_key)
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f
+  /feedback-done:
+    post:
+      summary: Пометить отзывы разобранными (архив, admin_key)
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e8n0p0gbm8jmg7kh9j
+        service_account_id: ajes5b7bt400gvjhc78f

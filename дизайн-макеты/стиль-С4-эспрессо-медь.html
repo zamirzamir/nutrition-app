@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>С4 · Эспрессо и медь — все 5 вкладок</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111312;font-family:'Inter',sans-serif;color:#eee;padding:36px 14px 70px}
+  .head{text-align:center;max-width:920px;margin:0 auto 28px}
+  .head h1{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,34px)}
+  .head p{color:#999;font-size:14px;margin-top:8px}
+  .row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{width:292px}
+  .cap{margin-top:10px;text-align:center;font-size:12.5px;color:#aaa}
+  .phone{background:var(--bg);border-radius:32px;border:1px solid var(--frame);overflow:hidden;
+    box-shadow:0 24px 54px rgba(0,0,0,.55);position:relative;padding-bottom:58px;color:var(--text);
+    font-family:'Inter',sans-serif;min-height:520px}
+  .hero{position:relative;height:112px;overflow:hidden}
+  .hero img{width:100%;height:100%;object-fit:cover;object-position:top;filter:var(--heroflt,none)}
+  .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 15%,var(--bg) 97%)}
+  .hero .in{position:absolute;left:13px;right:13px;bottom:6px;z-index:2}
+  .hero .hi{font-size:9.5px;color:var(--muted)}
+  .hero .t{font-family:var(--font-head),serif;font-size:var(--head-size,15px);font-weight:var(--head-weight,600);letter-spacing:var(--head-ls,0);text-transform:var(--head-case,none)}
+  .hero .t em{color:var(--accent2);font-style:var(--em-style,italic)}
+  .pbar{height:5px;border-radius:5px;background:var(--pbg);overflow:hidden;margin-top:6px}
+  .pbar i{display:block;height:100%;width:26%;background:var(--btn-bg);border-radius:5px}
+  .pad{padding:10px 12px 0}
+  .shead{padding:13px 12px 2px}
+  .shead h2{font-family:var(--font-head),serif;font-size:16px;font-weight:var(--head-weight,700);text-transform:var(--head-case,none);letter-spacing:var(--head-ls,0)}
+  .shead .m{font-size:9.5px;color:var(--muted);margin-top:2px}
+  .kbju{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px}
+  .kb{background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px 4px;text-align:center;box-shadow:var(--card-shadow,none)}
+  .kb .v{font-family:var(--font-head),serif;font-size:12px;font-weight:700;color:var(--accent2)}
+  .kb .t{font-size:7px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.05em}
+  .days{display:flex;gap:5px;overflow:hidden;margin-bottom:9px}
+  .dchip{min-width:38px;padding:6px 0;border-radius:var(--chip-r);text-align:center;background:var(--surface);border:var(--card-border);flex-shrink:0;box-shadow:var(--card-shadow,none)}
+  .dchip .dw{font-size:6.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+  .dchip .dn{font-family:var(--font-head),serif;font-size:12px;font-weight:700}
+  .dchip.past{opacity:.4}.dchip.past .dn{text-decoration:line-through}
+  .dchip.cur{background:var(--btn-bg);border-color:transparent;color:var(--onaccent)}
+  .dchip.cur .dw{color:var(--onaccent);opacity:.65}
+  .meal{display:flex;gap:8px;background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px;margin-bottom:7px;align-items:center;box-shadow:var(--card-shadow,none)}
+  .meal img{width:42px;height:42px;border-radius:calc(var(--card-r) - 4px);object-fit:cover}
+  .meal .mt{font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .meal .mn{font-size:10px;font-weight:600}
+  .meal .mk{font-size:8px;color:var(--muted)}
+  .meal .go{margin-left:auto;width:20px;height:20px;border-radius:50%;background:var(--chipbg);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:10px;flex-shrink:0}
+  .btn{display:block;text-align:center;background:var(--btn-bg);color:var(--onaccent);font-size:10px;font-weight:var(--btn-weight,700);
+    padding:9px;border-radius:var(--btn-r);margin-bottom:7px;box-shadow:var(--btn-shadow);letter-spacing:var(--btn-ls,0);text-transform:var(--btn-case,none)}
+  .ghost{display:block;text-align:center;border:1.5px solid var(--ghost-border);color:var(--accent2);font-size:10px;font-weight:600;padding:8px;border-radius:var(--btn-r);letter-spacing:var(--btn-ls,0);text-transform:var(--btn-case,none);margin-bottom:7px}
+  .seg{display:flex;gap:6px;margin-bottom:9px}
+  .sg{flex:1;padding:8px;border-radius:var(--chip-r);border:var(--card-border);background:var(--surface);color:var(--muted);font-size:9.5px;font-weight:700;text-align:center}
+  .sg.on{background:var(--btn-bg);color:var(--onaccent);border-color:transparent}
+  .num{display:flex;gap:6px;align-items:center;margin-bottom:9px}
+  .nb{width:34px;height:34px;border-radius:50%;border:var(--card-border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted)}
+  .nb.on{background:var(--btn-bg);color:var(--onaccent);border-color:transparent}
+  .nb.lock{font-size:12px}
+  .ex{display:flex;gap:8px;background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px;margin-bottom:7px;align-items:center;box-shadow:var(--card-shadow,none)}
+  .ex img{width:38px;height:38px;border-radius:calc(var(--card-r) - 4px);object-fit:cover}
+  .ex .en{font-size:9.5px;font-weight:700}
+  .ex .em2{font-size:8px;color:var(--accent2)}
+  .ex .ec{font-size:7.5px;color:var(--muted)}
+  .ex .chk{margin-left:auto;width:17px;height:17px;border-radius:6px;border:1.5px solid var(--ghost-border);flex-shrink:0}
+  .ex.done .chk{background:var(--accent2);border-color:transparent}
+  .grp{font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:800;padding:8px 0 3px}
+  .srow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--pbg);font-size:9.5px}
+  .srow span:last-child{color:var(--muted);font-size:9px}
+  .inp{display:flex;gap:6px;margin-bottom:7px}
+  .fld{flex:1;background:var(--surface);border:var(--card-border);border-radius:var(--card-r);padding:7px 9px}
+  .fld .l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .fld .v{font-size:11px;font-weight:700;margin-top:1px}
+  .note{font-size:8.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
+  .tabbar{position:absolute;bottom:var(--bar-bottom,0);left:var(--bar-side,0);right:var(--bar-side,0);height:50px;
+    background:var(--barbg);backdrop-filter:blur(10px);border-top:var(--bar-border-top);border:var(--bar-border,none);
+    border-radius:var(--bar-r,0);display:flex;padding:3px 4px;box-shadow:var(--bar-shadow,none)}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--muted);font-size:6.5px;font-weight:600;border-radius:var(--chip-r);margin:3px 1px}
+  .tab .i{font-size:13px}
+  .tab.on{color:var(--tab-on,var(--accent2));background:var(--chipbg)}
+
+  .sX{--bg:#140E0A;--surface:#221812;--frame:rgba(227,154,100,.32);--card-border:1px solid rgba(227,154,100,.18);
+      --accent:#C77B4A;--accent2:#E39A64;--onaccent:#1c0d03;--text:#F4EBE0;--muted:#A89684;
+      --pbg:rgba(244,235,224,.13);--chipbg:rgba(199,123,74,.14);--barbg:rgba(34,24,18,.92);
+      --font-head:'Manrope';--head-weight:800;--em-style:normal;
+      --card-r:20px;--chip-r:18px;--btn-r:18px;
+      --btn-bg:linear-gradient(135deg,#C77B4A,#E39A64);--btn-shadow:0 6px 20px rgba(199,123,74,.35);
+      --ghost-border:rgba(227,154,100,.4);
+      --bar-bottom:8px;--bar-side:10px;--bar-r:22px;--bar-border:1px solid rgba(227,154,100,.25);--bar-border-top:none;--bar-shadow:0 10px 26px rgba(0,0,0,.45)}
+
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>С4 · Эспрессо и медь</h1>
+  <p>Тёплый: шоколад + медь, круглые углы, плавающий бар.<br>Пять вкладок приложения слева направо: Сегодня · Питание · Тренировки · Покупки · Профиль.</p>
+</div>
+<div class="row" id="row"></div>
+<script>
+const SHAK='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103038_87fd1643-83ca-4de8-b5bc-e3a12bf201c0_min.webp';
+const BOWL='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103041_1e1110e3-defd-4304-a101-3498e5d3eebe_min.webp';
+const HERO='https://roman-nutrition-app.website.yandexcloud.net/design/bg_hero.webp';
+const SQ='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125732_c55a0e43-390d-4e21-9b88-914701f38c3b_min.webp';
+const PL='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125838_440d48fd-e19e-4e3f-b170-226f66dfa58a_min.webp';
+const BD='https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_160531_7b6965e1-82ad-4af2-8b94-dfc927c18ec0_min.webp';
+
+function bar(active){
+  const t=[['🍽','Питание'],['🏋️','Тренинг'],['✨','Сегодня'],['🛒','Покупки'],['👤','Профиль']];
+  return '<div class="tabbar">'+t.map(([i,l],n)=>`<div class="tab${n===active?' on':''}"><span class="i">${i}</span>${l}</div>`).join('')+'</div>';
+}
+const chips=`<div class="days">
+  <div class="dchip past"><div class="dw">день</div><div class="dn">21</div></div>
+  <div class="dchip past"><div class="dw">день</div><div class="dn">22</div></div>
+  <div class="dchip cur"><div class="dw">день</div><div class="dn">23</div></div>
+  <div class="dchip"><div class="dw">день</div><div class="dn">24</div></div>
+  <div class="dchip"><div class="dw">день</div><div class="dn">25</div></div>
+  <div class="dchip"><div class="dw">день</div><div class="dn">26</div></div></div>`;
+
+const S_TODAY=`<div class="phone sX">
+  <div class="hero"><img src="${HERO}"><div class="in">
+    <div class="hi">С возвращением 👋</div><div class="t">Сегодня — <em>день 23 из 90</em></div>
+    <div class="pbar"><i></i></div></div></div>
+  <div class="pad">
+    <div class="kbju"><div class="kb"><div class="v">1751</div><div class="t">ккал</div></div>
+      <div class="kb"><div class="v">108</div><div class="t">белки</div></div>
+      <div class="kb"><div class="v">60</div><div class="t">жиры</div></div>
+      <div class="kb"><div class="v">195</div><div class="t">углев</div></div></div>
+    <div class="meal"><img src="${BOWL}"><div><div class="mt">Питание</div><div class="mn">Меню на день 23</div><div class="mk">Блюда точно в твою норму</div></div><div class="go">›</div></div>
+    <div class="meal"><img src="${SQ}"><div><div class="mt">Тренировка</div><div class="mn">Всё тело · день B</div><div class="mk">6 упражнений · ~35 мин</div></div><div class="go">›</div></div>
+    <div class="btn">🔥 22 дня подряд — держи серию</div>
+    <div class="inp"><div class="fld"><div class="l">Пройдено</div><div class="v">22 / 90</div></div>
+      <div class="fld"><div class="l">Цель</div><div class="v">60 → 70 кг</div></div></div>
+  </div>${bar(2)}</div>`;
+
+const S_FOOD=`<div class="phone sX">
+  <div class="shead"><h2>Питание</h2><div class="m">Исключения, приёмы пищи и готовое меню дня</div></div>
+  <div class="pad">
+    ${chips}
+    <div class="note">Листай дни. Удержание — зачеркнуть пройденный.</div>
+    <div class="num"><div class="nb">4</div><div class="nb on">5</div><div class="nb">6</div><div class="nb lock">🔒</div></div>
+    <div class="meal"><img src="${SHAK}"><div><div class="mt">Завтрак</div><div class="mn">Шакшука с лавашом</div><div class="mk">412 ккал · Б28 Ж18 У34</div></div><div class="go">›</div></div>
+    <div class="meal"><img src="${BOWL}"><div><div class="mt">Обед</div><div class="mn">Боул с индейкой и нутом</div><div class="mk">486 ккал · Б36 Ж14 У52</div></div><div class="go">›</div></div>
+    <div class="ghost">🚫 Исключено из меню (3) — грибы, молочное…</div>
+  </div>${bar(0)}</div>`;
+
+const S_WORK=`<div class="phone sX">
+  <div class="shead"><h2>Тренировки</h2><div class="m">Неделя 4 · прогрессия растёт от недели к неделе</div></div>
+  <div class="pad">
+    <div class="seg"><div class="sg on">🏠 Дома</div><div class="sg">🏋️ В зале</div></div>
+    <div class="note">🌱 Первый месяц тело адаптируется — с весом не торопимся.</div>
+    <div class="ex done"><img src="${SQ}"><div><div class="en">Приседания</div><div class="em2">2 × 12–15 · отдых 90 сек</div><div class="ec">Таз назад и вниз, колени по носкам</div></div><div class="chk"></div></div>
+    <div class="ex done"><img src="${PL}"><div><div class="en">Планка</div><div class="em2">2 × 20–30 сек · отдых 40 сек</div><div class="ec">Локти под плечами</div></div><div class="chk"></div></div>
+    <div class="ex"><img src="${BD}"><div><div class="en">Птица-собака</div><div class="em2">2 × 15 · отдых 60 сек</div><div class="ec">Рука вперёд + нога назад</div></div><div class="chk"></div></div>
+    <div class="btn">Сделано ✓</div>
+    <div class="ghost">Рабочий вес?</div>
+  </div>${bar(1)}</div>`;
+
+const S_SHOP=`<div class="phone sX">
+  <div class="shead"><h2>Покупки</h2><div class="m">Продукты на ближайшие 7 дн. плана</div></div>
+  <div class="pad">
+    <div class="seg"><div class="sg on">7 дней</div><div class="sg">14</div><div class="sg">30</div></div>
+    <div class="grp">Скоропортящиеся — покупай чаще</div>
+    <div class="srow"><span>Куриное яйцо</span><span>8 шт (433 г)</span></div>
+    <div class="srow"><span>Греческий йогурт 0%</span><span>311 г</span></div>
+    <div class="srow"><span>Творог 5%</span><span>310 г</span></div>
+    <div class="srow"><span>Куриное филе</span><span>260 г</span></div>
+    <div class="srow"><span>Армянский лаваш</span><span>169 г</span></div>
+    <div class="grp">Долгого хранения — можно впрок</div>
+    <div class="srow"><span>Овсянка</span><span>174 г</span></div>
+    <div class="srow"><span>Рис</span><span>158 г</span></div>
+    <div class="srow"><span>Белая фасоль</span><span>205 г</span></div>
+    <div class="srow" style="border:none"><span>Оливковое масло</span><span>16 г</span></div>
+  </div>${bar(3)}</div>`;
+
+const S_PROF=`<div class="phone sX">
+  <div class="shead"><h2>Профиль</h2><div class="m">Данные, активность, норма и доступ</div></div>
+  <div class="pad">
+    <div class="inp"><div class="fld"><div class="l">Пол</div><div class="v">Женский</div></div>
+      <div class="fld"><div class="l">Возраст</div><div class="v">35</div></div></div>
+    <div class="inp"><div class="fld"><div class="l">Вес</div><div class="v">60 кг</div></div>
+      <div class="fld"><div class="l">Цель</div><div class="v">70 кг</div></div>
+      <div class="fld"><div class="l">Рост</div><div class="v">170</div></div></div>
+    <div class="note">🔒 Параметры зафиксированы — они основа расчёта на 90 дней.</div>
+    <div class="seg"><div class="sg">💺 Сидячая</div><div class="sg on">🧍 Стоячая</div><div class="sg">🔨 Физтруд</div></div>
+    <div class="kbju"><div class="kb"><div class="v">1751</div><div class="t">ккал</div></div>
+      <div class="kb"><div class="v">108</div><div class="t">белки</div></div>
+      <div class="kb"><div class="v">60</div><div class="t">жиры</div></div>
+      <div class="kb"><div class="v">195</div><div class="t">углев</div></div></div>
+    <div class="btn">Доступ активен до 29.09 · продлить</div>
+  </div>${bar(4)}</div>`;
+
+const caps=['Сегодня','Питание','Тренировки','Покупки','Профиль'];
+document.getElementById('row').innerHTML=[S_TODAY,S_FOOD,S_WORK,S_SHOP,S_PROF]
+  .map((p,i)=>`<div class="col">${p}<div class="cap">${caps[i]}</div></div>`).join('');
+</script>
+</body>
+</html>

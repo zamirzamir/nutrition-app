@@ -1,0 +1,28 @@
+-- ТАБЛИЦЫ для YDB (выполнять по одной в редакторе «Новый SQL-запрос»)
+
+-- 1. Подписки (оплаты) — УЖЕ СОЗДАНА
+CREATE TABLE subscriptions (
+    phone Utf8,
+    email Utf8,
+    paid_at Timestamp,
+    expires_at Timestamp,
+    prodamus_order_id Utf8,
+    updated_at Timestamp,
+    PRIMARY KEY (phone)
+);
+
+-- 2. Коды подтверждения — УЖЕ СОЗДАНА
+CREATE TABLE otp_codes (
+    phone Utf8,
+    code Utf8,
+    expires_at Timestamp,
+    attempts Uint32,
+    PRIMARY KEY (phone)
+);
+
+-- 3. Связь телефон ↔ Telegram chat_id — НУЖНО СОЗДАТЬ
+CREATE TABLE tg_links (
+    phone Utf8,
+    chat_id Utf8,
+    PRIMARY KEY (phone)
+);

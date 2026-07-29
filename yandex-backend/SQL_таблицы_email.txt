@@ -1,0 +1,28 @@
+-- Таблицы YDB для nutrition-auth (схема EMAIL). Выполнять КАЖДУЮ CREATE отдельным запросом.
+-- При полной пересборке сначала: DROP TABLE subscriptions; (и т.д.) отдельными запросами.
+
+CREATE TABLE subscriptions (
+    email Utf8,
+    phone Utf8,
+    prodamus_order_id Utf8,
+    paid_at Timestamp,
+    expires_at Timestamp,
+    updated_at Timestamp,
+    PRIMARY KEY (email)
+);
+
+CREATE TABLE user_profiles (
+    email Utf8,
+    data Utf8,
+    locked Utf8,
+    created_at Timestamp,
+    updated_at Timestamp,
+    PRIMARY KEY (email)
+);
+
+CREATE TABLE user_progress (
+    email Utf8,
+    data Utf8,
+    updated_at Timestamp,
+    PRIMARY KEY (email)
+);

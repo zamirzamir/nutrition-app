@@ -1,0 +1,15 @@
+-- Таблица YDB для обратной связи («Нашли ошибку?»).
+
+-- ТЫ УЖЕ СОЗДАЛ таблицу без колонки archived → выполни ОДНУ строку (архив разобранных):
+ALTER TABLE feedback ADD COLUMN archived Bool;
+
+-- (Для чистой установки с нуля — вместо ALTER используй этот CREATE:)
+-- CREATE TABLE feedback (
+--     id Utf8,
+--     email Utf8,
+--     text Utf8,
+--     diag Utf8,
+--     archived Bool,
+--     created_at Timestamp,
+--     PRIMARY KEY (id)
+-- );

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Макет Б — «Слоновая кость»</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5EFE3; --card:#FDFAF3; --ink:#182420; --ink2:#3E4C46;
+    --gold:#A8842C; --gold2:#C9A84C; --green:#3E8E5A;
+    --muted:#8A8471; --line:rgba(24,36,32,.1); --gline:rgba(168,132,44,.35);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#d9d2c2;font-family:'Inter',sans-serif;display:flex;justify-content:center;padding:40px 12px;gap:40px;flex-wrap:wrap}
+  .note{position:fixed;top:10px;left:14px;color:#666;font-size:12px;z-index:9}
+  .phone{
+    width:392px;background:var(--bg);border-radius:44px;border:1px solid #c4bba6;
+    overflow:hidden;box-shadow:0 40px 100px rgba(60,50,20,.4);position:relative;color:var(--ink);
+    padding-bottom:78px;
+  }
+  /* ── шапка ── */
+  .top{
+    padding:52px 22px 22px;
+    background:linear-gradient(180deg,#182420 0%,#22332C 100%);
+    color:#F2ECDD;border-radius:0 0 30px 30px;position:relative;overflow:hidden;
+  }
+  .top::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,168,76,.25),transparent 70%)}
+  .hello{font-size:13px;color:#A7A089}
+  .hello b{color:#E8C96A;font-weight:600}
+  .day-title{font-family:'Playfair Display',serif;font-size:25px;margin-top:10px;line-height:1.2}
+  .day-title em{color:#E8C96A;font-style:italic}
+  .progress{margin-top:16px}
+  .progress .lbl{display:flex;justify-content:space-between;font-size:11px;color:#A7A089;margin-bottom:6px}
+  .progress .lbl b{color:#E8C96A}
+  .pbar{height:8px;border-radius:8px;background:rgba(242,236,221,.14);overflow:hidden}
+  .pbar i{display:block;height:100%;width:26%;border-radius:8px;background:linear-gradient(90deg,#C9A84C,#E8C96A)}
+  /* КБЖУ капсулы поверх шва */
+  .kbju{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 18px;margin-top:-1px;transform:translateY(-22px)}
+  .kb{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 8px;text-align:center;
+    box-shadow:0 10px 24px rgba(60,50,20,.12);
+  }
+  .kb .v{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink)}
+  .kb .t{font-size:9.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+  .kb .d{height:3px;border-radius:3px;margin-top:7px;background:rgba(168,132,44,.18);overflow:hidden}
+  .kb .d i{display:block;height:100%;background:var(--gold2)}
+  .kb.ok .d i{background:var(--green)}
+  /* ── секции ── */
+  .sec{padding:0 20px 6px;margin-top:-6px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:14px 0 12px}
+  .sec-head h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink)}
+  .sec-head a{font-size:12px;color:var(--gold);font-weight:600;text-decoration:none}
+  /* лента дней */
+  .days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .days::-webkit-scrollbar{display:none}
+  .dchip{min-width:50px;padding:9px 0;border-radius:14px;text-align:center;flex-shrink:0;background:var(--card);border:1px solid var(--line)}
+  .dchip .dw{font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+  .dchip .dn{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-top:1px;color:var(--ink)}
+  .dchip.past{opacity:.45}
+  .dchip.past .dn{text-decoration:line-through}
+  .dchip.cur{background:var(--ink);border-color:var(--ink)}
+  .dchip.cur .dn{color:#E8C96A}
+  .dchip.cur .dw{color:#A7A089}
+  /* карточка приёма — фото сверху, крупно */
+  .meal{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    margin-bottom:12px;box-shadow:0 12px 28px rgba(60,50,20,.1);
+  }
+  .meal .imgw{position:relative}
+  .meal img{width:100%;height:128px;object-fit:cover;display:block}
+  .meal .mt{
+    position:absolute;top:10px;left:10px;background:rgba(24,36,32,.82);color:#E8C96A;
+    font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:100px;
+  }
+  .meal .kcal{
+    position:absolute;bottom:10px;right:10px;background:rgba(253,250,243,.92);color:var(--ink);
+    font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:100px;
+  }
+  .meal .body{display:flex;align-items:center;gap:10px;padding:11px 14px}
+  .meal .mn{font-size:15px;font-weight:600;flex:1}
+  .meal .mk{font-size:11px;color:var(--muted);margin-top:2px}
+  .meal .btn{
+    background:var(--ink);color:#E8C96A;font-size:12px;font-weight:600;padding:9px 14px;border-radius:100px;white-space:nowrap;
+  }
+  .meal.eaten img{filter:grayscale(.7) brightness(1.05)}
+  .meal.eaten .btn{background:var(--green);color:#fff}
+  /* тренировка — светлая карточка с золотой рамкой */
+  .wcard{
+    display:flex;gap:12px;background:var(--card);border:1.5px solid var(--gline);border-radius:22px;
+    padding:12px;margin-bottom:12px;align-items:center;box-shadow:0 12px 28px rgba(60,50,20,.1);
+  }
+  .wcard img{width:86px;height:86px;border-radius:16px;object-fit:cover}
+  .wcard .wt{font-family:'Playfair Display',serif;font-size:17px}
+  .wcard .wm{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .wcard .tag{display:inline-block;background:rgba(62,142,90,.12);color:var(--green);font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:7px}
+  /* таббар светлый */
+  .tabbar{
+    position:absolute;bottom:0;left:0;right:0;height:72px;
+    background:rgba(253,250,243,.94);backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);display:flex;padding:0 8px;
+  }
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:9.5px;font-weight:600}
+  .tab .i{font-size:19px;filter:grayscale(1);opacity:.55}
+  .tab.on{color:var(--gold)}
+  .tab.on .i{filter:none;opacity:1}
+  .cap{color:#555;font-size:12px;text-align:center;margin-top:14px;max-width:392px}
+</style>
+</head>
+<body>
+<div class="note">Макет Б</div>
+<div>
+<div class="phone">
+  <div class="top">
+    <div class="hello">С возвращением, <b>Замир</b> 👋</div>
+    <div class="day-title">Среда · <em>день 23 из 90</em></div>
+    <div class="progress">
+      <div class="lbl"><span>Твой путь</span><b>26% позади</b></div>
+      <div class="pbar"><i></i></div>
+    </div>
+  </div>
+
+  <div class="kbju">
+    <div class="kb ok"><div class="v">1751</div><div class="t">ккал</div><div class="d"><i style="width:100%"></i></div></div>
+    <div class="kb"><div class="v">86/108</div><div class="t">белки</div><div class="d"><i style="width:80%"></i></div></div>
+    <div class="kb"><div class="v">41/60</div><div class="t">жиры</div><div class="d"><i style="width:68%"></i></div></div>
+    <div class="kb"><div class="v">120/195</div><div class="t">углев.</div><div class="d"><i style="width:62%"></i></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="days">
+      <div class="dchip past"><div class="dw">пн</div><div class="dn">21</div></div>
+      <div class="dchip past"><div class="dw">вт</div><div class="dn">22</div></div>
+      <div class="dchip cur"><div class="dw">ср</div><div class="dn">23</div></div>
+      <div class="dchip"><div class="dw">чт</div><div class="dn">24</div></div>
+      <div class="dchip"><div class="dw">пт</div><div class="dn">25</div></div>
+      <div class="dchip"><div class="dw">сб</div><div class="dn">26</div></div>
+      <div class="dchip"><div class="dw">вс</div><div class="dn">27</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Меню на сегодня</h2><a href="#">заменить →</a></div>
+    <div class="meal eaten">
+      <div class="imgw">
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103038_87fd1643-83ca-4de8-b5bc-e3a12bf201c0_min.webp" alt="">
+        <span class="mt">Завтрак</span><span class="kcal">412 ккал</span>
+      </div>
+      <div class="body">
+        <div><div class="mn">Шакшука с лавашом</div><div class="mk">Б 28 · Ж 18 · У 34</div></div>
+        <span class="btn">✓ Съел</span>
+      </div>
+    </div>
+    <div class="meal">
+      <div class="imgw">
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_103041_1e1110e3-defd-4304-a101-3498e5d3eebe_min.webp" alt="">
+        <span class="mt">Обед</span><span class="kcal">486 ккал</span>
+      </div>
+      <div class="body">
+        <div><div class="mn">Боул с индейкой и нутом</div><div class="mk">Б 36 · Ж 14 · У 52</div></div>
+        <span class="btn">Готовить</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Тренировка дня</h2><a href="#">вся неделя →</a></div>
+    <div class="wcard">
+      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EYFzeIMBFYcZn6fKkhmqrweQkZ/hf_20260708_125909_163daeee-4121-4b2f-a692-834466f8648b_min.webp" alt="">
+      <div>
+        <div class="wt">Всё тело · день B</div>
+        <div class="wm">6 упражнений · 2×12–15 · ~35 минут · 🏠 дома</div>
+        <span class="tag">🌱 адаптация · неделя 4</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab on"><span class="i">🍽</span>Питание</div>
+    <div class="tab"><span class="i">🏋️</span>Тренировки</div>
+    <div class="tab"><span class="i">🛒</span>Покупки</div>
+    <div class="tab"><span class="i">📈</span>Прогресс</div>
+    <div class="tab"><span class="i">👤</span>Профиль</div>
+  </div>
+</div>
+<p class="cap"><b>Макет Б — «Слоновая кость».</b> Дневной люкс: кремовый фон как меню дорогого ресторана, тёмно-зелёная шапка с золотом, КБЖУ-капсулы «переливаются» через шов, крупные фото блюд. Читается легче при дневном свете, золото выглядит дороже на светлом.</p>
+</div>
+</body>
+</html>
